@@ -1,0 +1,127 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/ProgramData/App-V/2191B702-5279-4048-91BA-BCF8F2A20B49/21710E5E-1DEB-4C76-9578-9609978C17F5/Root/examples
+vadd8bit
+Z0 V`JN@9S9cnhjKRR_L]QIcM3
+r1
+!s85 0
+31
+!i10b 1
+!s100 o4Q]5KkGk7M;[c@;izCBb1
+I^7GTBQiXhzhbQj0n[`cN?1
+Z1 dI:/551/EXE3
+w1455036340
+8I:/551/EXE3/add8bit.v
+FI:/551/EXE3/add8bit.v
+L0 1
+Z2 OE;L;10.3c;59
+!s108 1455036713.468000
+!s107 I:/551/EXE3/add8bit.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|I:/551/EXE3/add8bit.v|
+!i113 0
+Z3 o-work work -L mtiAvm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+vadd8bit_tb
+!s110 1455036713
+!i10b 1
+!s100 :dh^g]9RK^U<8Szbz9b9_1
+IgcM;Yk>F_C]i41C2DUfKL3
+R0
+R1
+w1455034308
+8I:/551/EXE3/add8bit_tb.v
+FI:/551/EXE3/add8bit_tb.v
+L0 1
+R2
+r1
+!s85 0
+31
+!s108 1455036713.692000
+!s107 I:/551/EXE3/add8bit_tb.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|I:/551/EXE3/add8bit_tb.v|
+!i113 0
+R3
+varith
+R0
+r1
+!s85 0
+31
+!i10b 1
+!s100 CZQ4;9G2lS5S^_FRAbbSM3
+I8mkW9VZ>cj<FD5I1CPZ@N0
+R1
+w1455036704
+8I:/551/EXE3/arith.v
+FI:/551/EXE3/arith.v
+L0 1
+R2
+!s108 1455036714.190000
+!s107 I:/551/EXE3/arith.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|I:/551/EXE3/arith.v|
+!i113 0
+R3
+varith_tb
+R0
+r1
+!s85 0
+31
+!i10b 1
+!s100 A`cOZ1akScF0N`O2Zm0151
+IG;oFAXfH]lV[nY@`=hjTR2
+R1
+w1455036547
+8I:/551/EXE3/arith_tb.v
+FI:/551/EXE3/arith_tb.v
+L0 1
+R2
+!s108 1455036714.465000
+!s107 I:/551/EXE3/arith_tb.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|I:/551/EXE3/arith_tb.v|
+!i113 0
+R3
+vFA
+R0
+r1
+!s85 0
+31
+!i10b 1
+!s100 zbWMgjZE_`oLNDm02L^BT1
+I<CZHBM:kNTS0PQF]@l[:72
+R1
+w1455036212
+Z4 8I:/551/EXE3/FA.v
+Z5 FI:/551/EXE3/FA.v
+L0 1
+R2
+!s108 1455036713.912000
+Z6 !s107 I:/551/EXE3/FA.v|
+Z7 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|I:/551/EXE3/FA.v|
+!i113 0
+R3
+n@f@a
+vfull_adder
+!s110 1455036145
+!i10b 1
+!s100 Zfffe2PGU5l^@zW7=AY7B2
+Igi8H8YKzBJOe3`UE`Ibde2
+R0
+R1
+w1455034232
+R4
+R5
+L0 1
+R2
+r1
+!s85 0
+31
+!s108 1455036145.479000
+R6
+R7
+!i113 0
+R3

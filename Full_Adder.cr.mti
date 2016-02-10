@@ -1,0 +1,29 @@
+I:/551/EXE3/arith.v {1 {vlog -work work -vopt -stats=none I:/551/EXE3/arith.v
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module arith
+
+Top level modules:
+	arith
+
+} {} {}} I:/551/EXE3/add8bit.v {1 {vlog -work work -vopt -stats=none I:/551/EXE3/add8bit.v
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module add8bit
+
+Top level modules:
+	add8bit
+
+} {} {}} I:/551/EXE3/add8bit_tb.v {1 {vlog -work work -vopt -stats=none I:/551/EXE3/add8bit_tb.v
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module add8bit_tb
+
+Top level modules:
+	add8bit_tb
+
+} {} {}} I:/551/EXE3/FA.v {1 {vlog -work work -vopt -stats=none I:/551/EXE3/FA.v
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module FA
+
+Top level modules:
+	FA
+
+} {} {}}
