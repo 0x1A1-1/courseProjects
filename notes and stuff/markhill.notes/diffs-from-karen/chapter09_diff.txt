@@ -1,0 +1,921 @@
+1,4c1
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 9 - Procedures</title>
+< </head>
+---
+> <!--#include virtual="style1.html" -->
+6,7c3,4
+< <BODY>
+< <h1> Chapter 9 -- Procedures</h1>
+---
+> Lecture Notes for
+> Chapter 9 -- Procedures <!-- EDIT CHAPTER INFO -->
+9c6,12
+< <pre>
+---
+> <!--#include virtual="style2.html" -->
+> 
+> Monday, November 19, 2001 <!-- EDIT LAST UPDATE DATE -->
+> 
+> <!--#include virtual="style3.html" -->
+> 
+> </PRE><b>NOT YET UPDATED FOR FALL 2003</b><PRE>
+11,12c14,18
+< All about Procedures
+< --------------------
+---
+> 
+> *******************************************************************
+> *  Students should read UPDATED Chapter 9 handout from web page,  *
+> *  which is more up to date than Chapter 9 in the textbook.       *
+> *******************************************************************
+28a35,50
+> 
+> BEGIN WARNING {
+> 
+>    These notes first give concepts behind procedure linkage
+> 
+>    Near the end, we give the precise MIPS/354 conventions we use
+> 
+>    When writing programs, use the MIPS/354 conventions
+>    (e.g., the stack is expanded on entering a procedure, not
+>    each time a procedure is called)
+> 
+>    This will make more sense later
+> 
+> } END WARNING
+> 
+> 
+115c137
+< jr (jump register) is a new instruction --
+---
+> jr is a new instruction --
+124,125c146,147
+< The MIPS R2000 architecture (MAL) provides a convenient instruction
+< for procedure calls.  
+---
+> MIPS R2000 (MAL, actually) provides a convenient instruction for procedure
+> calls.  
+159,161c181,182
+< one problem with this scheme.  What happens if a procedure
+< calls itself (recursion), or if a procedure calls another
+< procedure (nesting) (using jal)?
+---
+> One problem with this scheme.  What happens if a procedure
+> calls another procedure (nesting) (using jal)?
+190c211
+<        The value in register $ra ($31) gets overwritten with each
+---
+>        The value in register $31 gets overwritten with each
+194a216,238
+> Even more exciting, what happens if a procedure
+> calls itself (recursion)?
+> 
+> 
+>              jal proc1
+> 	     .
+> 	     .
+> 	     .
+> 	     jal proc1
+> 	     .
+> 	     .
+> 	     .
+> 
+> 
+>    proc1:    .
+> 	     .
+> 	     jal proc1
+> 	     .
+> 	     .
+> 	     jr  $ra
+> 
+> 
+> 
+201,202c245,246
+< These return addresses will need to be used (for returning)
+< in the reverse order that they are saved.
+---
+> These return addresses will need to be used in the reverse
+> order that they are saved.
+204,205c248
+< The best way to save dynamically generated data that is needed
+< in the reverse order it is generated is on a STACK.
+---
+> The best way to save dynamically generated data is on a stack.
+213c256
+<   that many (most?) computer systems predefine a stack, the SYSTEM STACK.
+---
+>   that many computer systems predefine a stack, the SYSTEM STACK.
+219c262
+<       In this case, it is the amount of storage that cannot be
+---
+>       in this case, it is the amount of storage that cannot be
+225,226c268
+<   on the MIPS architecture:
+< 
+---
+>  largest
+228,230c270,272
+<     0     | your    |
+<           | program |
+<           | here    |
+---
+>           | system  |   |
+>           | stack   |   |  grows towards smaller addresses
+>           | here    |  \|/
+234,239c276,279
+<           |         |
+<           |         |
+<           | system  |  / \
+<   very    | stack   |   |  grows towards smaller addresses
+<  large    | here    |   |
+<  addresses
+---
+>           | your    |
+>           | program |
+>   Address | here    |
+>      0    |         |
+247,248c287
+<        addresses.  Their picture would show address 0 at the
+<        bottom (unlike my picture).
+---
+>        addresses.  
+255,257c294,296
+<  (the next available) at the top of the stack.  The stack pointer
+<  is register $29, also called $sp, and it is defined before program
+<  execution begins.
+---
+>  at the top of the stack.  The stack pointer is register $29,
+>  also called $sp, and it is defined before program execution
+>  begins.
+267,268c306,307
+<     sub  $sp, $sp, 4     # a "better" implementation, since it allocates
+<     sw   $?, 4($sp)      # the space before using the space.
+---
+>     sub  $sp, $sp, 4
+>     sw   $?, 4($sp)
+277,278c316,317
+<     lw  $?, 4($sp)       # a "better" implementation, since it copies
+<     add $sp, $sp, 4      # the data out before deallocating the space
+---
+>     lw  $?, 4($sp)
+>     add $sp, $sp, 4
+282a322,344
+> 
+>  ALWAYS CHANGE $sp BEFORE IN PUSH AND AFTER IN POP SO THAT
+>  INTERUPTS (surprise calls, Chapter 12) DON'T CLOBBER DATA.
+> 
+> Often a procedure push/pops many things.  
+> 
+>    addi  $sp,$sp,-4
+>    sw    $8,  4($sp)
+>    addi  $sp,$sp,-4
+>    sw    $9,  4($sp)
+>    addi  $sp,$sp,-4
+>    sw    $10, 4($sp)
+> 
+> Why bother to change $sp each time?
+> 
+>    addi  $sp,$sp,-12
+>    sw    $8, 12($sp)
+>    sw    $9,  8($sp)
+>    sw    $10, 4($sp)
+> 
+>    similar for pop
+> 
+> 
+297,300c359,361
+< doit: 
+<        sub $sp, $sp, 4     # save return address
+<        sw  $ra, 4($sp)
+< 
+---
+> doit:  
+>        sub $sp, $sp, 4 	   # allocate space for return address
+>        sw $ra, 4($sp)       # save return address
+309,312c370,372
+< 
+<        lw  $ra, 4($sp)      # restore return address
+<        add $sp, $sp, 4
+<        jr  $ra
+---
+>        lw $ra, 4($sp)       # restore return address
+>        add $sp, $sp, 4     # deallocate space
+>        jr $ra
+319c379
+< From a compiler's point of view, there are a bunch of things
+---
+> from a compiler's point of view, there are a bunch of things
+324a385,386
+>      local variables 
+>      temporary variables
+333c395
+< Space for a stack frame gets allocated on the stack each time
+---
+> Space for a stack frame gets placed on the stack each time
+365a428,434
+> A:  jal C
+>     jal D
+>     jr $ra
+> 
+> 
+> 
+> 
+382,384c451,453
+<    the body of the procedure.  That way, the compiler does not
+<    need to know the size of a procedure's frame (when producing
+<    the code where the call is).
+---
+>    the called procedure.  That way, the person writing the calling
+>    procedure (or the compiler) does not need to know the size of 
+>    the called procedure's frame.
+417a487
+>     
+420,421c490,491
+< 	declared without the 'var' in front of the variable name.
+< 	Fortran doesn't offer this type of parameter.
+---
+> 	declared without the var in front of the variable name.
+> 	Fortran doesn't have this type of parameter.
+430,431c500
+<         "var type" parameters.  C does not offer this type of
+< 	parameter.
+---
+>         "var type" parameters.
+443c512,513
+<    access to the variable is made through its address.
+---
+>    access to the variable is made through its address.  This
+>    is what is done in C.
+480,481c550,551
+< Place the parameters to a procedure (function) on the stack.
+< The parameters go between the caller and callee's AR.
+---
+> place the parameters to a procedure (function) in the activation
+> record (AR) for the procedure.
+487d556
+<        add $sp, $sp, 8   # deallocate space for parameters
+499c568
+<        add $sp, $sp, 12  # remove AR of proc
+---
+>        add $sp, $sp, 20  # remove AR of proc
+508d576
+< 		  deallocates space for parameters (when appropriate)
+511c579
+< 		  deallocates AR of procedure
+---
+> 		  deallocates AR of procedure (or at least most of it)
+522c590
+< $a0-a3) is allocated in the caller's AR !!
+---
+> $a0-a3) is allocated in the procedure's AR !!
+551,581d618
+< 
+< 
+< The example re-written, to do things the MIPS way.  Note that this is
+< only a code fragment. It does not show everything (like saving $ra).
+< 
+<    procA:  # receives 3 parameters is in $a0, $a1, and $a2.
+<            # The caller of procA has allocated space for $a0-$a3
+< 	   # at the top of the stack.
+< 
+< 	   # assume that procA has an activation record of 5 words.
+<          sub  $sp, $sp, 20   # allocate space for AR
+< 
+<          # save procA's parameters
+< 	 sw   $a0, 24($sp)
+< 	 sw   $a1, 28($sp)
+< 	 sw   $a2, 32($sp)
+<          # set up procB's parameters
+<          move $a0, $24 
+<          move $a1, $9 
+<          jal  procB     # the nested procedure call
+< 
+<          # procA continues after procB returns
+<          # procA's parameters are needed, so restore them
+< 	 lw   $a0, 24($sp)
+< 	 lw   $a1, 28($sp)
+< 
+< 
+<   In this code fragment,  procA saves its 3rd parameter (from $a2)
+<   on the stack.  Is this necessary (given that procB only receives
+<   2 parameters)?  Why or why not?
+< 
+586,587c623,625
+< 	proc1 layout:
+< 	    allocate AR (include space for outgoing parameters) 
+---
+> 	procedure layout:
+> 	    allocate remainder of AR ( includes space for the
+> 		procedure's parameters)
+592,594c630,631
+< 	    to set up and call proc2,
+< 	       place current parameters (from $a0-a3) into previously allocated
+< 	           space
+---
+> 	    to set up a call to proc2,
+> 	       place current parameters (from $a0-a3) into AR of procedure
+597,598c634,635
+< 	       copy any return values out of $v0-v1, $a0-a3
+< 	       restore current parameters back to $a0-a3
+---
+> 	       copy any return values out of $v0-v1, $a0-$a3
+> 	       restore current parameters from AR back to $a0-a3
+609a647,702
+> more about parameter passing.
+> 
+>   a trivial example that contains nested calls, so saves
+>   current parameters on the stack:
+> 
+>   # a set of procedures that do the following,
+>   # if a < b, then switch a with b and decrement both
+> 
+> 
+>   # a is in register 20
+>   # b is in register 21
+> 
+>   .text
+> 
+>             sub $8, $20, $21
+> 	    bgtz $8, othercode
+> 	    move $a0, $20           # place parameters in registers
+> 	    move $a1, $21    
+> 	    jal s_and_d
+> 	    move $20, $a0           # copy out return values
+> 	    move $21, $a1    
+>  othercode: 
+> 
+> 	    done
+> 
+>  # switch is a procedure to switch its 2 parameters, and then
+>  #   decrement each of the 2 parameters
+>  #   $a0 ($4) -- first parameter
+>  #   $a1 ($5) -- second parameter
+>  #   $8 -- temporary for switching
+>  s_and_d:   sub  $sp, $sp, 20     # allocate frame for switch
+> 	    sw   $ra, 20($sp)     # save return address on stack
+> 
+> 	    move $t0, $a0         # switch the 2 parameters
+> 	    move $a0, $a1         # $t0 is alias for $8
+> 	    move $a1, $t0
+> 
+>             sw   $a0, 16($sp)     # save current parameters
+>             sw   $a1, 12($sp)
+> 	    jal  decrement        # the parameter to decrement is already
+> 				  # in $a0.
+>             lw   $a0, 12($sp)     # set up parameter in $a0
+> 	    jal  decrement
+> 	    move $a1, $a0         # copy return value
+> 	    lw   $a0, 16($sp)     # restore current parameter
+> 
+> 	    lw   $ra, 20($sp)     # get return address
+> 	    jr   $ra
+> 
+> # procedure decrement subtracts 1 from its parameter
+> #   $a0 -- parameter to be decremented
+> decrement:  addi $a0, $a0, -1
+> 	    jr $ra
+> 
+> 
+> 
+667,672c760,765
+<   |       | ------ procedure's frame
+<   ---------    
+<   |param 2|    
+<   ---------    
+<   |       |    
+<   ---------    
+---
+>   |       |   |--- procedure's frame
+>   ---------   |
+>   |param 2|   |
+>   ---------   |
+>   |       |   |
+>   --------- ---
+691,696c784,789
+<   |       | ------ procedure's frame
+<   ---------    
+<   |param 2|    
+<   ---------    
+<   |       |    
+<   ---------    
+---
+>   |       |   |--- procedure's frame
+>   ---------   |
+>   |param 2|   |
+>   ---------   |
+>   |       |   |
+>   --------- ---
+716c809
+<   ---------   |-- procedure's frame
+---
+>   ---------   |
+719,724c812,817
+<   |       | ---   <-- frame pointer
+<   ---------    
+<   |param 2|    
+<   ---------    
+<   |       |
+<   ---------
+---
+>   |       |   |--- procedure's frame
+>   ---------   |
+>   |param 2|   |
+>   ---------   |
+>   |       |<- frame pointer 
+>   --------- ---
+732c825
+< parameter 2 will be at  4(frame pointer)
+---
+> parameter 2 will be at -4(frame pointer)
+736c829
+< parameter 2 is at  4($16)
+---
+> parameter 2 is at -4($16)
+763c856
+<     add  $16, $sp, 8  # set procedure's frame pointer
+---
+>     add  $16, $sp, 16  # set procedure's frame pointer
+767d859
+<     # Note that all accesses to procedure's AR is done with offsets from $16
+769c861
+<     lw   $ra, ($16)    # restore return address
+---
+>     lw   $ra, -8($16)   # restore return address
+771c863
+<     lw   $16, -4($16)  # restore callers frame pointer
+---
+>     lw   $16, -12($16) # restore callers frame pointer
+786c878
+<   | return address | <--- $16 (frame pointer)
+---
+>   | return address |
+790c882
+<   | space for P1   |
+---
+>   | space for P1   |<--- $16 (frame pointer)
+834c926
+<    $t0-$t9 are aliases for $8-15, $24-$25
+---
+>    $t0-$t8 are aliases for $8-15, $24-$25
+841c933
+< 
+---
+> </pre>
+845,846c937
+< what the mechanisms should look like from the compiler's
+< point of view:
+---
+> The CS/ECE 354 calling convention (adapted from the MIPS convention):
+847a939,1067
+> <ol>
+> <li><b>Correct usage of registers.</b>
+> All $s registers must be preserved across procedure calls.
+> That is, if procedure A calls procedure B, then A can safely assume
+> that the $s registers will contain the same values upon the return
+> from B.
+> <p>
+> $t registers do not need to be preserved across procedure calls; however,
+> if they contain live values, they should be saved before making a call.
+> That is, procedure A should save any $t registers containing live values
+> before calling procedure B, because procedure B is free to overwrite any $t
+> register. (Note: a register contains a "live value" if it could be read
+> before being written).
+> <li><b>Parameter location.</b>
+> The first four parameters to any procedure are passed in registers
+> $a0-$a3.  The first parameter always goes in $a0.
+> If there are more than 4 parameters to a procedure, the first
+> four still go in registers $a0-$a3, and the remaining ones go
+> on the stack.
+> <li><b>Space within activation record for parameters.</b>
+> The MIPS RISC conventions state that a procedure must allocate
+> space in its activation record for all out-going parameters.
+> Because the activation record is allocated/deallocated at the
+> beginning/end of the procedure, it must contain space for the
+> <b>maximum</b> number of outgoing parameters.
+> For example, if a procedure calls one procedure with 2 parameters,
+> calls another procedure with 1 parameter,
+> and calls yet a third procedure with 7 parameters,
+> it must allocate space for
+> 7 parameters in the activation record.
+> This space is reused for each set of parameters.
+> Some of this parameter space may be unused for some calls, but it must be
+> allocated.
+> Allocate a minimum of 4 words.
+> <li><b>Frame pointer.</b>
+> You do not need to use a frame pointer.  
+> If you wish to use a frame pointer, dedicate an $s register to
+> be the frame pointer.  Because the activation record size
+> does not change in the body of the procedure, it is possible to
+> access anything in the activation record, as well as the parameters passed
+> to a procedure using the stack pointer.
+> <li><b>Size of activation record.</b>
+> There are two choices for the size of a procedure's activation
+> record.  A compiler would either allocate an activation record
+> that is the same size for ALL procedures (and it would contain
+> extra, unused space for many procedures), or it would allocate
+> an activation record that is exactly the correct size for
+> a procedure.  This size would be different for different procedures.
+> You may implement either of these choices, but be consistant
+> within your program.
+> <li><b>About leaf procedures.</b>
+> A leaf procedure is one that contains no calls to other procedures.
+> There would be no <code>jal</code> instruction within a leaf
+> procedure.
+> You are not required to allocate or use an activation record 
+> for leaf procedures, unless you need space for local variables or
+> to save $s registers.
+> Therefore, you do not need to save the return address (on
+> the stack) for a leaf procedure.
+> </ul>
+> <ul>
+> Here is an abstract diagram of what an activation record on the
+> stack will contain.
+> Note that the ordering of data within the activation record
+> will be the same for all procedures.
+> Here are activation records for procedures A and B.
+> Assume that procedure A calls procedure B, and passes 5 parameters.
+> Assume that procedure B calls procedure C, and passes 1 parameter.
+> <pre>
+>         |                | largest addresses
+>         |----------------|
+>         |                |
+>         |----------------|
+>         |                |
+>         |----------------|
+>         |                |
+>         |================|
+>         | A's local      | --| <-- A's frame pointer
+>         | variables      |   |
+>         |----------------|   |
+>         | any $t regs    |   |
+>         | used by A, that|   |
+>         | must be preser-|   |
+>         | ved across the |   |
+>         | call to B      |   |
+>         |----------------|   |---- procedure A's activation record
+>         | copy of $ra    |   |
+>         | A's return addr|   |
+>         |----------------|   |
+>         | any $s regs    |   |
+>         | used by A      |   |
+>         |----------------|   |
+>         | 5 words,       |   |
+>         | parameters     |   |
+>         | from A to B    | --|
+>         |================|
+>         | B's local      | --|<-- A's $sp, B's frame pointer
+>         | variables      |   |
+>         |----------------|   |
+>         | any $t regs    |   |
+>         | used by B, that|   |
+>         | must be preser-|   |
+>         | across a call  |   |
+>         | to C           |   |
+>         |----------------|   |---- procedure B's activation record
+>         | copy of $ra    |   |
+>         | B's return addr|   |
+>         |----------------|   |
+>         | any $s regs    |   |
+>         | used by B      |   |
+>         |----------------|   |
+>         | 4 words,       |   |
+>         | space for $a0- |   |
+>         | $a3 if needed  |   |
+>         | (parameters    |   |
+>         | from B to C)   | --|
+>         |================|
+>         |                | <-- B's $sp
+>         |----------------|
+>         |                | smallest address
+> </pre>
+> </ul>
+> Notes:
+> <ul>
+> <li> The frame pointer is always equal to the stack pointer plus the size of the
+> activation record.  
+> <li> Procedure B allocates 4 words for parameters, although it is only 
+> passing one parameter to C.
+> </ul>
+849,903c1069,1071
+< THE CODE:
+< 
+<    call setup
+<    procedure call
+<    return cleanup
+<    .
+<    .
+<    .
+< procedure:  prologue
+< 
+<             calculations
+< 
+<             epilogue
+< 
+< 
+< 
+< CALL SETUP
+<   place current parameters into stack (space already allocated by
+<     caller of this procedure)
+<   save any TEMPORARY registers that need to be preserved across the
+<      procedure call
+<   place first 4 parameters to procedure into $a0-$a3
+<   place remainder of parameters to procedure into allocated space
+<      within the stack frame
+< 
+< 
+< 
+< PROLOGUE
+<   allocate space for stack frame
+<   save return address in stack frame
+<   copy needed parameters from stack frame into registers
+<   save any needed SAVED registers into current stack frame
+< 
+< 
+< EPILOGUE
+< 
+<   restore (copy) return address from stack frame into $ra
+<   restore from stack frame any saved registers (saved in prologue)
+<   de-allocate stack frame
+<      (move $sp so the space for the procedure's frame is gone)
+< 
+< 
+< RETURN CLEANUP
+<   copy needed return values and parameters from $v0-v1, $a0-a3, or stack
+<      frame to correct places
+<   restore any temporary registers from stack frame (saved in call setup)
+< 
+< 
+< 
+< An excellent and detailed example -- written by Prof. David Wood
+< 
+< # procedure: procA
+< # function: demonstrate CS354 calling convention
+< # input parameters: $a0 and $a1
+< # output (return value): $v0
+---
+> <pre>
+> # inputs: $a0 and $a1
+> # outputs: $v0
+906,907c1074,1075
+< # local variables: 5 integers named R, S, T, U, V
+< # procA calls procB with 5 parameters (R, S, T, U, V).
+---
+> # local variables: 5 integers, R, S, T, U, V
+> # Calls procB with 5 parameters
+914,928c1082,1096
+< #	|    V    |  60($sp)       --|
+< #	|    U    |  56($sp)         |
+< #	|    T    |  52($sp)         |
+< #	|    S    |  48($sp)         |
+< #	|    R    |  44($sp)         |
+< #       |   $t1   |  40($sp)         |
+< #       |   $t0   |  36($sp)         | --  A's activation record
+< #       |   $ra   |  32($sp)         |
+< #       |   $s1   |  28($sp)         |
+< #       |   $s0   |  24($sp)         |
+< #       | out arg4|  20($sp)         |
+< #       | out $a3 |  16($sp)         |
+< #       | out $a2 |  12($sp)         |
+< #       | out $a1 |   8($sp)         |
+< #       | out $a0 |   4($sp)       --|
+---
+> #	|    R    |  60($sp)
+> #	|    S    |  56($sp)
+> #	|    T    |  52($sp)
+> #	|    U    |  48($sp)
+> #	|    V    |  44($sp)
+> #       |   $t1   |  40($sp)
+> #       |   $t0   |  36($sp)
+> #       |   $ra   |  32($sp)
+> #       |   $s1   |  28($sp)
+> #       |   $s0   |  24($sp)
+> #       | out arg4|  20($sp)
+> #       | out $a3 |  16($sp)
+> #       | out $a2 |  12($sp)
+> #       | out $a1 |   8($sp)
+> #       | out $a0 |   4($sp)
+930,933c1098
+< #       |         | <-- $sp        ---
+< #       |         |                  |
+< #       |         |                  |   --  where B's activation record
+< #       |         |                  |        will be
+---
+> #       |         | <-- $sp
+946,947c1111
+<   	# save current (live) parameters into the space specifically
+< 	# allocated for this purpose within caller's stack frame
+---
+>   	# save current (live) parameters into caller's stack frame
+954,958c1118,1122
+< 	lw $a0, 44($sp)		# load R into $a0
+< 	lw $a1, 48($sp)		# load S into $a1
+< 	lw $a2, 52($sp)		# load T into $a2
+< 	lw $a3, 56($sp)		# load U into $a3
+< 	lw $t0, 60($sp)		# load V into a temp register
+---
+> 	lw $a0, 60($sp)		# load parameter
+> 	lw $a1, 56($sp)		# ditto
+> 	lw $a2, 52($sp)		# ditto
+> 	lw $a3, 48($sp)		# ditto
+> 	lw $t0, 44($sp)		# ditto
+989d1152
+< 
+991,996c1154,1155
+< An important detail for 354 students writing MAL code and using
+< the simulator:
+<    The I/O instructions  putc, puts, and getc are implemented
+<    as functions within the operating system.  They are not
+<    actual instructions on a MIPS R2000 processor. (In general,
+<    NO modern architecture has explicit input/output instructions.)
+---
+> </pre>
+> <pre>
+998,1002c1157
+<    Parameters get passed to the operating system, and return values
+<    get set by the functions implementing putc, puts, and getc.
+<    Therefore, in general, you must assume that $a0-$a3 and $v0-$v1
+<    will be overwritten during the execution of any putc, puts, or
+<    getc instruction.
+---
+> THE CODE:
+1004,1005c1159,1165
+<    In practice, I believe the simulator is implemented to only
+<    change values in $a0 and $v0.
+---
+>    call setup
+>    procedure call
+>    return cleanup
+>    .
+>    .
+>    .
+> procedure:  prologue
+1007c1167,1169
+< 
+---
+>             body of procedure
+> 
+>             epilogue
+1009,1054c1171,1209
+< Functions
+< ---------
+< Functions are just procedures that return a value.
+< 
+< For Java programmers, functions are methods.
+< 
+< A function sets a return value, and this return value is available
+< (set) after the function returns.  So, a return value is similar to
+< a parameter, only the flow of information is the reverse.
+< 
+< The location of a function return value follows the same rules
+< as the location of parameters.  We could place a function return
+< value
+<   1.  in a register
+<   2.  on the stack
+<       The caller would allocate space for both outgoing parameters
+<       AND return values in its activation record.  The function
+<       places the return value into this allocated space.
+<       The caller then has the return value in this allocated 
+<       space.
+<   3.  in a set-aside memory location (not on the stack)
+<       Just like for parameters, this location for a return value
+<       will not work for a recursive function.
+< 
+< The MIPS architecture specifies that a return value is placed
+< into a register.  In fact, there are two registers set aside
+< for this purpose:
+< 
+<         $2  is also called $v0
+< 	and
+< 	$3  is also called $v1
+< 
+< an example code fragment:
+< 
+<              jal  function1      # y = function1();
+<              sw   $v0, y
+<              .
+<              .
+<              .
+<  function1:  # the function does calculations
+<              .
+<              .
+<              .
+< 	     # and then sets the return value
+< 	     move $v0, $t0       # the return value was in $t0
+< 	     jr   $ra
+---
+> 
+> 
+> 
+> CALL SETUP
+>   place current (live) parameters into caller's stack frame
+> 	e.g., 
+> 		sw $a0, 40($sp)
+> 		sw $a1, 44($sp)
+>   save any temporary registers that need to be preserved across the
+>      procedure call
+> 	e.g., 
+> 		sw $t0, 20($sp)
+>   place first 4 parameters to procedure into $a0-$a3
+>   place remainder of parameters to procedure into newly allocated space
+> 
+> 
+> 
+> 
+> PROLOGUE
+>   allocate space for stack frame (activation record), including enough
+>      space for any outgoing parameters
+>      	e.g.,
+> 		sub $sp, $sp, 40
+>   save return address in stack frame
+>   copy needed parameters from stack frame into registers
+>   save any needed saved registers into current stack frame
+> 
+> 
+> EPILOGUE
+>   restore (copy) return address from stack frame into $ra
+>   restore from stack frame any saved registers (saved in prologue)
+>   pass back return value(s), if any
+>   de-allocate stack frame (or most of it)
+>      (move $sp so the space for the procedure's frame is gone)
+> 
+> 
+> RETURN CLEANUP
+>   copy needed return values from $v0-v1
+>   restore any temporary registers from stack frame (saved in call setup)
+1059a1215,1248
+> REVISITING PROCEDURES.
+> 
+> 
+> What needs to be done depends on HLL.
+> The order is fairly consistent.
+> What is done by caller/callee varies from implementation to implementation.
+> 
+> 
+> Needed:
+>  --> items to go in activation record.
+> 
+>    return address
+>    frame pointer (if used)
+>    parameters
+>    local variables  --|  may be some overlap here
+>    saved registers  --|
+> 
+> 
+>  --> mechanism
+> 
+>  before ANY procedure CALL
+>  1.  caller gets parameters into correct location
+>  2.  space is allocated for part of activation record
+>  then
+>  3.  control is transfered to procedure
+> 
+>  before procedure RETURN
+>  1.  put return values into correct location
+>  2.  restore anything that needs to be restored (return address, callee
+>      saved registers, frame pointer)
+>  3.  remove activation record
+>  then
+>  4.  jump to return location
+> 
+1064c1253
+<     callee's activation records.
+---
+>     callees activation records.
+1066c1255
+<  -- use of frame pointer can reduce amount of code.  It gives a better
+---
+>  -- use of frame pointer reduces amount of code.  It gives a better
+1070c1259
+<     space allocated for activation record may be different than
+---
+>     space allocated for activation record may be different then
+1078,1079c1267,1286
+<       always allocate space in activation record for all parameter
+<       registers, even if there are fewer than 4 parameters.
+---
+>       always allocate space in activation record for all parameters,
+>       even if there are less than 4.
+> 
+> Footnote:
+> 
+> An important detail for 354 students writing MAL code and using
+> the simulator:
+>    The I/O instructions  putc, puts, and getc are implemented
+>    as functions within the operating system.  They are not
+>    actual instructions on a MIPS R2000 processor. (In general,
+>    NO modern architecture has explicit input/output instructions.)
+> 
+>    Parameters get passed to the operating system, and return values
+>    get set by the functions implementing putc, puts, and getc.
+>    Therefore, in general, you must assume that $a0-$a3 and $v0-$v1
+>    will be overwritten during the execution of any putc, puts, or
+>    getc instruction.
+> 
+>    In practice, I believe the simulator is implemented to only
+>    change values in $a0 and $v0.
+1081d1287
+< </pre>
+1082a1289
+> <!--#include virtual="style4.html" -->

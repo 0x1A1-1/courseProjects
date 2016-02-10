@@ -1,0 +1,808 @@
+<HTML>
+<HEAD>
+<TITLE>CS/ECE 354 Spring 2000 (Section 2)</TITLE>
+</HEAD>
+
+<BODY> 
+
+<!--  { BEGIN COMMENT
+	I will comment this way.
+END COMMENT } -->
+ 
+<HR> <!-- ------------------------------------------------ -->
+<IMG align=middle width=152 height=62 border=0 ALIGN=TOP SRC="/pics/logo.small.gif" ALT="University of Wisconsin - Madison"></A>
+<H1>CS/ECE 354: Machine Organization and Programming</H1>
+<H2>Spring 2000</H2>
+<H2>David A. Wood's Section 2 </H2>
+<H2>Return to <a href="http://www.cs.wisc.edu/~cs354-1/cs354.html">CS/ECE 354 Home Page</a></H2>
+<HR> <!-- ------------------------------------------------ -->
+<H2>Approximate Lecture Notes for
+Chapter 7 -- Data Structures</H2>
+<P>
+Purpose: I provide these notes to students to:
+<UL>
+<LI> Allow better concentration in lecture by reducing note-taking pressure.
+<LI> Provide a study-aid after lecture.
+</UL>
+<P>
+Disclaimers:
+<UL>
+<LI> I will not follow these notes exactly in class.
+<LI> Students are responsible for what I say in class.
+<LI> Reading these notes is not a substitute for attending lecture.
+<LI> These notes probably contain errors.
+</UL>
+<P>
+Acknowledgement:
+<UL>
+<LI> These notes are derived from the notes of Karen Miller and Mark Hill,
+sometimes with substantial and sometimes with trivial changes.
+</UL>
+<HR> <!-- ------------------------------------------------ -->
+<pre>
+
+Outline
+	memory as an array
+	arrays
+	stacks
+	queues
+
+
+Memory
+------
+
+	Before we considered individual memory locations
+	Identified by label or address
+	Now we will consider what all of memory is
+
+
+memory is an array
+    it is a giant array of bytes (picture needed here!)
+    the element numbering starts at 0
+    the element number is an address
+
+In C:
+	char m[size_of_memory];
+
+In Pascal:
+	m: array [0..size_of_memory-1] of char;
+
+In Sal, you don't have to declare m[]!
+
+Example
+
+	.data
+ mychar:	.byte 
+ newline:	.byte '\n'
+	...
+	.text
+	...
+	get mychar
+	beq mychar, newline, found_newline
+	...
+found_newline: ...
+
+
+	address 	memory		comment
+	------		------		-------
+
+	20		0x00		mychar w/ initial value '\0'
+	21		0x0c		newline w/ value '\n'
+
+	.text
+
+	get 20				# address of mychar for result
+	beq m[20], m[21], found_newline # compare values, not addresses
+	...
+found_newline: ...
+
+
+
+    m[address]    refers to the element at address
+    m[20]   is the byte numbered address 20, the 21-st byte of memory.
+	  
+	  important:  20 is the address
+		      m[20] is the contents of the byte at address 20
+
+
+What about integers?
+	Use 4-bytes beginning at address that is multiple of 4
+	So at address 20, want bytes 20, 21, 22, and 23
+	Denote with M[20] vs. m[20]
+
+	Like m[], need not declare M[]
+
+
+[[Chapter 7 mixes introducing addresses with introducing arrays.  
+This example introduces addresses to expose "what's really happening".
+Note that the careful student may notice some incorrect details (e.g., the 
+destination of the add should be an address not a value).]]
+
+		  .data
+	n:	  .word  1
+	n2:	  .word  -1
+	newline:  .byte	'\n'
+	str1:	  .asciiz "Enter number "
+
+		  .text
+	__start:  puts str1
+		  get n
+		  add n2, n, n
+
+
+The assembler/linker will expand the .data segment to:
+
+
+	address 	memory		comment
+	------		------		-------
+
+	40		0x00		n: 1 in 2SC
+	41		0x00
+	42		0x00
+	43		0x01	
+	44		0xff		n2: -1 in 2SC
+	45		0xff
+	46		0xff
+	47		0xff	
+	48		0x0c		newline: '\n' in ASCII
+	49		0x45		str1: 'E' in ASCII
+	50		0x6e		      'n' in ASCII
+	...		...
+	60		0x72		      'r' in ASCII
+	61		0x20		      ' ' in ASCII
+	62		0x00		      '\0' in ASCII
+
+
+		  .text
+	__start:  puts 49 		# expects address for a string (str1)
+		  get 40		# expects an address (n)
+		  add M[44], M[40], M[40] # expects "values"
+
+	Real machine codes have addresses for variables, not labels.
+
+	Later, we will show how to store instructions and get rid
+	of branch labels.  Then the .text segment with look similar
+	to the .data segment.
+
+Endian-ness (c.f., Gullivers Travels)
+-----------
+If you always 
+
+* store a word at address A (a multiple of 4) then load a word from address A 
+* store a byte at address A then load a byte from address A 
+
+then this section can be ignored.
+
+But what happens if:
+
+        .data
+  n:    .word 0x61626364 # ASCII for 'a', 'b', 'c', 'd'
+  addr:	.word
+
+        .text
+ __start: la addr, n
+        put m[addr]
+	put '\n'
+        done
+
+Do you print 'a' or 'd'?
+
+Answer: 'a' since simp/sim on Sun SPARC is Big Endian
+
+	40: 0x61
+	41  0x62
+	42  0x63
+	43  0x64
+
+Big Endian -- smallest address is most sigificant -- IBM, Motorola, Sun
+
+Little Endian -- smallest address is least significant -- DEC VAX, Intel
+
+Answer: 'd'
+
+	40: 0x64
+	41  0x63
+	42  0x62
+	43  0x61
+
+Note: simp/sim inherits endianness from the underlying machine, so if
+you run simp/sim on an Intel PC it is Little Endian.
+
+Bi-endian -- have to to select -- DEC Alpha???, MIPS???
+
+ARRAYS
+------
+
+array implementation is important
+ 1. most assembly languages have no concept of arrays
+ 2. from an array, any other data structure we might want can be built
+
+Properties of arrays:
+ 1. each element is the same size (char = 1 byte, integer = 1 word)
+ 2. elements are stored contiguously, with the first element
+    stored at the smallest memory address
+
+so, the whole trick in assembly language is
+  1.  allocate correct amount of space for an array
+  2.  an ADDRESS tells the location of an element
+
+
+SAL declarations of arrays within memory
+
+    to allocate a portion of memory (more than a single variable's worth)
+      (allocating an array within memory)
+
+
+     variablename:  type     initvalue:numelements
+
+
+       type is just like before --   .byte, .word or .float
+       numelements is just that,
+	   numbering ALWAYS starts at 0
+       initvalue is a value given to each element of the array
+
+new directive:
+  name:  .space    numberofbytes
+
+  .space is a way of allocating space (bytes) within memory,
+  but not give them an initial value.  Note: the type of the
+  data within this space cannot be inferred.
+
+
+   example:
+
+      arrayname: .byte  0:8
+	 8 character elements, numbered 0 - 7, initialized to 0
+      name: .space  18
+	 18 bytes of memory
+
+an example of how to calculate the address of an element:
+
+  byte (character) elements --
+       array1:  array[6..12] of char;   /* PASCAL */
+
+
+        6   7   8   9  10  11  12    <---- element index
+      -----------------------------
+      |   |   |   |   |XXX|   |   |
+      |   |   |   |   |XXX|   |   |
+      -----------------------------
+       25  26  27  28  29  30  31    <---- address
+
+	byte address of array1[10] =   25 + (10 - 6)
+                       	           =   29
+
+
+
+In C:
+============
+Arrays always start with 0.
+
+	char array1[7];
+
+
+this same example (or close) only in SAL:
+       array1:  .byte  0:7
+
+        0   1   2   3   4   5   6
+      -----------------------------
+      |   |   |   |   |XXX|   |   |
+      |   |   |   |   |XXX|   |   |
+      -----------------------------
+       25  26  27  28  29  30  31    <---- address
+
+       want the 5th element,
+
+	    array1[4] is at address     array1 + 4
+	    If element[0] is at address 25,
+	byte address of array1[4] =   25 + 4
+
+
+how do you get the address array1?
+     SAL la (load address) instruction
+
+     la   addr, array1
+
+     takes the address array1 (25 in the example) and puts it
+     into the variable called addr.
+
+     this is where it is extremely important to understand and keep
+     clear the difference between an address and the contents of
+     an address.
+
+     to reference array1[4] in SAL, write the code,
+
+	la  baseaddr, array1
+	add elem4, baseaddr, 4
+
+	# then if  we wanted to decrement element number 4
+	sub m[elem4], m[elem4], 1
+
+
+	remember,   elem4 is an address (declared as .word)
+		    m[elem4] is the byte at the address elem4
+
+
+
+  word (integer) elements --
+      in Pascal:
+      array2:  array[0..5] of integer;
+
+      in C:
+      int array[6];
+
+
+      in SAL,
+      array2:  .word 0:6
+      (or array2:  .align    <== needed to insure proper alignment of integers
+		   .space 24)
+
+
+        0   1   2   3   4   5      <-- index
+      -------------------------
+      |   |   |   |XXX|   |   |
+      |   |   |   |XXX|   |   |
+      -------------------------
+       80  84  88  92  96  100      <-- memory address
+
+      byte address of array2[3] =  80 + 4(3 - 0)
+				=  92
+
+
+      SO, we need to know
+	1.  where the array starts (called base address)
+	2.  size of an element in bytes (to get a byte address)
+	3.  what the first element is numbered
+
+
+     byte address of element[x] = base + size(x - first index)
+
+
+
+
+2 DIMENSIONAL ARRAYS
+--------------------
+
+There are more issues here, than for 1 dimensional arrays.
+
+First, how to map a 2 dimensional array onto a 1 dimensional memory?
+
+	  TERMINOLOGY:
+
+	  r x c array -- r rows
+			 c columns
+	  
+	  element[y, x] -- y is row number
+			   x is column number
+
+
+  example:     4 x 2 array
+
+
+
+mapping this 4 x 2 array into memory.
+2 possiblilities:
+    
+
+row major order:
+
+    rows are all together
+
+
+        |     |
+	-------
+        | 0,0 |
+	-------
+        | 0,1 |
+	-------
+        | 1,0 |
+	-------
+        | 1,1 |
+	-------
+        | 2,0 |
+	-------
+        | 2,1 |
+	-------
+        | 3,0 |
+	-------
+        | 3,1 |
+	-------
+        |     |
+
+column major order:
+     
+     columns are all together
+
+        |     |
+	-------
+        | 0,0 |
+	-------
+        | 1,0 |
+	-------
+        | 2,0 |
+	-------
+        | 3,0 |
+	-------
+        | 0,1 |
+	-------
+        | 1,1 |
+	-------
+        | 2,1 |
+	-------
+        | 3,1 |
+	-------
+        |     |
+
+
+
+2-D Arrays
+----------
+
+The goal: come up with a formula for calculating the address of
+          an element of a 2-D array.
+
+
+
+Row Major:
+
+
+
+
+
+ addr. of [y, x] =  base +    offset to      +       offset within
+			     correct row                 row
+
+		  (size)(y - first_row) (# columns)
+
+						(size) (x - first_col)
+
+
+
+Column Major:
+
+
+
+
+ addr. of [y, x] =  base +    offset to      +       offset within
+			     correct column             column
+
+		  (size)(x - first_col) (# rows)
+
+						(size) (y - first_row)
+
+
+Need to know:
+   1. row/column major (storage order)
+   2. base address
+   3. size of elements
+   4. dimensions of the array
+
+
+HINTS toward getting this correct:
+ Draw pictures.
+ Don't forget to account for size.
+
+Do example on page 179 ; maybe 181 as well.
+
+
+
+
+BOUNDS CHECKING
+---------------
+
+Many HLL's offer some form of bounds checking.  Your program crashes,
+or you get an error message if an array index is out of bounds
+       example:      x:  array[1..6] of integer;
+		 code. . .
+
+		     y := x[8];
+
+
+Assembly languages offer no implied bounds checking.
+After all,  if your program calculates an address of an element,
+and then loads that element (by the use of the address), there is
+no checking to see that the address calculated was actually within
+the array!
+
+example (to motivate some thought as to how to do bounds checking):
+
+   given --      a 5 x 3 array
+		 byte size elements
+		 row major order
+		 first_row = 1
+		 first_col = 1
+
+	  what is the address of element[2, 5]
+
+     a program probably just plugs the numbers into the formula:
+
+     addr of [2, 5] = base + 1(2 - 1)(3) + 1(5)
+		    = base + 8
+	
+
+     this actually gives the address of element [3, 3],
+     still a valid element of the array, but not what was really
+     required. . .
+
+
+
+
+
+
+STACKS
+------
+
+We often need a data structure that stores data in the reverse
+order that it is used.  Along with this is the concept that the
+data is not known until the program is executed (RUN TIME).
+A STACK allows both properties.
+
+Abstractly, here is a stack.  Analogy to stack of dishes.
+Also dubbed Last In First Out, LIFO.
+
+       |       |
+       |-------|
+       |       |
+       |-------|
+       |       |
+       |-------|
+       |       |
+       |-------|
+       |       |
+       |-------|
+
+
+Data put into the stack is said to be PUSHED onto the stack.
+Data taken out of the stack is said to be POPPED off the stack.
+
+Example:
+      printing out a positive integer, character by character
+      (integer to character string conversion)
+
+      integer = 1024 
+
+      if integer == 0 then
+	 push '0'
+      else
+         while integer <> 0
+            digit <- integer mod base
+            char <- digit + 48
+	    push char onto stack
+            integer <- integer div base
+      
+      while stack is not empty
+	 pop char
+	 put char
+
+
+
+IMPLEMENTATION OF A STACK
+-------------------------
+One implementation of a stack out of an array.
+
+Need to know:
+    index of TOP OF STACK (tos), often called a stack pointer (sp).
+
+
+  (initial state)
+     sp
+      |
+     \ /
+    -----------------------------
+    |   |   |   |   |   |   |   |
+    -----------------------------
+
+
+   sp is a variable that contains the address of the empty location
+   at the top of the stack.
+
+
+for an array declared (in SAL) as
+
+Do example w/o [ ] statments first.
+
+       stack:  .word  0:50
+       sp:     .word  stack
+     [ stackend: .word stack+4*50 ]
+
+  OR
+       stack:  .space  0:200
+       sp:     .word  stack
+
+
+   New use of a directive for initial contents of sp.
+   The address (label) stack gets put into the variable sp.
+   Identical to use of
+       la  sp, stack       # initialization of stack pointer
+
+
+
+a PUSH operation:
+      
+    [ bge     sp, stackend, overflow ]
+      move    M[sp], data
+      add     sp, sp, 4
+
+       
+a POP operation:
+
+    [ ble     sp, stackend, underflow ]
+      sub     sp, sp, 4
+      move    data, M[sp]
+
+
+Add in [ ] statments to get bounds checking.
+
+
+
+
+A stack could instead be implemented such that the stack pointer
+points to a FULL location at the top of the stack.
+
+  (initial state)
+  sp
+  |
+ \ /
+    -----------------------------
+    |   |   |   |   |   |   |   |
+    -----------------------------
+
+
+a PUSH operation:
+      
+      add     sp, sp, 4
+      move    M[sp], data
+
+       
+a POP operation:
+
+      move    data, M[sp]
+      sub     sp, sp, 4
+
+
+ANOTHER ALTERNATIVE:
+  The stack could "grow" from the end of the array towards
+  the beginning.  (Note that which end of the array the stack
+  grows toward is independent of what sp points to.)
+
+
+
+For the student to figure out:
+  How do you know when there are no more items in the stack?
+  How do you know when the stack is full?
+
+
+
+QUEUES
+-------
+
+whereas a stack is LIFO,
+	a queue is FIFO (First In, First Out).
+
+a real life analogy is a line (called a queue in British English).
+  Person gets on the end of the line (the TAIL),
+    waits,
+      and gets off at the front of the line (the HEAD).
+
+getting into the queue is an operation called ENQUEUE.
+taking something off the queue is an operation called DEQUEUE.
+
+it takes 2 pointers to keep track of the data structure,
+  the head and the tail.
+
+
+  initial state:
+  --------------------------------------------
+      |     |     |     |     |      |
+  --------------------------------------------
+              ^
+              |
+	      head, and tail
+
+
+  after 1 enqueue operation:
+  --------------------------------------------
+      |     |  x  |     |     |      |
+  --------------------------------------------
+               ^     ^
+               |     |
+               |     tail
+	       head
+
+  after another enqueue operation:
+  --------------------------------------------
+      |     |  x  |  y  |     |      |
+  --------------------------------------------
+               ^           ^
+               |           |
+               |           tail
+	       head
+
+  after a dequeue operation:
+  --------------------------------------------
+      |     |  x  |  y  |     |      |
+  --------------------------------------------
+                     ^     ^
+                     |     |
+                     |     tail
+	             head
+
+
+
+Note that (like stacks) when an item is removed from
+the data structure, it is physically still present,
+but correct use of the structure cannot access it.
+
+
+
+If enough items are enqueued (and possibly dequeued) from
+the queue, the points will eventually run off the end of the
+array!  This leads to implementations that "wrap" the
+beginning of the array to the end, and forms a CIRCULAR QUEUE.
+
+The implementation of the circular queue is a bit more complex.
+  The conditions to test for an empty queue and full queue
+  are more difficult.  They can be eased by implementing a
+  queue with one element that is a DUMMY.  It is never used
+  for data storage.
+
+  This is an example of the space vs. time trade-off.
+  An extra piece of memory is used in an inefficient
+  manner, in order to make the test for full/empty queues
+  more efficient.
+
+
+Optional example in more detail
+
+     head	 tail
+      | 	  |
+     \ /         \ /
+    -----------------------------
+    |   |   |   |   |   |   |   |  ...
+    -----------------------------
+
+
+   head points to first item in queue (next to be dequeued)
+   unless head = tail, which implies queue empty
+
+   tail points to empty location (for next enqueued item)
+
+
+Do example w/o [ ] statments first.
+
+
+  storage:
+
+       queue:  .word  0:infinity	# assume infinite for now
+     [ queue:  .word  0:queue_size ]
+     [ queue_end: .word queue+4*queue_size ]
+       head:	.word  queue	# static version of: la head, queue
+       tail:    .word  queue
+
+  enqueue (item):
+
+       move 	M[tail], item
+       add	tail, tail, 4
+     [ blt	tail, queue_end, continue1 ]
+     [ la	tail, queue		# wrap around ]
+ [ continue1: ]
+     [[ beq	head, tail, queue_overflow   # undo and fail? ]]
+
+  dequeue (item):
+
+	beq	head, tail, queue_empty
+	move	item, M[head]
+	add	head, head, 4
+     [ blt	head, queue_end, continue2 ]
+     [ la	head, queue		# wrap around ]
+ [ continue2: ]
+
+
+For finite queues, add [ ] statements (wrap around)
+and then [[ ]] (overflow).
+
+</pre>
+<HR> <!-- ------------------------------------------------ -->
+
+</BODY>
+</HTML>

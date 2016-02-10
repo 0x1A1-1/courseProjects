@@ -1,0 +1,21 @@
+#
+set k=../../karen.notes
+set m=../
+#
+diff $k/basics.html $m/chapter01.html > chapter01_diff.txt
+diff $k/SAL.html $m/chapter02.html > chapter02_diff.txt
+diff $k/numbers.html $m/chapter03.html > chapter03_diff.txt
+diff $k/represent.html $m/chapter04.html > chapter04_diff.txt
+diff $k/arith.int.html $m/chapter05.html > chapter05_diff.txt
+diff $k/data.structures.html $m/chapter07.html > chapter07_diff.txt
+diff $k/MAL.html $m/chapter08.html > chapter08_diff.txt
+diff $k/procedures.html $m/chapter09.html > chapter09_diff.txt
+cat $k/assembly.html $k/linknload.html > tmp10.html
+diff tmp10.html $m/chapter10.html > chapter10_diff.txt
+cat $k/io.html $k/moreio.html > tmp11.html
+diff tmp11.html $m/chapter11.html > chapter11_diff.txt
+diff $k/interrupts.html $m/chapter12.html > chapter12_diff.txt
+cat $k/performance.html $k/cpi.html > tmp13.html
+diff tmp13.html $m/chapter13.html > chapter13_diff.txt
+diff $k/.html $m/chapter14.html > chapter14_diff.txt
+diff $k/arith.flpt.html $m/chapter06.html > chapter06_diff.txt

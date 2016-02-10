@@ -1,0 +1,550 @@
+1,4c1
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 10 - Assembly</title>
+< </head>
+---
+> <!--#include virtual="style1.html" -->
+6,7c3,12
+< <BODY>
+< <h1> Chapter 10 -- The Assembly Process</h1>
+---
+> Lecture Notes for
+> Chapter 10 -- The Assembly Process <!-- EDIT CHAPTER INFO -->
+> 
+> <!--#include virtual="style2.html" -->
+> 
+> Wednesday, August 29, 2001 <!-- EDIT LAST UPDATE DATE -->
+> 
+> <!--#include virtual="style3.html" -->
+> 
+> </PRE><b>NOT YET UPDATED FOR FALL 2003</b><PRE>
+9d13
+< <pre>
+26c30
+<   In the past, there was a one-to-one correspondence between
+---
+>   in the past, there was a one-to-one correspondence between
+29c33
+<   This is no longer the case.  Assemblers are now-a-days made more
+---
+>   this is no longer the case.  Assemblers are now-a-days made more
+34d37
+< 
+43,44c46
+< equivalent.  They will be translated (composed, synthesized) into
+< one or more TAL instructions.
+---
+> equivalent.
+61,64c63,65
+<     why?  32-bit multiplication produces a 64-bit result.
+<     To deal with this larger result, the MIPS architecture
+<     has 2 registers that hold results for integer multiplication and
+<     division.  They are called HI and LO.  Each is a 32 bit register.
+---
+>     why?  because the MIPS architecture has 2 registers that
+>     hold results for integer multiplication and division.
+>     They are called HI and LO.  Each is a 32 bit register.
+69,71d69
+<     Then, more TAL instructions are needed to move data into or out
+<     of registers HI and LO:
+< 
+83,95d80
+< 
+<   Integer division also uses register HI and LO, since it
+<   generates both a quotient and remainder as a result.
+< 
+<   MAL        div $rd, $rs, $rt
+< 
+<   becomes TAL    div  $rs, $rt
+<                  mflo $rd          # quotient in register LO
+< 
+<   and MAL    rem $rd, $rs, $rt
+< 
+<   becomes TAL    div  $rs, $rt
+<                  mfhi $rd          # remainder in register HI
+99c84
+<   addressing modes do not exist in TAL!
+---
+>     addressing modes do not exist in TAL!
+108c93
+<     lui $8, 0xMSpart of label      # label represents an address
+---
+>     lui $8, 0xMSpart of label
+115,116d99
+<            (this 2-instruction sequence only works if the most significant
+< 	    bit of the LSpart of label is a 0)
+119c102,103
+<   instructions with immediates are synthesized with other instructions
+---
+>     instructions with immediates are synthesized with other
+>     instructions
+143,144c127,128
+<    li $2, 11         # MAL
+<    move $4, $18      # MAL
+---
+>    li $2, 11
+>    move $4, $18	# not a TAL instruction
+147,148c131
+<    which becomes
+<           addi $2, $0, 11
+---
+>    OR     addi $2, $0, 11
+158c141
+<    move $11, $2
+---
+>    move $11, $2	# not a TAL instruction
+160,161c143
+<    which becomes
+<           addi $2, $0, 12
+---
+>    OR     addi $2, $0, 12
+170c152
+<    move $4, $13
+---
+>    move $4, $13	# not a TAL instruction
+173,174c155
+<    which becomes
+<           addi $2, $0, 4
+---
+>    OR     addi $2, $0, 4
+185,186c166
+<    which becomes
+<           addi $2, $0, 10
+---
+>    OR     addi $2, $0, 10
+189a170,216
+> Summary of MAL-->TAL
+> 
+> 	MAL				TAL
+> 	---				---
+> 
+> 	move $4, $3			add $4, $3, $0
+> 
+> 	add $4, $3, 15 # not $15	addi $4, $3, 15
+> 					# also andi, ori, etc.
+> 
+> 	mul $8, $9, $10			mult $9, $10  # $HI || $LO <-- product
+> 						      # never overflow
+> 					mflo $8	      # $8 <-- $LO
+> 						      # ignore $HI!
+> 
+> 	div $8, $9, $10			div $9, $10   # $LO <-- quotient
+> 						      # $HI <-- remainder
+> 					mflo $8
+> 
+> 	rem $8, $9, $10			div $9, $10
+> 					mfhi $8
+> 
+> 	branches:
+> 	bltz,bgez,blez,bgtz,beqz,bnez,	bltz,bgez,blez,bgtz,
+> 	blt,bge,ble,bgt,beq,bne		beq,bne
+> 
+> 	beqz $4, loop			beq $4, $0, loop
+> 
+> 	blt $4, $5, target		slt $at, $4, $5	# $at is 1 if $4 < $5
+> 							# $at is 0 otherwise
+> 					bne $at, $0, target
+> 
+> 
+> 	I/O instructions:
+> 
+> 	put,puts,putc,			Really "procedure call to OS"
+> 	get,getc,done			Assume  $2 <-- call type
+> 					Assume  $4 <-- input parameters
+> 
+> 	putc $12			addi $2, $0, 11 # putc is syscall 11
+> 							# see p. 262
+> 					add $4, $12, $0 # char to putc
+> 					syscall		# call OS
+> 
+> 	done				addi $2, $0, 10 # done is syscall 10
+> 					syscall
+> 
+207c234
+<   -- it generates an image of what memory must look like for the
+---
+>   -- it generated an image of what memory must look like for the
+220,223c247
+< SYMBOL TABLE -- a table, listing address assignments (made by the assembler)
+<   for ALL labels
+< 
+< The assembler starts at the top of the source code program,
+---
+> assembler starts at the top of the source code program,
+238c262
+< EXAMPLE  (given in little endian order)
+---
+> EXAMPLE
+240c264
+< a1: .word 3
+---
+> a1: .word 0xffffffff
+242a267,268
+> a4: .byte 'a'
+> a5: .word 0x12345678
+245,251c271,274
+<      0x00001000    0x00000003
+<      0x00001004    0x??????0a
+<      0x00001008    0x????????
+<      0x0000100c    0x????????  (the 3 MSbytes are not part of the declaration)
+< 
+<   the assembler will align data to word addresses unless you specify
+<   otherwise!
+---
+>      0x10010000    0xffffffff
+>      0x10010004    0x0a000000
+>      0x10010008    0x00006100   <-- LSB undefined
+>      0x1001000c    0x12345678  
+294c317
+< __start: la $6, a2              # MAL code fragment
+---
+> __start: la $6, a2
+305,309c328,332
+<     a1         0040 0000
+<     a2         0040 0004
+<     a3         0040 0014
+<     __start    0080 0000
+<     loop       0080 0008
+---
+>     a1         1001 0000
+>     a2         1001 0004
+>     a3         1001 0014
+>     __start    0040 0000
+>     loop       0040 0008
+316,321c339,344
+< 0040 0000   0000 0003    0000 0000 0000 0000 0000 0000 0000 0011 
+< 0040 0004   0000 0010    0000 0000 0000 0000 0000 0000 0001 0000
+< 0040 0008   0000 0010    0000 0000 0000 0000 0000 0000 0001 0000
+< 0040 000c   0000 0010    0000 0000 0000 0000 0000 0000 0001 0000
+< 0040 0010   0000 0010    0000 0000 0000 0000 0000 0000 0001 0000
+< 0040 0014   0000 0005    0000 0000 0000 0000 0000 0000 0000 0101
+---
+> 1001 0000   0000 0003    0000 0000 0000 0000 0000 0000 0000 0011 
+> 1001 0004   0000 0010    0000 0000 0000 0000 0000 0000 0001 0000
+> 1001 0008   0000 0010    0000 0000 0000 0000 0000 0000 0001 0000
+> 1001 000c   0000 0010    0000 0000 0000 0000 0000 0000 0001 0000
+> 1001 0010   0000 0010    0000 0000 0000 0000 0000 0000 0001 0000
+> 1001 0014   0000 0005    0000 0000 0000 0000 0000 0000 0000 0101
+327c350
+< __start: lui $6, 0x0040      # la $6, a2
+---
+> __start: lui $6, 0x1001      # la $6, a2
+340,346c363,369
+< 0080 0000    3c06 0040    0011 1100 0000 0110 0000 0000 0100 0000 (lui)
+< 0080 0004    34c6 0004    0011 0100 1100 0110 0000 0000 0000 0100 (ori)
+< 0080 0008    8cc7 0004    1000 1100 1100 0111 0000 0000 0000 0100 (lw)
+< 0080 000c    012a 0018    0000 0001 0010 1010 0000 0000 0001 1000 (mult)
+< 0080 0010    1000 fffd    0001 0000 0000 0000 1111 1111 1111 1101 (beq)
+< 0080 0014    3402 000a    0011 0100 0000 0010 0000 0000 0000 1010 (ori)
+< 0080 0018    0000 000c    0000 0000 0000 0000 0000 0000 0000 1100 (syscall)
+---
+> 0040 0000    3c06 1001    0011 1100 0000 0110 0001 0000 0000 0001 (lui)
+> 0040 0004    34c6 0004    0011 0100 1100 0110 0000 0000 0000 0100 (ori)
+> 0040 0008    8cc7 0004    1000 1100 1100 0111 0000 0000 0000 0100 (lw)
+> 0040 000c    012a 0018    0000 0001 0010 1010 0000 0000 0001 1000 (mult)
+> 0040 0010    1000 fffd    0001 0000 0000 0000 1111 1111 1111 1101 (beq)
+> 0040 0014    3402 000a    0011 0100 0000 0010 0000 0000 0000 1010 (ori)
+> 0040 0018    0000 000c    0000 0000 0000 0000 0000 0000 0000 1100 (syscall)
+363c386
+<    Assume that the program data starts at address 0x0080 0000.
+---
+>    Assume that the program data starts at address 0x0040 0000.
+382c405
+< 		= 00800008 - ( 00000004 + 00800010 )  (hex)
+---
+> 		= 00400008 - ( 00000004 + 00400010 )  (hex)
+387,388c410,411
+< 		 0000 0000 1000 0000 0000 0000 0001 0100
+< 	      -  0000 0000 1000 0000 0000 0000 0000 1000
+---
+> 		 0000 0000 0100 0000 0000 0000 0001 0100
+> 	      -  0000 0000 0100 0000 0000 0000 0000 1000
+392d414
+< 		    (compute the additive inverse)
+425,491c447,448
+<    An example of machine code generated for a jump instruction:
+<       .
+<       .
+<       .
+<       j   L2
+<       .
+<       .
+<   L2: # another instruction here
+< 
+< 
+<      Assume that the j instruction is to be placed at address 0x0100acc0
+<      Assume that the assembler assigns address 0x0100ff04 for label L2
+< 
+<      Then, when the assembler is generating machine code for the j instruction,
+<      1.  The assembler checks that the most significant 4 bits of
+<          the address of the jump instruction is the same as the most
+< 	 significant 4 bits of the address for the target (L2).
+< 	    instruction address        0000 0001 0000 0000 (m.s. 16 bits)
+< 	    L2 address                 0000 0001 0000 0000 (m.s. 16 bits)
+< 	                               ^^^^
+<          These 4 bits ARE the same, so procede.
+<      2. Extract bits 27..2 of the target address for the machine code.
+< 	    L2  0000 0001 0000 0000 1111 1111 0000 0100
+<                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<      3. The machine code for the j instruction:
+< 
+<           000010     0001 0000 0000 1111 1111 0000 01
+< 	  op code       26-bit partial address
+< 
+< 	  Given in hexadecimal:
+<           0000 1000 0100 0000 0011 1111 1100 0001
+< 	  0x 0    8    4    0    3    f    c    1
+< 
+< 
+<   In the first step, if the address of the jump instruction and the
+<   target address differ in their 4 most significant bits, then the
+<   assembler must translate to different TAL code.
+< 
+<   One possible translation:
+<      
+<      j  L3     # assume j will be placed at address 0x0400 0088
+<      .
+<      .
+<      .
+<   L3:          # assume L3 is at address 0xab00 0040
+< 
+< 
+<     becomes
+<       la   $1, L3
+<       jr   $1
+< 
+<       which in TAL, would be
+< 
+<           lui  $1, 0xab00
+< 	  ori  $1, $1, 0x0040
+< 	  jr   $1
+< </pre>
+< 
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 10 - assembly</title>
+< </head>
+< 
+< <BODY>
+< <h1> more on Chapter 10 -- assembly</h1>
+< 
+< <pre>
+---
+> More Complete Picture of Assembly 
+> ---------------------------------
+492a450
+> C.f., Larus's appendix to:
+494,496c452,463
+< 
+<   getting to program execution
+<   ----------------------------
+---
+> %T Computer Organization and Design:  The Hardware and Software Interface
+> %A John L. Hennessy
+> %A David A. Patterson
+> %I Morgan Kaufmann
+> %C San Mateo, California
+> %D 2nd Edition, 1997
+> %Y topic: CS552
+> 
+> Levine
+> Linkers and Loaders
+> Morgan Kaufmann
+> 1999
+501a469
+>   [show left half of picture below] 
+507a476,489
+> A picture
+> 
+> 	---- assembler
+> 
+> 	==== linker
+> 
+> 	**** loader
+> 			    	obj of libs
+> 	src1 ----->  obj1  =====+     ||
+> 				V     VV
+> 	src2 ----->  obj2  ======>  linker ------> executable ******> a process
+> 				^
+> 	src3 ----->  obj3  =====+
+> 
+511a494,515
+> Big Picture
+>     object file
+> 	header 		-- start / size of other parts
+> 	text   		-- ML
+> 	data   		-- static data
+> 	relocation info -- instrn & data w/ abs addrs
+> 	symbol table	-- addr of external labels
+> 	debugging info 
+> 
+>     Linker
+> 	search libs
+> 	relocate code/data
+> 	resolve extern refs
+> 
+>     Loader
+> 	create address spaces for text & data
+> 	copy text & data in memory
+> 	init stack and copy args
+> 	init regs (maybe)
+> 	jump to startup routine (& then addr of __start)
+> 
+> 
+527,528c531
+<   The data section starts at 0x00400000 in our simulator of 
+<   the MIPS RISC processor.
+---
+>   The data section starts at 0x10010000 for the MIPS RISC processor.
+541,542c544,545
+<     0x00400000     0000 0000 0000 0000 0000 0000 0000 1111
+<     0x00400004     1111 1111 1111 1111 1111 1111 1111 1110
+---
+>     0x10010000     0000 0000 0000 0000 0000 0000 0000 1111
+>     0x10010004     1111 1111 1111 1111 1111 1111 1111 1110
+556c559
+< across 2 files.  EACH IS ASSEMBLED SEPARATELY.
+---
+> across 2 files.  Each is assembled separately.
+582,583c585,586
+< Two problems with this
+< ----------------------
+---
+> Problems with this
+> ------------------
+587,588c590,591
+<      a1 (in file1) is supposed to be placed at 0x00400000
+<      a3 (in file2) is supposed to be placed at 0x00400000
+---
+>      a1 (in file1) is supposed to be placed at 0x10010000
+>      a3 (in file2) is supposed to be placed at 0x10010000
+590,591c593,594
+<      __start (in file1) is placed at location 0x00800000
+<      proc5   (in file1) is placed at location 0x00800000
+---
+>      __start (in file1) is placed at location 0x00400000
+>      proc5   (in file1) is placed at location 0x00400000
+636c639
+<       This last one is something new.
+---
+>       This last one is something new, not discussed yet.
+657c660,775
+< </pre>
+---
+> 
+> Larus' example
+> 
+> -------------------------------------------------------------------------
+> sum.c
+> -------------------------------------------------------------------------
+> 
+> #include <stdio.h>
+> 
+> int
+> main (int argc, char *argv[])
+> {
+>   int i;
+>   int sum = 0;
+> 
+>   for (i = 0; i <= 100; i++) sum += i * i;
+>   printf ("The sum from 0 .. 100 is %d\n", sum);
+> }
+> 
+> -------------------------------------------------------------------------
+> sum.s
+> -------------------------------------------------------------------------
+> 
+> 	.text
+> 	.align	2
+> 	.globl	main
+> 	.ent	main 2
+> main:
+> 	subu	$sp, 32
+> 	sw	$31, 20($sp)
+> 	sd	$4, 32($sp)
+> 	sw	$0, 24($sp)
+> 	sw	$0, 28($sp)
+> loop:
+> 	lw	$14, 28($sp)
+> 	mul	$15, $14, $14
+> 	lw	$24, 24($sp)
+> 	addu	$25, $24, $15
+> 	sw	$25, 24($sp)
+> 	addu	$8, $14, 1
+> 	sw	$8, 28($sp)
+> 	ble	$8, 100, loop
+> 	la	$4, str
+> 	lw	$5, 24($sp)
+> 	jal	printf
+> 	move	$2, $0
+> 	lw	$31, 20($sp)
+> 	addu	$sp, 32
+> 	j	$31
+> 	.end	main
+> 
+> 	.data
+> 	.align	0
+> str:
+> 	.asciiz	"The sum from 0 .. 100 is %d\n"
+> 
+> 
+> -------------------------------------------------------------------------
+> sum.nolabels
+> -------------------------------------------------------------------------
+> 
+> addiu	sp,sp,-32
+> sw	ra,20(sp)
+> sw	a0,32(sp)
+> sw	a1,36(sp)
+> sw	zero,24(sp)
+> sw	zero,28(sp)
+> lw	t6,28(sp)
+> lw	t8,24(sp)
+> multu	t6,t6
+> addiu	t0,t6,1
+> slti	at,t0,101
+> sw	t0,28(sp)
+> mflo	t7
+> addu	t9,t8,t7
+> bne	at,zero,-9
+> sw	t9,24(sp)
+> lui	a0,4096
+> lw	a1,24(sp)
+> jal	1048812
+> addiu	a0,a0,1072
+> lw	ra,20(sp)
+> addiu	sp,sp,32
+> jr	ra
+> move	v0,zero
+> 
+> -------------------------------------------------------------------------
+> sum.machine_lang
+> -------------------------------------------------------------------------
+> 
+> 00100111101111011111111111100000
+> 10101111101111110000000000010100
+> 10101111101001000000000000100000
+> 10101111101001010000000000100100
+> 10101111101000000000000000011000
+> 10101111101000000000000000011100
+> 10001111101011100000000000011100
+> 10001111101110000000000000011000
+> 00000001110011100000000000011001
+> 00100101110010000000000000000001
+> 00101001000000010000000001100101
+> 10101111101010000000000000011100
+> 00000000000000000111100000010010
+> 00000011000011111100100000100001
+> 00010100001000001111111111110111
+> 10101111101110010000000000011000
+> 00111100000001000001000000000000
+> 10001111101001010000000000011000
+> 00001100000100000000000011101100
+> 00100100100001000000010000110000
+> 10001111101111110000000000010100
+> 00100111101111010000000000100000
+> 00000011111000000000000000001000
+> 00000000000000000001000000100001
+> 
+> <!--#include virtual="style4.html" -->

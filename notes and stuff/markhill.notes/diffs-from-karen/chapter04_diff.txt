@@ -1,0 +1,1258 @@
+0a1,253
+> <!--#include virtual="style1.html" -->
+> 
+> Lecture Notes for
+> Chapter 4 -- Data Representation <!-- EDIT CHAPTER INFO -->
+> 
+> <!--#include virtual="style2.html" -->
+> 
+> Tuesday, October 9, 2001 <!-- EDIT LAST UPDATE DATE -->
+> 
+> <!--#include virtual="style3.html" -->
+> 
+> </PRE><b>NOT YET UPDATED FOR FALL 2003</b><PRE>
+> 
+> 
+> Intro
+> -----
+> 
+> Want to store numbers, characters, etc. in computer
+> 
+> Will store in a memory location, which a BOX or CONTAINER that
+> can hold a value
+> 
+> (Memory is just an array of these boxes, address is just the array index)
+> 
+> Concentrate on one box.
+> 
+> Its easiest to build electronic circuits with two states,
+> logicaly called 1 and 0, physically often 3.3 and 0 volts.
+> 
+> This is a bit.
+> 
+> Assume our box consists of one bit
+> 
+> We can use the bit to represent two different values
+> 
+> 	value	representation 
+> 	----	-----
+> 	1	0	but only two numbers not useful
+> 	2	1
+> 
+> Recall number vs. representation in last chapter
+> 
+> 	value	representation 
+> 	----	-----
+> 	false	0	for Pascal's boolean variables
+> 	true	1
+> 
+> What if box has two bits:
+> 	one combination has zero ones:	00
+> 	two have one one:		01, 10
+> 	one has two ones:		11
+> 
+> Since position matters can represent four values (or 2^2)
+> 
+> 	value	representation 
+> 	----	-----
+> 	east	00
+> 	north	01
+> 	west	10
+> 	south	11
+> 
+> Three bits can represent 8 (2^3) values:  000, 001, ..., 111
+> 
+> n bits can represent 2^n values:
+> 
+> 	n	can represent		about
+> 	--	---
+> 	8	256	
+> 	16	65,536			65 thousand (64K where K=1024)
+> 	32	4,294,967,296		4 billion
+> 	64	1.8446... x 10^19	20 billion billion
+> 
+> 
+> 
+> Most computers today use:
+> 
+> 	type		bits	name for box size
+> 	---		----	-----------------
+> 	characters	 8 | 16	  byte (ASCII) | 16b Unicode (e.g., Java)
+> 	integers	32	  word (sometimes 16 or 64 bits)
+> 	reals		32 | 64	  word | double-word
+> 
+> 
+> Let's do characters first.  
+> 
+> 
+> 
+> CHARACTER REPRESENTATION
+> ------------------------
+> 
+> Box (memory location) for a character usually contains 8 bits:
+> 00000000 to 1111111 or in hex 0x00 to 0xff.
+> 
+> Two questions:
+> 
+> (1) Which characters?
+> 
+> (2) Which bit patterns for which characters?
+> 
+> For (1):  A, B, C, ..., Z, a, b, c, ..., Z, 0, 1, 2, ..., 9
+> punctuation (,:{ ...) and special (\n \0 ...)
+> 
+> For (2): (a) Want STANDARD! and (b) want to help sorting
+> (i.e., representation(B) is between rep(A) and rep(C)).
+> 
+> I/O devices work with 8 bit (really only 7 bit) quantities.
+> A standard code  ASCII (American Standard for Computer Information
+> Interchange) defines what character is represented by each sequence.
+> 
+> Pronounced "as-KEY"
+> 
+>   examples:
+>     0100 0001  is  41 (hex)  or 65 (decimal).  It represents 'A'
+>     0100 0010  is  42 (hex)  or 66 (decimal).  It represents 'B'
+> 
+> 
+>     Different bit patterns are used for each different character
+>     that needs to be represented.
+> 
+>     SEE ASCII TABLE 4.4 ON PAGE 102
+> 
+> The code has some nice properties.  If the bit patterns are compared,
+> (pretending they represent integers), then
+> 
+> 	'A' < 'B'  
+> 	 65 < 66
+> 
+> This is good, because it helps with sorting things into alphabetical
+> order.
+> 
+> 
+> Notes:        'a' (61 hex)  is different than 'A' (41 hex)
+>               '8' (38 hex) is different than the integer 8
+> 
+>     the digits:
+> 	  '0' is 48 (decimal) or 30 (hex)
+> 	  '9' is 57 (decimal) or 39 (hex)
+> 
+> Quiz question:  Why are there no character codes to represent: 10, 12 or 354?
+> Answer:  	Use 2 or 3 chars
+> 
+> 
+> 
+> Because of this, you have to be careful.  Consider the following example:
+> 
+> 
+>        in1:  .byte
+>        result:  .byte
+> 
+> 
+> 	     get in1
+> 	     add  result, in1, in1
+> 	     put result
+> 
+> 
+>     suppose the user types '3'
+>        result <-  51 + 51 = 102 (decimal)
+> 
+>        put prints out 'f', since the ASCII code for 102(decimal) is 'f'
+> 
+> 
+> What we really wanted was more likely this:
+> 
+>        in1:     .byte
+>        number:  .word
+>        result:  .word
+>        out1:    .byte
+>        asciibias .word	48	# code for '0', 49 is '1', ...
+> 
+> 
+> 	     get  in1
+> 	     sub  number, in1, asciibias     # convert char for digit to number
+> 	     add  result, number, number
+> 	     add  out1, result, asciibias    # convert back
+> 	     put  out1
+> 
+>   the subtract takes the "bias" out of the character representation.
+>   the add puts the "bias" back in.
+> 
+> 
+> This will only work right if the result is a single digit.
+>         (What would happen if it wasn't?)
+> 
+> What we need is an algorithm for translating character strings
+> to the integers the represent, and visa versa.
+> 
+> 
+> 
+> ALGORITHM:   character string --> integer
+>    the steps:
+> 
+>       for '3' '5' '4'
+> 
+>       read '3'
+>       translate '3' to 3
+> 
+>       read '5'
+>       translate '5' to 5
+>       integer =  3 * 10  + 5 = 35
+> 
+>       read '4'
+>       translate '4' to 4
+>       integer =  35 * 10  + 4 = 354
+> 
+>   the algorithm:
+>      
+>      asciibias = 48
+>      integer = 0
+>      while there are more characters
+>        get character
+>        digit <-  character - asciibias
+>        integer <- integer * 10  + digit
+> 
+> 
+> ALGORITHM:  integer --> character string
+>    the steps:
+>    for 354, figure out how many characters there are (3)
+> 
+>    354 div 100 gives 3
+>    translate 3 to '3' and print it out
+>    354 mod 100 gives 54
+> 
+>    54 div 10 gives 5
+>    translate 5 to '5' and print it out
+>    54 mod 10 gives 4
+> 
+>    4 div 1 gives 4
+>    translate 4 to '4' and print it out
+>    4 mod 1 gives 0, so you're done
+> 
+> 
+> Compare:
+> 
+> mystring:	.asciiz	"123"
+> mynumber:	.word	 123
+> 
+> "123" is '1'	0x31	0011 0001
+> 	 '2'	0x32	0011 0010
+> 	 '3'	0x33	0011 0011
+> 	 '\0'	0x0	0000 0000
+> 
+> 	==> 0011 0001 0011 0010 0011 0011 0000 0000
+> 	Series of four ASCII characters
+> 
+> 123 = 0x7b = 0x0000007b = 00 00 00 7b
+> 	
+> 	==> 0000 0000 0000 0000 0000 0000 0111 1011
+> 	a 32-bit 2SC integer
+> 
+> P.S.  if you read "123" as .word it would be 825,373,440
+> 
+> 
+> (OPTIONAL) GO OVER FIG 4.7 (p. 103) (SAL codes for char/int conversion.)
+2,19d254
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 4 - Data Representation</title>
+< </head>
+< 
+< <BODY>
+< <h1> Chapter 4 -- On Representations</h1>
+< 
+< <pre>
+< 
+< We need to use binary representations for every piece of data.
+< Computers operate on binary values (as a result of being built from
+< transistors).
+< 
+< There are 3 types of data we want to represent:
+<  1. integers
+<  2. characters
+<  3. floating point values
+24,45c259,327
+< There are different binary representations for integers.
+< Possible qualities:
+<   1. positive numbers only
+<   2. positive and negative numbers
+<   3. ease of human readability
+<   4. speed of computer operations
+< 
+< There are 4 commonly known (1 not common) integer reprentations.
+< All have been used at various times for various reasons.
+<    1. unsigned
+<    2. sign magnitude
+<    3. one's complement
+<    4. two's complement
+<    5. biased (not commonly known)
+<    A 6th integer representation:  BCD (Binary Coded Decimal), used
+<       mainly by business applications in the 1960s and 70s.
+< 
+< Virtually all modern computers operate based on 2's complement
+<  representation.  Why?
+<    1. hardware for doing the most common operations is faster
+<       (the most common operation is addition)
+<    2. hardware is simpler
+---
+> Assume our box has a fixed number of bits n (e.g., 32).
+> 
+> We have two problems.
+> 
+> (1) Which 4 billion integers do we want?  Remember there are an
+> infinite number of integers less than zero and an infinite number
+> greater than zero.
+> 
+> (2) What bit patterns should we select to represent each integer
+> from (1)?  Recall representation does not affect the result of
+> a calculation, but it can dramatically affect its ease.  Since
+> we'll convert to decimal before showing numbers to humans, we'll
+> select representation for computation ease, not intuition.
+> 
+> 
+> Today (1) is answered with either
+> 
+>   (a) non-negative integers:  zero & first positive integers
+>   (b) positive and negative integers: zero about half negative & half positive
+> 
+> Today (2):
+> 
+>    unsigned for (a)
+>    signed magnitude for (b)
+>    one's complement for (b)
+>    two's complement for (b) 
+>    biased for (b)
+> 
+> Today unsigned and two's complement most common.
+> 
+> 
+> 
+> Use n=4 to illstrate,
+> 	Do "in box" column now
+> 	ADD OTHER COLUMNS AS WE GO
+> 
+> 			values
+> 
+> 	in box		unsign	SM	1SC	2SC	Bias-8
+> 
+> 	0000		 0	+0			-8
+> 	0001		 1	+1			-7
+> 	0010		 2	+2	non-negative 	-6
+> 	0011		 3		the same
+> 	
+> 	0100		 4
+> 	0101		 5
+> 	0110		 6
+> 	0111		 7	+7			-1
+> 
+> 	1000		 8	-0	-7	-8	 0
+> 	1001		 9	-1	-6	-7	+1
+> 	1010		10	-2	-5	-6	+2
+> 	1011		11
+> 
+> 	1100		12
+> 	1101		13
+> 	1110		14
+> 	1111		15	-7	-0	-1	+7
+> 
+> 
+> 	key values
+> 
+> 	0		0
+> 	2^(n-1) - 1	7
+> 	2^(n-1)	8
+> 	2^n - 1	15
+> 	2^n		16
+> 	(and corresponding negative values)
+52c334,336
+< only positive values (and 0)
+---
+> only positive values and zero
+> 
+> range:   0 to 2^n - 1, for n bits
+54c338
+< range:   0 to (2^n) - 1, for n bits
+---
+> 	ADD UNSIGN TO TABLE
+57a342
+> 	   [0, 15] = 16 = 2^4 different numbers
+59,67c344,349
+< 	   binary decimal hex     binary decimal hex
+< 	   0000      0     0       1000    8      8
+< 	   0001      1     1       1001    9      9
+< 	   0010      2     2       1010    10     a
+< 	   0011      3     3       1011    11     b
+< 	   0100      4     4       1100    12     c
+< 	   0101      5     5       1101    13     d
+< 	   0110      6     6       1110    14     e
+< 	   0111      7     7       1111    15     f
+---
+> 	   7 is 0111
+> 	   17 not represenable
+> 	   -3 not represenable
+> 
+> example:   32 bits = [0, 4,294,967,295] 
+> 	   4,294,967,296 = 2^32 different numbers
+73d354
+< 
+75,88c356,358
+< The HW that does arithmetic on sign magnitude integers
+< is not fast, and it is more complex than the HW that does arithmetic
+< on 1's complement and 2's complement integers.
+< 
+< use 1 bit of the integer to represent the sign of the integer
+< 
+<     let sign bit of 0 be positive,
+< 		    1 be negative.
+< 
+< Where does the sign bit go?  Could be anywhere. . .
+<   The 2 logical locations for the sign bit would be at the
+<   extreme left of the representation and the extreme right.
+<   We are used to seeing the sign of an integer to its
+<   left.  This is what is done in sign magnitude representation.
+---
+> The hw that does arithmetic on sign magnitude integers
+> is not fast, and it is more complex than the hw that does arithmetic
+> on 1's comp. and 2's comp. integers.
+90,91c360
+< The rest of the integer is a magnitude, and it uses same encoding
+< as unsigned integers.
+---
+> use 1 bit of integer to represent the sign of the integer
+93,94c362,364
+< example:  4 bits
+< 	      0101   is  5
+---
+>     let sign bit be msb where
+> 		    0 is +
+> 		    1 is -
+96,101c366,367
+< 	      1101   is -5
+< 	
+<           8 bits
+< 	                    s   mag
+< 	      00100001  is  0 0100001  is  33
+< 	      10100001  is  1 0100001  is -33
+---
+> the rest of the integer is a magnitude, uses same encoding
+> as unsigned integers
+103,104c369,370
+< to get the additive inverse of a sign magnitude integer, just flip 
+<   (not, invert, complement, negate) the sign bit.
+---
+> to get the additive inverse of a number, just flip (invert, complement)
+> the sign bit.
+107c373,374
+<                where n is the number of bits
+---
+> 
+> 	ADD SM TO TABLE
+112a380,382
+> example:             4 bits
+> 	      0101   is  5
+> 
+114c384,390
+< Because of the sign bit, there are 2 representations for 0.
+---
+> 	      -5 is represented as 1101
+> 	      +12 not represenable
+> 
+> 	      [-7,..,-1,0,+1,..,+7] = 7 + 1 + 7 = 15 < 16 = 2^4  Why?
+> 
+> 
+> because of the sign bit, there are 2 representations for 0.
+117,133c393
+<     0000 is 0, 1000 is 0
+<     The computer must do all calculations such that they
+<     come out correctly and the same whichever representation is used.
+< 
+<     An interesting example:
+<     Suppose X = 00000000   and Y = 10000000
+<     These variables represent 8-bit, sign magnitude integers.
+<     What should the following instruction do?
+<             beq  X, Y, XequalsY
+<     Should the instruction take the branch, since the intended values
+<     (given the representation) are the same, or not take the branch,
+<     since the bit patterns are different?  What if the variables were
+<     unsigned integers instead?  One solution could provide a different
+<     instruction for each representation:
+<             beq   X, Y, XequalsY   # for unsigned (SAL does this)
+< 	    beqsm X, Y, XequalsY   # for sign mag. (doesn't exist in SAL)
+< 
+---
+>     0000 is +0, 1000 is -0
+134a395,398
+>     Since +0 equals -0, comparision logic can't just test for the
+>     same representation -- sounds trivial, but it's a big deal!
+> 
+> 
+138,140c402,403
+< 
+< Historically important, and we use this representation to get
+<   2's complement integers.
+---
+> historically important, and we use this representation to get
+> 2's complement integers, so I present it first.
+146,147c409
+< 
+< Positive integers use the same representation as unsigned.
+---
+> positive integers use the same representation as unsigned.
+149,150c411,412
+<      00000 is 0
+<      00111 is 7,  etc.
+---
+>      0000 is 0
+>      0111 is 7,  etc.
+152c414
+< Negation (finding an additive inverse) is done by taking a bitwise
+---
+> negation (finding an additive inverse) is done by taking a bitwise
+155c417
+<   COMPLEMENT. INVERT. NOT. FLIP. NEGATE.
+---
+>   COMPLEMENT. INVERT. NOT.  FLIP.
+161,162c423,424
+< 	-1 -->        take +1,    00001
+< 	      complement each bit 11110
+---
+> 	-1 -->        take +1,    0001
+> 	      complement each bit 1110
+170c432
+< EXAMPLES:        11100         this must be a negative number.
+---
+> EXAMPLES:        1100          this must be a negative number.
+173,175c435,436
+< 		 00011   is +3 by sight,
+< 			 so 11100 must be -3
+< 
+---
+> 		 0011   is +3 by sight,
+> 			 so 1100 must be -3
+179,180c440
+< 			00000 and 11111.
+< 
+---
+> 			0000 and 1111.
+181a442,444
+> 	ADD 1SC TO TABLE
+>       
+> 
+184a448,450
+> a variation on 1's complement that does not have 2 representations for
+> 0.  This makes the hardware that does arithmetic faster than for the
+> other representations.
+186,193d451
+< A variation on 1's complement that does not have 2 representations for
+< 0.  This makes the hardware that does arithmetic (addition, really)
+< faster than for the other representations.
+< 
+<   a 3-bit example:
+<   bit pattern:    100   101  110  111  000  001  010  011
+< 
+<   1's comp:       -3     -2   -1    0   0    1    2    3
+195c453
+<   2's comp.:      -4     -3   -2   -1   0    1    2    3
+---
+>   the negative values are all "slid" by one, eliminating the -0.
+197,198c455
+<   The negative values are all "slid" down by one, eliminating the 
+<   extra zero representation.
+---
+> 	ADD 2SC TO TABLE
+200,205c457
+< 
+< 
+<   How to get an integer in 2's comp. representation:
+< 
+<     positive values are the same as for sign mag. and 1's comp.
+<     they will have a 0 in the MSB (but it is NOT a sign bit!)
+---
+>   how to get an integer in 2's comp. representation:
+210,213c462,464
+< 	      use the positive value     00101 (+5)
+< 
+< 	      take the 1's comp.         11010 (-5 in 1's comp)
+< 	      add 1                     +    1
+---
+> 	      take the positive value    0101 (+5)
+> 	      take the 1's comp.         1010 (-5 in 1's comp)
+> 	      add 1                     +   1
+215c466
+< 					 11011 (-5 in 2's comp)
+---
+> 					 1011 (-5 in 2's comp)
+217c468
+<   To get the additive inverse of a 2's comp integer,
+---
+>   to get the additive inverse of a 2's comp integer,
+221c472
+<   To add 1 without really knowing how to add:
+---
+>   to add 1 without really knowing how to add:
+225,228d475
+<       All other remaining bits are the same as before.
+< 
+<   EXAMPLE:
+<        What decimal value does the two's complement 110011 represent?
+230,231c477
+<        It must be a negative number, since the most significant bit (msb)
+<        is a 1.  Therefore, find the additive inverse:
+---
+>       [-8,..,-1,0,+1,..,+7] = 8 + 1 + 7 = 16 = 2^4 numbers
+233,241c479
+< 	     110011  (2's comp.  ?)
+< 
+< 	     001100  (after taking the 1's complement)
+< 		+ 1
+< 	     ------
+< 	     001101  (2's comp.  +13)
+< 
+< 	     Therefore, its additive inverse (110011) must be -13.
+< 
+---
+>       With 32 bits:
+242a481,482
+>       [2147483648,..,-1,0,+1,..,2147483647]  approx= +/- 2G
+>       [2^31,..,-1,0,+1,..,(2^31 - 1)] = 2^31 + 1 + (2^31 - 1) = 2^32
+246c486
+<   We'll see how to really do this in the next chapter, but here's
+---
+>   we'll see how to really do this in the next chapter, but here's
+248a489,502
+>   its really just like we do for decimal!
+>     0 + 0 = 0
+>     1 + 0 = 1
+>     1 + 1 = 2  which is 10 in binary, sum is 0 and carry the 1.
+>     1 + 1 + 1 = 3  sum is 0, and carry a 1.
+> 
+>        a      0011
+>       +b     +0001
+>       --     -----
+>      sum      0100
+> 
+>      see truth table next
+> 
+> 
+260,273d513
+<        a      0011
+<       +b     +0001
+<       --     -----
+<      sum      0100
+< 
+< 
+<   its really just like we do for decimal!
+<     0 + 0 = 0
+<     1 + 0 = 1
+<     1 + 1 = 2  which is 10 in binary, sum is 0 and carry the 1.
+<     1 + 1 + 1 = 3  sum is 1, and carry a 1.
+< 
+< 
+< 
+281,283c521
+< It represents a range of values (different from unsigned representation)
+< using the unsigned representation.  Another way of saying this:
+< biased representation is a re-mapping of the unsigned integers.
+---
+>     examples:    given 4 bits, we BIAS values by 2^3 (8)
+285,302c523
+< 
+<     visual example (of the re-mapping):
+< 
+<         bit pattern:        000  001  010  011  100  101  110  111
+< 
+<         unsigned value:      0    1    2    3    4    5    6    7
+< 
+<         biased-2 value:      -2   -1   0    1    2    3    4    5
+< 
+< 	This is biased-2.  Note the dash character in the name
+< 	of this representation.  It is not a negative sign.
+< 
+< 
+<     examples:    given 4 bits, we BIAS values by 2**3 (8)
+<        (This choice of bias results in approximately half the
+<        represented values being negative.)
+< 
+< 	  TRUE VALUE to be represented      3
+---
+> 	  true value to be represented      3
+307c528
+< 	  so the biased-8 representation of the value 3
+---
+> 	  so the bit pattern of 3 in biased-8 representation
+318c539
+< 	  TRUE VALUE represented   -2
+---
+> 	  true value represented   -2
+319a541,545
+>     ADD BIAS TO TABLE
+> 
+>     this representation allows operations on the biased numbers
+>     to be the same as for unsigned integers, but actually represents
+>     both positive and negative values.
+324,325c550,554
+<       equal distribution of values above and below 0,
+<       the bias should be    2 ** (n-1)      or   (2**(n-1)) - 1
+---
+>       equal distribution of true values above and below 0,
+>       the bias should be    2 ^ (n-1)      or   (2^(n-1)) - 1
+> 
+> Used in floating-point exponents
+> 
+332c561
+< How to change an integer with a smaller number of bits into the
+---
+> how to change an integer with a smaller number of bits into the
+335c564
+< This is commonly done on some architectures, so it is best to
+---
+> this must be done a lot by arithmetic units, so it is best to
+339,340c568,569
+< 
+<   unsigned:             xxxxx   -->   000xxxxx
+---
+>   unsigned:             xxxxx   -->   yyyyyyyy
+> 				      000xxxxx
+343c572,573
+<   sign/magnitude:       sxxxx   -->   s000xxxx
+---
+>   sign/magnitude:       sxxxx   -->   yyyyyyyy
+> 				      s00xxxxx
+349c579,582
+< 	take the MSB of original integer and replicate it elsewhere.
+---
+> 	take the MSB of original integer and copy it elsewhere.
+> 
+> 	example:       0010101
+> 		   000 0010101
+351,354c584,585
+< 	example:       0010101 ->  000 0010101
+<                        ^           ^^^
+< 		       11110000 ->  11111111 11110000
+<                        ^            ^^^^^^^^
+---
+> 		       11110000
+> 	      11111111 11110000
+360c591
+< Sometimes a value cannot be represented in the limited number
+---
+> sometimes a value cannot be represented in the limited number
+366c597
+< When a value cannot be represented in the number of bits allowed,
+---
+> when a value cannot be represented in the number of bits allowed,
+376a608,612
+> 
+> What happens on overflow?
+> 	ignored
+> 	tested
+> 	trap
+380,381c616,617
+< CHARACTER REPRESENTATION
+< ------------------------
+---
+> OPTIONAL: DERIVING TWO'S COMPLEMENT
+> -----------------------------------
+383c619
+< Everything represented by a computer is represented by binary sequences.
+---
+> Why does two complement work?
+385,386c621
+< A common non-integer to be represented is a character.
+< We use standard encodings (binary sequences) to repreesent characters.
+---
+> 1. Background
+388c623
+< REMEMBER:  bit patterns do NOT imply a representation
+---
+> Consider a two-digit adder (in base ten):
+389a625,628
+>      75
+>    + 50
+>    ----
+>    1 25
+391,394c630
+< Many I/O devices work with 8-bit quantities.
+< A standard code  ASCII (American Standard for Computer Information
+< Interchange) defines what character is represented by each sequence.
+< You'll look these up in a table (page 102 in your textbook).
+---
+> This is a mod 100 adder, since (75+50) mod 100 = 25
+396,398c632
+<   examples:
+<     0100 0001  is  41 (hex)  or 65 (decimal).  It represents `A'
+<     0100 0010  is  42 (hex)  or 66 (decimal).  It represents `B'
+---
+> Also note that it is a mod 10^2 adder and it keeps two decimal digits
+399a634
+> Consider a 4-bit unsigned adder:
+401,402c636,639
+<     Different bit patterns are used for each different character
+<     that needs to be represented.
+---
+>     0011
+>   + 1110
+>   ------
+>   1 0011
+404,407c641
+< The code has some nice properties.  If the bit patterns are compared,
+< (pretending they represent integers), then `A' < `B'  
+< This is good, because it helps with sorting things into alphabetical
+< order.
+---
+> This is a mod 16 or mod 2^4 adder that keeps 4 bits
+408a643
+> Also recall:
+410c645
+< Notes:        `a' (0x61)  is different than `A' (41 hex)
+---
+> 5 mod 16 = (5 + 16) mod 16 = 21 mod 16 = (5 - 16) mod 16 = -9 mod 16
+412,414d646
+<               `8' (0x38) is different than the integer 8
+< 	   two's comp rep for 8:   0000 0000 0000 0000 0000 0000 0000 1000
+< 	   the ASCII character '8':   0011 1000
+416,418c648
+<     the digits:
+< 	  `0' is 48 (decimal) or 0x30
+< 	  `9' is 57 (decimal) or 0x39
+---
+> 2. The Challenge
+419a650,652
+> (1) Want positive & negative numbers represented in 4 bits
+> (2) Want 0 to 7 as unsigned (0000, 0001, ..., 0111).
+> (3) Want 4-bit unsigned addition (mod 16 addition) to "do the right thing"
+421c654
+< Because of this, you have to be careful.  Consider the following example:
+---
+> E.g., let "rep(-n)" be the representation of -n
+422a656,657
+>     5 + rep(-2) = 3
+>     5 + rep(-7) = rep(-2)
+424,425c659
+<        in1:  .byte
+<        result:  .byte
+---
+> ==> Represent -1, -2, -3 ... as 8 (1000) to 15 (1111) in some order!
+426a661,673
+>     bits uns    new
+>     ---- ---    ---
+>     0000  0      0
+>     0001  1      1
+>     0010  2      2
+>     ...
+>     0111  7      7
+>     
+>     1000  8 ==> -???
+>     1001  9 ==> -???
+>     ...
+>     1110 14 ==> -???
+>     1111 15 ==> -???
+428,431c675
+< 	     get in1
+< 	     add  result, in1, in1
+< 	     put result
+< 
+---
+> Case 1
+432a677,679
+> 5 + rep(-2) = 3
+> (5 + rep(-2)) mod 16 = 3 
+> And 8 <= rep(-2) <= 15
+434,435c681
+<     suppose the user types `3'
+<        result <-  51 + 51 = 102 (decimal)
+---
+> So rep(-2) = 14 = 1110
+437c683
+<        put prints out `f', since the ASCII code for 102(decimal) is `f'
+---
+> Why? Because: (5+14) mod 16 = 19 mod 16 = 3
+438a685
+> Double-check:
+440c687,690
+< What we really wanted was more likely this:
+---
+>     0101       5
+>   + 1110  rep(-2)
+>   ------  -------
+>   1 0011       3    & add to table
+442,445c692
+<        in1:     .byte
+<        number:  .word
+<        result:  .word
+<        out1:    .byte
+---
+> Case 2
+446a694,696
+> 5 + rep(-7) = rep(-2)
+> (5 + rep(-7)) mod 16 = 14
+> And 8 <= rep(-7) <= 15
+448,452c698
+< 	     get  in1
+< 	     sub  number, in1, 48
+< 	     add  result, number, number
+< 	     add  out1, result, 48
+< 	     put  out1
+---
+> So rep(-7) = 9 = 1001
+454,455c700
+<   the subtract takes the "bias" out of the character representation.
+<   the add puts the "bias" back in.
+---
+> Why? Because: (5+9) mod 16 = 14 mod 16 = 14 = rep(-2)
+456a702
+> Double-check:
+458,459c704,707
+< This will only work right if the result is a single digit.
+<         (What would happen if it wasn't?)
+---
+>     0101       5
+>   + 1001  rep(-7)
+>   ------  -------
+>   0 1110  rep(-2)    & add to table
+461,462d708
+< What we need is an algorithm for translating character strings
+< to the integers they represent, and visa versa.
+463a710,712
+> Fill in table by interpolation!
+> Have derived 4-bit 2SC
+> A similar derivations works for 32 bits (or any other number of bits)
+465,466d713
+< ALGORITHM:   character string --> integer
+<    the steps:
+468,469c715
+<       for `3' `5' `4'
+<       integer = 0
+---
+> 3. Optional Appendix
+471,481c717,718
+<       read `3'
+<       translate `3' to 3
+<       integer =  integer * 10  + 3 = 3
+< 
+<       read `5'
+<       translate `5' to 5
+<       integer =  integer * 10  + 5 = 35
+< 
+<       read `4'
+<       translate `4' to 4
+<       integer =  integer * 10  + 4 = 354
+---
+> So why do we get 2SC representation (or additive inverse)
+> by fliping bits and adding one?
+483,489c720
+<   the algorithm:
+<      
+<      integer = 0
+<      while there are more characters
+<        get character
+<        digit <-  character - 48
+<        integer <- integer * 10  + digit
+---
+> rep(-N) = -N + 16
+491,493c722
+<      Note that integer and digit are of type .word,
+<      and character is of type .byte
+< 
+---
+> rep(-N) + N = 16 = 0 mod 16
+495,498c724,726
+< ALGORITHM:  integer --> character string
+<    the steps:
+<    For 354, figure out how many characters there are in
+<    the base desired (3).
+---
+> Let
+> N = b3 b2 b1 0 in bits
+> N = b3*8 + b2*4 + b1*2 +b0*1
+500c728,730
+<    Figure out base^(number of characters - 1)  (10^2)=100
+---
+> We said
+> rep(-N) = (1-b3) (1-b2) (1-b1) (1-b0) + 1
+> rep(-N) = (1-b3)*8 +(1-b2)*4 + (1-b1)*2) + (1-b0)*1 + 1
+502,531c732,734
+<      354 div 100 gives 3
+<      translate 3 to `3' and print it out
+<      354 % 100 gives 54
+<      100/10 = 10
+< 
+<      54 div 10 gives 5
+<      translate 5 to `5' and print it out
+<      54 mod 10 gives 4
+<      10/10 = 1
+< 
+<      4 div 1 gives 4
+<      translate 4 to `4' and print it out
+<      4 mod 1 gives 0
+<      1/10 = 0, so you're done
+< 
+<   written in a form using two loops:
+< 
+<      # figure out base^(number of characters - 1)
+<      power_of_base = base
+<      while power_of_base is not large enough
+<          power_of_base = power_of_base * base
+< 
+<      while power_of_base != 0
+<          digit = integer / power_of_base
+< 	 char_to_print = digit + 48
+< 	 print char_to_print
+< 	 integer = integer % power_of_base    # remainder after integer division
+< 	 power_of_base = power_of_base / base # quotient
+<      
+< 
+---
+> rep(-N) + N = 16
+> [(1-b3)*8 +(1-b2)*4 + (1-b1)*2) + (1-b0)*1] + [b3*8 + b2*4 + b1*2 +b0*1] + 1 = 16
+> 8 + 4 + 2 + 1 + 1 = 16!
+532a736
+> 
+537,544c741,785
+< Computers represent real values in a form similar to that of
+< scientific notation.  
+<         1.23 x 10^4
+< 	The number has a sign (+ in this case)
+< 	The significand (1.23) is written with one non-zero digit
+< 	  to the left of the decimal point.
+< 	The base (radix) is 10.
+< 	The exponent (an integer value) is 4.  It too must have a sign.
+---
+> Box (memory location) for a real number usually contains 32 or 64 bits,
+> allowing 2^23 or 2^64 numbers.
+> 
+> As with integers and chars, we ask
+> 
+> (1) Which reals?  There are an infinite number between two adjacent integers.
+> In fact, there are an infinite number between any two reals!!!!!!!
+> 
+> (2) Which bit patterns for reals selected for (1)?
+> 
+> Answer for both strongly related to scientific notation.
+> 
+> Consider: a x 10^b and show on number line, where
+> "a" has only one digit of precision.
+> 
+> 	 a	   b		a x 10^b
+> 	---	  ---		--------
+> 	0	  any		0
+> 	1 .. 9	   0		1 .. 9
+> 	1 .. 9	   1		10 .. 90
+> 	1 .. 9	   2		100 .. 900
+> 
+> 	1 .. 9	  -1		0.1 .. 0.9
+> 	1 .. 9	  -2		0.01 .. 0.09
+> 
+> Many representable numbers close to zero where a small error is a big deal
+> 
+> Representable numbers spread out far from zero where a larger absolute error
+> is still a small relative error
+> 
+> Let r be some real number and let fp(r) be the representable number closest
+> to r,  want
+> 
+> 	| fp(r) - r |
+> 	| --------- |  <  small for all r (but zero)
+> 	|     r     |
+> 
+> For above error maximum at r=1.5  | (1-1.5)/1.5 | = 1/3
+> 
+> If a can have five digits, worst relative error at 1.00005
+> 
+> 	| (1-1.00005)/1.00005 | approx= 0.00005
+> 
+> 	
+> For (1):  Minimize max relative error due to representation
+546,547c787
+< There are standards which define what the
+< representation means, so that across computers there will be consistancy.
+---
+> For (2): (a) Want STANDARD! 
+549,550c789,791
+< Note that this is not the only way to represent floating point
+< numbers, it is just the IEEE standard way of doing it.
+---
+> Answer:  Floating-point, especially IEEE FP
+> 
+> 
+554c795
+< the representation has three fields:
+---
+> the representation
+556,558c797,799
+< 	 ----------------------------
+< 	 | S |   E     |     F      |
+< 	 ----------------------------
+---
+> 	 -------------------
+> 	 | S |   E   |  F  |
+> 	 -------------------
+561c802
+<     E is an 8-bit biased integer representing the exponent
+---
+>     E is an 8 bit biased integer representing the exponent
+564c805
+<  the decimal value represented is:
+---
+>  the true value represented is:
+572c813
+< 	    f = F/2    + 1
+---
+> 	    f = F/2  + 1
+574c815
+<  for single precision representation (the emphasis in this class)
+---
+>  for single precision numbers (the emphasis in this class)
+578,582d818
+<  for double precision representation (a 64-bit representation)
+<        n = 52 (there are 52 bits for the mantissa field)
+<        bias = 1023 (there are 11 bits for the exponent field)
+< 
+< 
+588,589c824,825
+<   --> S  is just a sign bit.  0 for positive, 1 for negative.
+<       This is the sign of the number.
+---
+>   --> S  is just a sign bit.  (-1)^S ==> (-1)^0 = +1 and (-1)^1 = -1
+>       ==> just a sign bit for signed magnitude
+592,593c828,829
+<       So, the true exponent represented is (E - bias).  The radix for
+<       the number is ALWAYS 2.
+---
+>       So, the true exponent represented is (E - bias).  The base (radix) for
+>       the number is ALWAYS 2 and NOT STORED.
+597c833
+< 	     Example:  some IBM machines had radix of 16.
+---
+> 	     Example:  IBM machines had radix of 16.
+599,602c835,838
+<   --> F  is the mantissa (significand).  It is in a somewhat modified
+<       form.  There are 23 bits available for the mantissa.  It turns out that
+<       if fl. pt.  numbers are always stored in their normalized form, then the
+<       leading bit (the one on the left, or MSB) is ALWAYS a 1.  So, why store
+---
+>   --> F  is the mantissa.  It is in a somewhat modified form.  There are
+>       23 bits available for the mantissa.  It turns out that if fl. pt.
+>       numbers are always stored in their normal form, then the leading
+>       bit (the one on the left, or MSB) is always a 1.  So, why store
+608a845
+> 
+610,611c847,848
+< An example:   Put the decimal number 64.2 into the IEEE standard
+<               single precision floating point representation.
+---
+> An example:   put the decimal number 64.2 into the standard single
+> 	      precision representation.
+620c857
+< 	  .2 can be gotten using the algorithm:
+---
+> 	  .2 can be gotten using the following algorithm:
+634,637d870
+<                  ----
+< 	    or  .0011  (The bar over the top shows which bits repeat.)
+< 
+< 
+644c877
+< 	Normalize the binary representation. (make it look like
+---
+> 	put the binary rep. into normal form. (make it look like
+652c885
+< 	be in 8-bit, biased-127 representation.
+---
+> 	be in biased-127 form.
+659c892
+< 	133 in 8-bit, unsigned representation is 1000 0101
+---
+> 	133 in 8 bit, unsigned representation is 1000 0101
+661c894
+< 	This is the bit pattern used for E in the standard form.
+---
+> 	this is bit pattern used for E in the standard form.
+665c898
+< 	in the normalized form.  We need 23 bits of it.
+---
+> 	in the normal form.  We need 23 bits of it.
+680d912
+< 
+685c917
+<  -->  Since floating point numbers are always stored in a normalized
+---
+>  -->  Since floating point numbers are always stored in normal
+693,695c925,928
+<       Note that the hardware that does arithmetic on floating
+<       point numbers must be constantly checking to see if it needs
+<       to use a hidden bit of a 1 or a hidden bit of 0 (for 0.0).
+---
+>  -->  Other special values:
+> 
+>        +5 / 0 = +infinity
+>        +infinity     0 11111111 00000... (0x7f80 0000)
+697,698c930,931
+<       Values that are very close to 0.0, and would require the hidden
+<       bit to be a zero are called denormalized or subnormal numbers.
+---
+>        -7/ 0 = -infinity
+>        -infinity     1 11111111 00000... (0xff80 0000)
+699a933,935
+>        0 / 0 or +infinity + -infinity = NaN (Not a Number)
+>        NaN      ? 11111111 ?????... 
+> 	  (S is either 0 or 1, E=0xff, and F is anything but all zeros)
+701,703c937
+<                 S         E           F
+<    0.0         0 or 1   00000000   00000000000000000000000
+<                (hidden bit is a 0)
+---
+>        Also denormalized numbers (but beyond scope of this course)
+705,706d938
+<    subnormal   0 or 1   00000000   not all zeros
+<                (hidden bit is a 0)
+708,709d939
+<    normalized  0 or 1   > 0        any bit pattern
+<                (hidden bit is a 1)
+711,714c941
+<  -->  Other special values:
+<                               S  E        F
+<        +infinity              0 11111111 00000... (0x7f80 0000)
+<        -infinity              1 11111111 00000... (0xff80 0000)
+---
+> One last example
+716,717c943,945
+<        NaN (Not a Number)     ? 11111111 ?????... 
+< 	  (S is either 0 or 1, E=0xff, and F is anything but all zeros)
+---
+> 	0x4228 0000 is stored
+> 
+> 	0100 0010 0010 1000 0 ...
+718a947
+> 	0 |  1000 0100 |  0101 0000 ...
+720,723c949
+<  -->  Single precision representation is 32 bits.
+<       Double precision representation is 64 bits.
+<       For double precision:
+<          S  is the sign bit (same as for single precision).
+---
+> 	positive
+725c951
+< 	 E  is an 11-bit, biased-1023 integer for the exponent.
+---
+> 	e = E - 127 = E - 128 + 1 = E - 10000000 + 1 =5
+727,728c953,964
+< 	 F  is a 52-bit mantissa, using same method as single
+< 	    precision (hidden bit is not expicit in the representation).
+---
+> 	f = F/2^23 + 1 =  0.01010000 + 1 = 1.01010000
+> 
+> 	+1.01010000 x 2^(+5)  = 101010.000 = 32 + 8 + 2 = 42
+> 
+> 
+> Important Ideas
+> --------------
+> 	n-bit box can represent 2^n things
+> 	choose represention that eases computation
+> 	integers: UNSIGNED and 2SC most common
+> 	character: ASCII
+> 	real numbers: IEEE FP
+730d965
+< </pre>
+731a967
+> <!--#include virtual="style4.html" -->

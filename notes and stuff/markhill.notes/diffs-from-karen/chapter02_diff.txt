@@ -1,0 +1,663 @@
+1c1
+< <pre>
+---
+> <!--#include virtual="style1.html" -->
+3,4c3,18
+< ABOUT SAL
+< ---------
+---
+> Lecture Notes for
+> Chapter 2 -- SAL <!-- EDIT CHAPTER INFO -->
+> 
+> <!--#include virtual="style2.html" -->
+> 
+> Wednesday, November 14, 2001 <!-- EDIT LAST UPDATE DATE -->
+> 
+> <!--#include virtual="style3.html" -->
+> 
+> </PRE><b>NOT YET UPDATED FOR FALL 2003</b><PRE>
+> 
+> 
+> *******************************************************************
+> *  Students should read UPDATED Chapter 2 handout from web page,  *
+> *  which is more up to date than Chapter 2 in the textbook.       *
+> *******************************************************************
+29d42
+< ----
+32d44
+<      no object oriented anything (no classes)
+56c68
+<   - they can label (assign a name to) the memory space
+---
+>   - they assign a name to the memory space
+59c71
+<   We can build other types out of these,
+---
+>   can build other types out of these,
+74c86
+< 		   .float     if floating point
+---
+> 		   .float     if real (floating point)
+77d88
+<      variablename is optional -- it gives a way of identifying the variable
+84,85c95
+<        variable3: .word          # integer-sized variable, defaults to
+<                                  # an initial value of 0
+---
+>        variable3: .word
+89c99
+<        uservalue:    .byte       # character-sized variable
+---
+>        uservalue:    .byte
+93,95d102
+<          .word   0               # the variablename is not required,
+< 	                         # but then there is no name for the
+< 				 # variable!
+101,104d107
+< 
+< The variablenames are labels.  Labels (in SAL/MAL) should start
+< with a letter of the alphabet ('A'-'Z', 'a'-'z'), and may be
+< followed by other letters, digits or the underscore character ('_').
+107,117d109
+< Some useful characters:
+< 
+<       '\n'  the newline (a line feed followed by a carriage return)
+<       '\t'  horizontal tab
+<       '\\'  the backslash character
+<       '\"'  the double quote mark
+<       '\0'  the null character  (for SAL/MAL, appended to the end of
+<                                  a string to identify the end of the
+< 				 string.)
+< 
+< 
+122,123d113
+<   (The assembler is the program that translates from SAL to
+<    machine code.)
+134,137c124,125
+< 		     #   There can be more than 1 .data section in
+< 		     #     a program.
+< 		     #   There will be 1 global location where data
+< 		     #     from all .data sections is placed.
+---
+> 		     #   there can be more than 1 .data section in
+> 		     #   a program
+141,142c129,130
+< 		     #   There can be more than 1 .text section in
+< 		     #   a program.
+---
+> 		     #   there can be more than 1 .text section in
+> 		     #   a program
+146,147d133
+< 				 # This is a bunch of characters consecutively
+< 				 # allocated within memory.
+159c145
+<      SAL             Pascal             C or C++ or Java
+---
+>      SAL             Pascal             C
+165,166c151,152
+<      div x, y, z     x := y div z;     x = y / z;  gives quotient
+<      rem x, y, z     x := y mod z;     x = y % z;  gives remainder
+---
+>      div x, y, z     x := y div z;     x = y / z;
+>      rem x, y, z     x := y mod z;     x = y % z;
+170c156
+< 	  3. y and/or z can be IMMEDIATES, constants in the code
+---
+> 	  3. y and/or z can be IMMEDIATES
+175,177c161
+<       move  count, 0        # the zero is an immediate
+< 
+<       move  loop_count, init_count
+---
+>       move  count, 0
+181c165
+<       add   sum, 2, addend  # the 2 is an immediate
+---
+>       add   sum, 2, addend
+184,185c168,169
+< NOTE:  there are other instructions that implement boolean (logical)
+<        operations, but we don't cover them until Chapter 5.
+---
+> NOTE:  there are other instructions that implement boolean functions,
+>        but we don't cover them yet.
+188,191c172,240
+< On a real processor, an integer division operation gives two results:
+<   both the quotient and the remainder.  In SAL, we separate these
+<   into two instructions.
+< 
+---
+> GO OVER SIMPLE PROGRAM modified from REVISED Chapter 2 Figure 1 page 7
+> (and note that (20+13+82)/3 = 38.333...)
+> 
+> 
+> -------------------------------------------
+> avg3.c
+> -------------------------------------------
+> 
+> /* a simple C program to average 3 integers */
+> 
+> #include &lt;stdio.h&gt; <!-- really: #include <stdio.h> -->
+> 
+> void main()
+> {
+>    int avg;
+>    int i1 = 20;
+>    int i2 = 13;
+>    int i3 = 82;
+> 
+>    avg = (i1 + i2 + i3) / 3;
+> 
+>    printf("%d\n", avg);
+> }
+> 
+> -------------------------------------------
+> avg3.s
+> -------------------------------------------
+> 
+> # a simple SAL program to average 3 integers
+> 
+>         .data
+> avg:    .word
+> i1:     .word 20
+> i2:     .word 13
+> i3:     .word 82
+> 
+>         .text
+> 
+> __start: add avg, i1, i2
+>          add avg, avg, i3
+> 	 div avg, avg, 3
+> 	 put avg
+> 	 put '\n'
+> 	 done
+> 
+> -------------------------------------------
+> 
+>         Show assembly code
+>         Assembler translates to executable -- machine language
+>         (multiple source files need "linker" -- much later)
+> 
+>         To Run
+>                 loader puts executable into memory and makes
+>                 CPU jump to first instruction or __start:
+>                 execute
+>                 executing done returns control to OS
+> 
+>         Repeat last step to run again -- usually with different data
+> 
+>         simp combines all of the above
+> 
+> Explain
+>         # comment follows and end at end of line
+>         .data   # data follows
+>         .text   # instructions follow
+> 
+>         __start:        label to start program
+>         done            syscall to end program
+> 
+196c245
+<   Sometimes an instruction (or a set of instructions) should
+---
+>   sometimes an instruction (or a set of instructions) should
+199c248
+<   In a HLL, the simplest form is a go-to.  (Always discouraged.)
+---
+>   HLL -- simplest form is a go-to.  (Always discouraged.)
+211c260
+< C  or JAVA  if-then-else
+---
+> C if-then-else
+236,244d284
+< 
+< 
+< In the mnemonics,
+<   b   stands for branch
+<   g              greater
+<   l              less
+<   t              than
+<   e              equal to
+<   z              zero
+251d290
+< 
+259,260c298
+< 
+<   C/Java equivalent:
+---
+>   C equivalent:
+266,267c304
+< 
+<   SAL equiv to if-then-else:
+---
+> SAL equiv to if-then-else:
+281d317
+< 
+285,317d320
+< Examples of compound conditionals:
+< 
+<   C/Java:
+< 
+<      if ( (x < y) || (w == z) ) {
+< 	 a = a + 1;
+<      }
+< 
+< 
+<   One possible SAL equivalent:
+< 
+<                     blt   x, y, increment    # no need to check second
+<                     bne   w, z, no_increment # condition if first is True
+<      increment:     add   a, a, 1
+<      no_increment: 
+< 
+< 
+< 
+<   C/Java:
+< 
+<      if ( (x < y) && (w == z) ) {
+< 	 a = a + 1;
+<      }
+< 
+< 
+<   One possible SAL equivalent:
+< 
+<                     bge   x, y, no_increment   # must check second
+<                     bne   w, z, no_increment   # condition if first is True
+<                     add   a, a, 1
+<      no_increment: 
+< 
+< 
+327d329
+< 
+336d337
+< 
+345,346c346
+< 
+<   C/Java:
+---
+>   C:
+353d352
+< 
+366d364
+<     (NOTE:  This example shows an implementation of nonsense code.)
+372,376c370,374
+< 	   if (aa < bb) then
+< 	      aa := a + 1;
+< 	   if (aa > bb) then
+< 	      aa := aa - 1;
+<        until aa = bb;
+---
+> 	   if (a < b) then
+> 	      a := a + 1;
+> 	   if (a > b) then
+> 	      a := a - 1;
+>        until a = b;
+383,387c381,385
+< 	   if (aa < bb)
+< 	       aa++;
+< 	   if (aa > bb)
+< 	       aa--;
+<        } while( aa != bb);
+---
+> 	   if (a < b)
+> 	       a++;
+> 	   if (a > b)
+> 	       a--;
+>        } while( a != b);
+392,396c390,394
+<       repeat:    bge aa, bb, secondif
+<                  add aa, aa, 1
+<       secondif:  ble aa, bb, until
+< 	         sub aa, aa, 1
+<       until:     bne aa, bb, repeat
+---
+>       repeat:    bge a, b, secondif
+>                  add a, a, 1
+>       secondif:  ble a, b, until
+> 	         sub a, a, 1
+>       until:     bne a, b, repeat
+401,402d398
+< 
+< 
+410,411c406
+< 
+<   C/Java:
+---
+>   C:
+417,418d411
+< 
+< 
+454c447
+<                  move i, 3          # initialize loop induction variable
+---
+>                  move i, 3
+457c450
+<                  add  i, i, 1       # increment loop induction variable
+---
+>                  add  i, i, 1
+471,472c464,465
+< SAL doesn't have any oddities about testing for eoln or eof (like
+< Pascal does).  A carriage return is just another
+---
+> SAL doesn't have any oddities about
+> testing for eoln or eof.  A carriage return is just another
+485c478
+<     places the first character variable it has into charvariable
+---
+>     placed the first character variable it has into charvariable
+501c494
+<   another example with the same input:
+---
+>   OR:
+508c501
+<   another example with the same input:
+---
+>   OR:
+517c510
+< a single line, you must read input in character by character, and
+---
+> a single line, you must read in character by character, and
+522,575d514
+< Example 1 of using puts:
+< 
+<      .data
+<      str1:  .asciiz  "hello."
+<      .text
+< 
+<      puts  str1
+<       
+< 
+<       -------------
+<       |hello.
+<       |      ^
+<              more output starts here, when more is printed
+< 
+< 
+< Example 2 of using puts:
+< 
+<      .data
+<      str1:  .asciiz  "hello.\nMy name is George."
+<      .text
+< 
+<      puts  str1
+< 
+<       -------------
+<       |hello.
+<       |My name is George.
+<       |                  ^
+<                          more output starts here, when more is printed
+< 
+< Example 3 of using puts:
+< 
+<      .data
+<      str1:  .ascii   "Hi.\n"
+<      str2:  .asciiz  "I am a badger."
+<      .text
+< 
+<      puts  str1
+< 
+<       -------------
+<       |Hi.
+<       |I am a badger.
+<       |              ^
+<                      more output starts here, when more is printed
+< 
+<    Explanation:  The declarations just place the characters into memory.
+<    The characters are contiguous.  The .ascii directive does NOT add
+<    a null terminating character to the string.  The puts instruction
+<    knows to stop printing characters when it encounters the NULL
+<    character ('\0').  It does not find the null character at the end
+<    of the first string, so it just keeps going (through the second
+<    string) until it encounters the null character at the end of the
+<    second string.
+< 
+< 
+600c539
+<  __start:  puts prompt1
+---
+>            puts prompt1
+631c570
+< Another simple SAL example program
+---
+> Another simple SAL example program (optional)
+685,701c624,625
+< PROCEDURES/FUNCTIONS/METHODS
+< -----------------------------
+< 
+< SAL has a rudimentary method for procedure call and return.
+< There is no mechanism for parameter passing or function return
+< values.
+< 
+< 
+< procedure parts:
+<   1. call
+< 
+<      SAL procedure call:
+<          b procname
+< 
+<   2. execute procedure
+< 
+<      procname:  #code for procedure goes here
+---
+> PROCEDURES 101
+> --------------
+703c627
+<   3. return
+---
+> In main program:
+705,706c629,632
+<      "the hard part"
+<      could be a branch, if we had a label for the return place.
+---
+> 	...
+> 	y = abs(x);	<--call--need a branch
+> 	y = y + 1;	<--return point/address
+> 	...
+710,712c636,646
+<      # a BAD example, since it does not implement a procedure
+<             b procname          # the call
+<    rtn1:     # more code here   # the return point
+---
+> 	int abs (x);
+> 	int x, y;
+> 	{
+> 	    if (x < 0) {
+> 		y = -x;
+> 	    }
+> 	    else {
+> 		y = x;
+> 	    }
+> 	return(y);
+> 	};	<-- return -- branch back
+715,719c649,671
+<   procname:  # procedure code here
+<          .
+<          .
+<          .
+<             b rtn1              # the return?
+---
+> Ignore parameters, simplest SAL:
+> 	
+> 	...
+> 	b abs
+> return:	add y,y,1
+> 	...
+> 
+> abs:	bgez x, nonnegative
+> 	sub y, 0, x
+> 	b endabs
+> nonnegative: move y, x
+> endabs:	b return
+> 
+> 
+> But what about (add to HLL):
+> 
+> 	...
+> 	... = abs(y,x)
+> 	y = y + 1;
+> 	x = y*x;	<-- new
+> 	... = abs(y,x)	<-- new
+> 	y = y + 2;	<-- new
+> 	...
+722,723d673
+<     This is not a procedure.  It just jumps to a different place in the
+<     code!  The procedure cannot be called from more than one location.
+725,727d674
+< 
+< 
+< 
+730d676
+< Convenient SAL instruction:
+733,741c679,682
+<        la stands for Load Address
+< 
+<        Operation: the address implied by label is placed into var1.
+<        NOTE:  var1 must be declared as an integer (.word)
+< 
+<        So, var1 is a POINTER (a REFERENCE, for Java programmers).
+< 
+<        Notice the difference between an address and the contents at
+<        a given address.
+---
+>        The address implied by label is placed into var1.
+>        Notice difference between address and contents of
+>        the address.
+>        NOTE:  var1 must be declared as integer (.word)
+758,818c699,702
+< 
+< 
+< 
+< For procedure call and return, save a return address
+< before branching to the procedure.
+< 
+< 
+<              la  procname_ret, rtn1    # save return address
+< 	     b procname                # the call
+<   rtn1:      # more code here
+<   .
+<   .
+<   .
+<   procname:  # procedure code here
+<              .
+<              .
+<              .
+<              b procname_ret            # an incorrect return
+< 
+< THIS STILL DOESN'T WORK!
+<   It branches to label procname_ret.  But, procname_ret
+<   is a variable!  We do NOT want to branch to a variable!
+<   To solve the problem, there is a special form of the b
+<   instruction used only for procedure return.
+< 
+< 
+<   b  (var1)     #parentheses identify the special form
+< 
+<   branches to the contents of var1, not to var1 itself.
+< 
+< 
+< So, the complete  and correct SAL call/return code is:
+< 
+< 
+< 
+<              la  procname_ret, rtn1    # save return address
+< 	     b   procname              # a first call
+<   rtn1:      # more code here          # the first return location
+< 
+<              .
+<              .
+<              .
+< 
+<              la  procname_ret, rtn2    # save return address
+< 	     b   procname              # a second call
+<   rtn2:      # more code here          # the second return location
+<              .
+<              .
+<              .
+<   procname:  # procedure code here
+<              .
+<              .
+<              .
+<              b (procname_ret)          # the return
+< 
+< 
+< 
+< A SAL code fragment to show procedures.
+< 
+<  # code fragment that has two distinct calls to a procedure
+<  # that calculates the area of a rectangle.
+---
+> 	
+> Change SAL again
+> 	
+> returnhere:	.word			<-- add
+820,822c704,734
+<  # Note:  the three variables used (area, length, and width) are
+<  #        global variables.  SAL has no way to pass parameters
+<  #        or use a (function) return value.
+---
+> 	...
+> 	la returnhere, return		<-- add
+> 	b abs
+> return:	add y,y,1
+> 	mul x,y,x
+> 	la returnhere, return2		<-- add
+> 	b abs
+> return2: ...
+> 
+> Change SAL procedure:
+> 
+> abs:	bgez x, nonnegative
+> 	sub y, 0, x
+> 	b endabs
+> nonnegative: move y, x
+> endabs:	b returnhere		<-- change, NOT!
+> 
+> Must be:
+> 
+> endabs:	b (returnhere)	<-- Parentheses are important
+> 
+> 
+> Key ideas
+> 	assembly vs execution
+> 	SAL language
+> 		declatations
+> 		arithmetic
+> 		conditional
+> 		looping
+> 		I/O
+> 		procedures
+824,828d735
+<  .data
+<  rect_area_rtn:  .word          # return address for rect_area
+<  width:          .word 0
+<  length:         .word 0
+<  area:           .word 0
+830,857c737
+<  .text
+<     .
+<     .
+<     .
+<          la   rect_area_rtn, rtn1   # one call
+< 	 b    rect_area
+<  rtn1:
+<     .
+<     .
+<     .
+<  rect_area:                        # the procedure
+<          mul  area, length, width
+< 	 b    (rect_area_rtn)
+<     .
+<     .
+<     .
+< 
+<          la   rect_area_rtn, rtn2   # another call
+< 	 b    rect_area
+<  rtn2:
+< 
+< 
+< Further notes on the example:
+<   The ordering of procedures and other code is not important.
+<   The setting of the parameters (width and length) is not shown in
+<     the code fragment.
+<   The use of the return value (area) is not shown in the code fragment.
+< </pre>
+---
+> <!--#include virtual="style4.html" -->

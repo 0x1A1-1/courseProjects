@@ -1,0 +1,6 @@
+#
+set k=../../karen.notes
+set m=../
+#
+diff tmp13.html $m/chapter13.html > chapter13_diff.txt
+diff tmp14.html $m/chapter14.html > chapter14_diff.txt

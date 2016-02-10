@@ -1,0 +1,808 @@
+1,4c1
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 12 - Exception Handling</title>
+< </head>
+---
+> <!--#include virtual="style1.html" -->
+6,7c3,4
+< <BODY>
+< <h1> Chapter 12 -- Exception Handling</h1>
+---
+> Lecture Notes for
+> Chapter 12 -- Interrupts and Exception Handling <!-- EDIT CHAPTER INFO -->
+9c6
+< <pre>
+---
+> <!--#include virtual="style2.html" -->
+10a8
+> Wednesday, November 14, 2001 <!-- EDIT LAST UPDATE DATE -->
+12,13c10
+< EXCEPTION HANDLERS
+< ------------------
+---
+> <!--#include virtual="style3.html" -->
+15,16c12
+< The trouble with programmed I/O is that it both wastes CPU
+< resources and it has potential for "incorrect" operation.
+---
+> </PRE><b>NOT YET UPDATED FOR FALL 2003</b><PRE>
+18,22d13
+< What we really want:
+<   (Since most I/O devices are slow), have I/O devices signal
+<   the CPU when they have a change in status.  This would be more
+<   efficient than polling the devices at the devices' maximum
+<   operating speed.
+24c15,22
+<   The I/O devices tell the processor that they are "ready."
+---
+> </PRE>
+> <P>
+> <b>Students should also print
+> <A HREF="http://www.cs.wisc.edu/~cs354-2/cs354/markhill.notes/chapter12kernel_gist.html">kernel gist</a>
+> and
+> <A HREF="http://www.cs.wisc.edu/~cs354-2/cs354/markhill.notes/chapter12kernel.html">kernel</a>.
+> </b>
+> <PRE>
+26,29c24,26
+< In order to do this we need:
+<   Hardware (wires) from devices to the CPU.
+<   A way for special software to be invoked when the a device
+<   signals on the wire.
+---
+> For I/O
+> 	Why have SW repeatedly ask a device, "Are you ready?" (polling).
+> 	Instead have device tell SW, "I am ready!" (interrupt)
+32,34c29
+< The modern solution bundles the software to deal with
+< these signals (interrupts) and other situations  into
+< an EXCEPTION HANDLER.  (Effectively part of the OS.)
+---
+> Device needs HW wire into CPU.
+35a31
+> This wire must somehow influence SW.
+37c33,35
+< EXCEPTIONS
+---
+> DRAW PICTURE -- SPEND CONSIDERABLE TIME MOTIVATING
+> 
+> Interrupts
+39,70c37,73
+< There are 2 categories of exceptions:  interrupts and traps.
+< All processors use the same mechanism (a combination of
+< hardware and software) to deal with exceptions.
+< 
+< The 2 categories:
+<  1.  interrupts
+<      --initiated outside the instruction stream
+<      --arrive asynchronously (at no specific time)
+< 
+<      examples:
+<        I/O device status change
+<        I/O device error condition
+<        thermal override shutdown
+<        internal error detection
+< 
+<      when should the interrupt be dealt with?
+<        as soon as conveniently possible
+< 
+<  2.  traps
+<      --occur due to something in instruction stream
+<      --arrive synchronously (while instruction is executing)
+<          good test:  if program was re-run (with the same input),
+< 	 the trap would occur in precisely the same place in the code.
+< 
+<      examples:
+<        unaligned address error
+<        arithmetic overflow
+<        syscall
+< 
+<      when should the trap be dealt with?
+<        right now!  The user program cannot continue until
+<        whatever caused the trap is dealt with.
+---
+> Examples
+>     I/O device
+> 	    change in status	<== we will concentrate on this
+> 	    error condition
+>     processor problem
+> 	    thermal overide shutdown
+> 	    internal error detected
+>     clock
+>     ...
+> 
+> Properties
+>     they arrive asynchronously
+>     can't communmicate with running program (no args or return values)
+>     they are associated with various priorities
+> 
+> Want to handle soon (interrupt latency)
+> (Usually) want to resume program (may even be other user's I/O!)
+> 
+> 
+> Traps
+> -----
+> Related to interrupts
+> 
+> Examples
+>     syscall	<== we will concentrate on this
+>     illegal instruction
+>     arithmetic overflow
+>     lw from unaligned address
+>     ...
+> 
+> Properties
+>     they arrive synchronously -- i.e. pertain to specific instruction
+>     (get trap in same place if your re-run program)
+>     they are associated with various priorities
+> 
+> Must handle immediately
+> (Usually) want to resume program
+72a76,77
+> Exception
+> ---------
+74,75c79
+< exception handling
+< ------------------
+---
+> (People often incorrectly mix up the terms interrupt, trap and exception.)
+77,128c81,83
+< the mechanism for dealing with exceptions is simple; its
+< implementation can get complex.  The implementation varies
+< among architectures.
+< 
+<   situation:  a user program is running (executing), and
+< 	      a device generates an interrupt request.
+<   mechanism to respond:
+< 	      the hardware temporarily suspends the user
+< 	      program, and instead runs code called
+< 	      an EXCEPTION HANDLER.  After the handler
+< 	      is finished doing whatever it needs to,
+< 	      the hardware returns control to the user program.
+< 
+<   limitations of exception handler:
+<      since it is being invoked (potentially) in the middle
+<      of a user program, the handler must take extra care
+<      not to change the state of the user program.
+<        -- it can't change register values
+<        -- it can't change the stack
+<      So, how can it do anything at all?
+<        The key to this answer is that any portion of the
+<        processor state that the handler wishes to change must be saved before
+<        the change and restored before returning to the user program.
+< 
+<        The handler often uses the system stack to temporarily
+<        save register values.
+< 
+< 
+< WHEN to handle an interrupt -- 2 possiblilities:
+<   1.  right now!  Note that this could be in the middle of
+<       an instruction.  In order to do this, the hardware
+<       must be able to know where the instruction is in
+<       its execution and be able to "take up where it left off"
+< 
+<       This is very difficult to do, because the hardware is
+<       complex.  But, it has been done in simpler forms on a few machines.
+<       Example:  arbitrary memory to memory copy on IBM 360.
+< 
+<   2.  Wait until the currently executing instruction finishes,
+<       then handle.  THIS IS THE METHOD OF CHOICE.
+<       It handles interrupts inbetween 2 instructions.
+< 
+<       The instruction fetch/execute cycle must be expanded to
+< 
+<        1. If an interrupt is pending, handle it.
+<        2. instruction fetch
+<        3. PC update
+<        4. decode
+<        5. operand load
+<        6. operation
+<        7. store results
+< 
+---
+> Mechanism used to handle both interrupts and traps
+> 	HW handles initial reaction
+> 	then invokes SW called an Exception Handler
+129a85,91
+> HW
+>  1. sets state giving cause of exception
+>  2. changes to kernel mode, saving the previous mode
+>     in a hardware stack (3 levels deep) -- for dangerous work ahead
+>  3. disables further interrupts -- to prevent infinite loop
+>  4. saves current PC -- to able to resume previously-running program
+>  5. jumps to hardwired address 0x8000 0080.
+132,133c94,127
+< MIPS exception handling mechanism
+< ---------------------------------
+---
+> Exception Handler (.ktext beginning at 0x80000080)
+> 	Set flag to detect incorrect entry
+> 	(due to exception while in exception handler)
+> 	Saves some registers
+> 	Assertain exception type (MIPS: exception_code in Cause register)
+> 	(e.g., I/O interrupt or syscall)
+> 	Jump to specific exception handler
+> 
+> 	Handle specific exceptions
+> 
+> 	To resume program, jump to clean up routine
+> 	Restore registers
+> 	Reset flag (that detects incorrect entry)
+> 	Atomically
+> 		Restore previous mode
+> 		Reenable interrupts
+> 		Jump back to program (using EPC)
+> 
+> 
+> Syscall handler (1 of 2 specfic exceptions we examine)
+> 
+> 	Change EPC to point to next instruction 
+> 	(to prevent infinite syscall loop)
+> 
+> 	Look at syscall number (MIPS: $2)
+> 	(e.g., putc is 11 and getc 12) 
+> 	Jump to specfic syscall handler
+> 
+> 
+> putc handler (one of many syscall handlers)
+> 	Add char (from $4) to putqueue
+> 	Turn on display interrupts
+> 	Try to print a char	# note to me: DP_handler
+> 	Jump back to main exception handler
+135,143c129,130
+< When an exception occurs, the hardware does the following things.
+< Note that there is no inherent ordering of #1-4.  They all happen
+< "between" instructions, and before #5.
+< 
+<  1. sets state giving cause of exception 
+<     
+<     within the Cause register -- coprocessor C0, register 13
+<       32 bit register, bits 6..2 (5 bits) specify the type
+<       of the exception, called the ExcCode.
+---
+> getc handler
+> 	...
+145,150c132
+<       Page 316 (text)  gives the mapping of encodings to causes
+<       Examples:
+< 	 00000  (0)  Interrupt
+< 	 00100  (4)  load from an illegal address
+< 	 01000  (8)  syscall instruction
+< 	 01100  (12) arithmetic overflow
+---
+> 
+152,153c134,138
+<  2. changes to kernel mode, saving the previous mode
+<     in a hardware stack (3 levels deep)
+---
+> External (I/O) interrupt handler (to me: HandleInt)
+> 	Which interrupt (interrupt field in Cause reg)
+> 	(for us: interrupt 0 is clock, 1 keyboard, 2 display)
+> 	Call specific interrupt handler (xxx, KB_handler, DP_handler)
+> 	Jump back to main exception handler
+155,156c140,143
+<     The mode is in the Status register -- coprocessor C0, register 12,
+<       bit 1.
+---
+> DP_handler (print char if can)
+> 	(Re-)check display status (MIPS: memory-mapped)
+> 	If putqueue not empty, print char
+> 	Return to external interrupt handler
+158,165c145
+<     defined in the processor's architecture are 2 modes,
+<        user -- the mode that user programs run under.
+< 	       Certain instructions are not available, like those
+< 	       that can write to the control registers (Status register
+< 	       and Cause register).
+<        kernel -- the operating system mode.  Allows the OS
+< 	       to retain control over "vital" system aspects.
+< 	       All instructions are available.
+---
+> Back to hardware...
+167c147,148
+<       user mode -- 1       or  kernel mode -- 0
+---
+> MIPS Exception Registers
+> ------------------------
+169c150
+<  3. disables further interrupts
+---
+> Show picture of CPU, CO, CI, Memory, I/O.
+171,177c152,154
+<     bit 0 of the Status register (the field is called IEc)
+<     determines whether interrupts are currently
+<       enabled -- 1         or disabled -- 0
+<     
+<     If interrupts are disabled, then the hardware is not checking
+<     to see if there are further interrupts to handle.  Disabling
+<     makes sure that the handling of an interrupt is not interrupted.
+---
+> Kernel Register 0
+> 	GPR $26 nicknamed $k0
+> 	Kernel can trash between any two user instructions
+179,181c156,158
+<  4. saves current PC
+<     
+<     coprocessor C0, register 14, called Exception Program counter.
+---
+> Kernel Register 1
+> 	GPR $27 nicknamed $k1
+> 	Like $k0
+183,184c160
+<     Gives return address within user program. Where to return to
+<     when done handling the exception.
+---
+> The rest are coprocessor 0 registers.
+186,187c162,172
+<  5. jumps to hardwired address 0x8000 0080.
+<     This is where the exception handler code is.
+---
+> To read  c0 reg $14 use:  mfc0 .., $14  (move from coprocessor 0)
+> To write c0 reg $14 use:  mtc0 .., $14  (...  to   ...)
+> 
+> 
+> Exception Program Counter (EPC)
+> 
+> 	Coprocessor 0 reg $14
+> 
+> 	PC of instruction causing exception 
+> 		loaded on an exception
+> 		"the return address"
+189a175
+> Cause Register
+190a177
+> 	Coprocessor 0 reg $13
+192,195c179,220
+< Then, the instruction fetch and execute cycle starts up again,
+< only now the code within the exception handler is being executed.
+< This handler code does the following:
+<  1.  save some registers (on system stack).
+---
+> 	bits	size	field
+> 	----	----	-----
+> 	31..16  16	IGNORE
+> 	15..10	 6	interrupt
+> 	9..8	 2	software_interrupt
+> 	7..6	 2	ZERO
+> 	5..2	 4	exception_code
+> 	1..0	 2	ZERO
+> 
+> 	interrupt || software_interrupt give seven interrupt-pending bits
+> 
+> 	exception_codes
+> 	---------------
+> 	  0			external interrupt
+> 	  1-7			IGNORE
+> 	  8			syscall exception
+> 	  9-12			IGNORE
+> 	  13-15			RESERVED
+> 	       
+> LSB HW interrupt is used for clock	interrupt[0] = cause[10]
+> 	then		     keyboard	interrupt[1] = cause[11]
+> 			     display	interrupt[2] = cause[12]
+> 
+> Says what interrupts are pending.
+> 
+> 
+> Status Register
+> 
+> 	Coprocessor 0 reg $12
+> 
+> 	bits	size	field
+> 	----	----	-----
+> 	31..16	16	IGNORE
+> 	15..10	 5	hw_interrupt_mask
+> 	9..8	 2	sw_interrupt_mask
+> 	7..6	 2	ZERO
+> 	5	 1	mode_old
+> 	4	 1	interrupt_enable_old
+> 	3	 1	mode_previous
+> 	2	 1	interrupt_enable_previous
+> 	1	 1	mode_current
+> 	0	 1	interrupt_enable_current
+197,199c222,226
+<      The handler needs to use registers too!  It may not
+<      change (clobber, overwrite) the register contents of the user
+<      program.  So, it saves them (on stack or in memory).
+---
+> 
+> Like w/ Cause:
+> hw-interrupt is used for     clock	interrupt[0] = cause[10]
+> 	then		     keyboard	interrupt[1] = cause[11]
+> 			     display	interrupt[2] = cause[12]
+201c228,230
+<  2.  Figure out exception type. (in ExcCode)
+---
+>         ----ignore---- IIII IISS ZZEE EEZZ
+> 	mask    1 .. 1 1111 0111 1111 1111
+> 	0x        ffff	  f    7    f    f
+203,204c232
+<      mfc0  $k0, $13        # get Cause register
+<      andi  $k0, $k0, 0x3c  # Mask out all but ExcCode
+---
+> Want to disable keyboard interrupts (called "maskable interrupt")
+206,207c234,236
+<  3.  use ExcCode in combination with a JUMP TABLE to jump to
+<      the correct location within the exception handler.
+---
+> 	mfc0	$5, $12
+> 	andi	$5, $5, 0xffffff7ff	# Turn off keyboard interrupts
+> 	mtc0	$5, $12
+209c238
+<  4.  handle the exception (whatever it is!)
+---
+> See GetQueueFull
+211d239
+<  5.  restore registers saved in (1).
+213,217c241,243
+<  6.  atomically:
+<      (as if done in 1 step, not 3)
+< 	restore previous kernel/user mode (from Status register)
+< 	reenable interrupts
+< 	jump back to user program (using EPC)
+---
+> Mode/interrupt_enable
+> 		mode_* = 0 ==> kernel
+> 		mode_* = 1 ==> user
+218a245,246
+> 		interrupt_enable_* = 0 ==> interrupts disabled
+> 		interrupt_enable_* = 1 ==> interrupts ensabled
+219a248,250
+> 	On exception (and in parallel):
+> 	   0 --> mode_current --> mode_previous --> mode_old
+> 	   0 --> interrupt_enable_current --> <similarly>
+220a252,254
+> 	On instruction (return from exception) instruction:
+> 	   mode_current <-- mode_previous <-- mode_old <-- ??
+> 	   interrupt_enable_current <-- <similarly>
+222,223c256
+< some terms
+< ----------
+---
+> 	A three-level stack!
+225,240d257
+< interrupt request -- the activation of hardware somewhere that
+< 		     signals the initial request for an interrupt.
+< pending interrupt --  an interrupt that hasn't been handled yet,
+< 		      but needs to be
+< kernel-- the exception handler
+<          In most minds, when people think of a kernel, they think
+< 	 of critical portions of an operating system.  The exception
+< 	 handler IS a critical portion of an operating system!
+< handler --  the code of the exception handler.
+< 
+< nonreentrant -- what we talk about (mostly) in 354.  While running
+<   an exception handler (the kernel), further pending interrupts are
+<   ignored.
+< reentrant -- An exception handler that is carefully crafted such
+<   that the handling of one exception can be interrupted to handle
+<   a second exception.
+241a259,272
+> Reference:
+> 
+> %T MIPS R2000 RISC Architecture
+> %A Gerry Kane
+> %I Prentice-Hall
+> %C Englewood Cliffs, NJ
+> %D 1987
+> 
+> See Chapter 5 
+> pp. 1-12 (intro to exceptions), 
+> p. 17 (external interrupts), and
+> p. 21 (syscall)
+> 
+> 1987 edition is much cleaner than 1992 edition
+243a275
+> On Exception HW does:
+245,246c277,279
+< about Jump Tables
+< -----------------
+---
+> hardware does the following:
+>  1. sets state giving cause of exception
+>     Cause register -- coprocessor C0, register 13
+248c281,322
+< A clever mechanism for doing something like a CASE (SWITCH) statement.
+---
+>       32 bit register, bits 6..2 (5 bits) specify the type
+>       of the exception, called the ExcCode.
+> 
+>       Page 316 gives the mapping of encodings to causes
+>       examples:
+>          00000  (0)  Interrupt
+>          00100  (4)  load from an illegal address
+>          01000  (8)  syscall instruction
+>          01100  (12) arithmetic overflow
+> 
+>  2. changes to kernel mode, saving the previous mode -- for dangerous work ahead
+>     in a hardware stack (3 levels deep)
+> 
+>     The mode is saved in the Status register.
+>     coprocessor C0, register 12
+> 
+>     defined in the processor's architecture are 2 modes,
+>        user -- the mode that user programs run under.
+>                certain instructions are not available
+>        kernel -- the operating system mode.  Allows the OS
+>                to retain control over "vital" system aspects.
+>                All instructions are available.
+> 
+>  3. disables further interrupts -- to prevent infinite loop
+>  4. saves current PC -- so able to resume previously-running program
+> 
+>     coprocessor C0, register 14, called Exception Program counter.
+> 
+>     Gives return address in user program. Where to return to
+>     when done handling the exception.
+> 
+>  5. jumps to hardwired address 0x8000 0080.
+>     This is where the exception handler code is.
+> 
+> 
+> Before we do the exception hander...
+> 
+> 
+> Jump Tables
+> -----------
+> 
+> A clever mechanism for doing something like a CASE statement.
+255,258c329,332
+< 	       .word case1
+< 	       .word case2
+<  
+<     
+---
+>                .word case1
+>                .word case2
+> 
+> 
+260c334
+< 			    # (need a word offset into table, not byte)
+---
+>                             # (need a word offset into table, not byte)
+289,292c363,365
+< 
+<      MAL->TAL synthesis of this must be something like:
+< 	 la  $1, label
+< 	 add $1, $1, $rb
+---
+>     MAL->TAL synthesis of this must be something like:
+>          la  $1, label
+>          add $1, $1, $rb
+294a368
+> 
+296a371,373
+> ***********************************************
+> GO OVER EXCEPTION HANDLER (KERNEL) LINE BY LINE
+> ***********************************************
+298,299c375
+< some advanced topics
+< --------------------
+---
+> 1. Use Interrupt Kernel Structure Handout
+301c377
+< PRIORITIES
+---
+> 2. Statically go through Kernel.
+303,304c379
+< problem:  Multiple interrupt requests can arrive simultaneously.
+< 	  Which one should get handled first?
+---
+> 3. Dynamically follow putc syscall
+306,341c381
+< possible solutions:
+<      FCFS -- the first one to arrive gets handled first.
+< 
+<          difficulty 1) This might allow a malicious/recalcitrant
+<          device or program to gain control of the processor.
+< 
+<          difficulty 2) There must be hardware that maintains
+<          an ordering of pending exceptions.
+< 
+<      prioritize all exceptions -- the one with the highest priority
+< 	 gets handled first.  This is a common method for solving
+< 	 the problem.
+< 
+< 	 Priorities for various exceptions are assigned either by
+< 	 the manufacturer, or by a system manager through software.
+< 	 The priorities are normally set when a machine is 
+< 	 booted (the OS is started up).
+< 
+<          difficulty 1) Exceptions with the same priority must
+< 	 still be handled in some order.  Example of same priority
+< 	 exceptions might be all keyboard interrupts.  Consider
+< 	 a machine with many terminals hooked up.
+< 
+< 	 The instruction fetch/execute cycle becomes:
+< 	  1.  any interrupts with a higher priority than whatever
+< 	      is currently running pending?
+< 	  2.  fetch
+< 	  3.  decode
+< 	  4.  operands
+< 	  5.  operation
+< 	  6.  result
+< 
+< 	     NOTE:  This implies that there is some hardware
+< 	     notion of the priority for whatever is running
+< 	     (user program, keyboard interrupts, clock interrupt, etc.)
+< 
+---
+> Before:
+342a383,387
+> cp0         bits        543210
+> ---         ----        ------
+> $12  Status all-enabled ..xx11   "11" means user mode & interrupts enabled
+> $13  Cause  all-enabled CCCCxx   "CCCC" for ExcCode
+> $14  EPC
+343a389
+> User code:
+345,361c391,393
+< 	 What should get given the highest priority?
+< 	   clock? power failure?  thermal shutdown?  arithmetic overflow?
+< 	   keyboard?  I/O device ready?
+< 
+< 	   priorities are a matter of which is most urgent,
+< 	   and therefore cannot wait, and how long it takes
+< 	   to process the interrupt.
+< 	   -- clock is urgent, and takes little processing,
+< 	      maybe only a variable increment.
+< 	   -- power failure is very urgent, but takes a lot
+< 	      or processing, because the machine will be stopped.
+< 	   -- overflow is urgent to the program which caused it,
+< 	      because it cannot continue.
+< 	   -- keyboard is urgent because we don't want to lose
+< 	      a second key press before the first is handled.
+< 
+< 	      (story of what can happen if interrupt priorities set wrong)
+---
+> li $2, 11
+> move $4, 'x'
+> syscall
+363a396
+> After exception:
+364a398,421
+> cp0         bits        543210
+> ---         ----        ------
+> $12  Status all-enabled ..1100   "00" means system mode & interrupts disabled
+> $13  Cause  all-enabled 1000xx   "CCCC" for ExcCode
+> $14  EPC    <address of syscall>
+> 
+> 4. Dynamically go through display interrupt, ExcCode = 0
+> 
+> 5. OPTIONALLY dynamically go through getc syscall
+> 
+> li $2, 12
+> syscall
+> move  .., $2 
+> 
+> 
+> Different architectures do exception differently,
+> but it is a variation on a common theme
+> -------------------------------------------------
+> 
+> 	E.g., instead of jumping to specific address
+> 	jump to address specified in a special register
+> 	jump to address specified at a specific address (memory indirect)
+> 	let address by modified by a few bits of the cause
+> 	(hardware "vectors" interrupts)
+366,394d422
+< REENTRANT EXCEPTION HANDLERS
+< 
+< The best solution combines priorities with an exception handler
+< that can itself be interrupted.  There are many details to
+< get right to make this possible.
+<    The instruction fetch/execute cycle remains the same.  At
+<    the beginning of EVERY instruction (even those within
+<    the exception handler), a check is made if there are
+<    pending interrupts.  Only those with higher priorities
+<    than whatever is currently running will be processed. 
+< 
+<    The exception handler must be modified so that it can
+<    be interrupted.  Its own state must be saved (safely).
+< 
+<    Within the handler:
+< 
+<      1.  disable interrupts momentarily in order to save
+< 	 important state that cannot get clobbered.
+< 	 (EPC, current priority level, maybe registers
+< 	 $26 and $27).
+< 	 Question:  where do these things get saved?
+<      2.  re-enable interrupts for higher priorities than
+< 	 current level.
+< 
+< 	 If the priority level checking is done in hardware,
+< 	 then all interrupts can be re-enabled.
+<      3.  This invocation of the exception handler eventually
+< 	 finishes.
+< 
+396c424,425
+<       The instruction fetch/execute cycle must be expanded to
+---
+> Multiple interrupts
+> -------------------
+398,404c427,497
+<        1. handle pending interrupts
+<        2. instruction fetch
+<        3. PC update
+<        4. decode
+<        5. operand load
+<        6. operation
+<        7. store results
+---
+> So far
+> 	run user program
+> 	interrupt
+> 	generation exception
+> 	exception handler deals with interrupt
+> 	resume user program
+> 
+> Q: What happens if multiple interrupt (and traps) arrive simultaneously?
+> 
+> A: Have priorities in HW / SW
+> 	Handle highest-priority interrupt first
+> 	("equal" priority interupts must be handled is some order)
+> 	Give higher priority
+> 		more serious (e.g., power failing)
+> 		can't wait long (e.g., rotating disk)
+> 
+> Q: What happens if an interrupt arrives while an interrupt is being serviced?
+> 
+> Poor A: Make it wait until done with first interrupt
+> 
+> 	But how do you prevent it from causing an exception?
+> 
+> 	May be a bad idea for higher priority interrupts
+> 
+> Better A: Make (most of) exception handler re-entrant
+> 	Allow higher-priority exceptions
+> 
+> Basic Idea
+> 	Initial exception disables all interrupts
+> 	Exception handler (EH) determines exception's priority
+> 	EH then saves important state that could be clobbered
+> 	if higher priority interrupt occurs (most important: EPC)
+> 	EH re-enables higher-priority interrupts
+> 	Higher-priority interrupts may or may not cause an exceptions
+> 	This EH eventually finishes
+> 
+> For MIPS
+> 	Status register's interrupt_enable bit is reset by exception
+> 	(with current and previous moved to previous and old)
+> 	A "master circuit breaker"
+> 	Status register's 7b interrupt_mask field allows five levels
+> 	of HW and two SW to be masked (ignored)
+> 
+> 
+> Processes and Multiprogramming
+> ------------------------------
+> 
+> OS often has one exception handler called the "kernel"
+> 
+> A program running is called a "process" (or task)
+> 
+> A process's state is
+> 	its memory (include stack)
+> 	its regular registers (GPRs and FPRs)
+> 	its PC and other control registers
+> 	some OS memory (e.g., info and buffer for open files)
+> 
+> On an exception, the CPU jumps into the kernel
+> 
+> The kernel will eventually resume the user process
+> 
+> If the user process ask of an I/O (disk read), the kernel schedules it,
+> and then both often have nothing to for a long time (20 ms = 2M instructions)
+> 
+> Why not run another user program?
+> 	Called multiprogramming or multitasking
+> 		
+> To create the illusion of running processes concurrently,
+> 	Also (context) switch after a time quantum (e.g., 2 ms or
+> 	200K instructions)
+> 	Check on clock interrupts
+406c499
+< </pre>
+---
+> Multiprogramming on uniprocessor != multiprocessing on multiprocessor.
+407a501
+> <!--#include virtual="style4.html" -->

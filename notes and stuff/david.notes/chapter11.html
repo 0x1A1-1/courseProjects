@@ -1,0 +1,422 @@
+<HTML>
+<HEAD>
+<TITLE>CS/ECE 354 Spring 2000 (Section 2)</TITLE>
+</HEAD>
+
+<BODY> 
+
+<!--  { BEGIN COMMENT
+	I will comment this way.
+END COMMENT } -->
+ 
+<HR> <!-- ------------------------------------------------ -->
+<IMG align=middle width=152 height=62 border=0 ALIGN=TOP SRC="/pics/logo.small.gif" ALT="University of Wisconsin - Madison"></A>
+<H1>CS/ECE 354: Machine Organization and Programming</H1>
+<H2>Spring 2000</H2>
+<H2>David A. Wood's Section 2 </H2>
+<H2>Return to <a href="http://www.cs.wisc.edu/~cs354-4/cs354.html">CS/ECE 354 Home Page</a></H2>
+<HR> <!-- ------------------------------------------------ -->
+<H2>Approximate Lecture Notes for
+Chapter 11 -- Input and Output</H2>
+<P>
+Purpose: I provide these notes to students to:
+<UL>
+<LI> Allow better concentration in lecture by reducing note-taking pressure.
+<LI> Provide a study-aid after lecture.
+</UL>
+<P>
+Disclaimers:
+<UL>
+<LI> I will not follow these notes exactly in class.
+<LI> Students are responsible for what I say in class.
+<LI> Reading these notes is not a substitute for attending lecture.
+<LI> These notes probably contain errors.
+</UL>
+<P>
+Acknowledgement:
+<UL>
+<LI> These notes are derived from the notes of Karen Miller,
+sometimes with substantial and sometimes with trivial changes.
+</UL>
+<HR> <!-- ------------------------------------------------ -->
+<pre>
+
+
+I/O (w/o interrupts)
+--------------------
+
+We modeled a computer as (show w/o i/o first):
+
+      
+       -----        --------
+       |CPU| <----> |memory|
+       -----   ^    --------
+	       |
+	       |
+	      \ /
+
+	     -----
+	     |i/o|
+	     -----
+
+To be useful computers must communication with outside world
+
+	input:  get data in
+		from keyboards, mice, disks, networks, microphones...
+
+	output: get data out
+		to displays, printers, disks, networks, speakers...
+
+	called I/O (input/output)
+
+
+There example devices
+
+Keyboard
+	user presses A key ==> 'a' (ASCII 0x61 == 01100001)
+	user presses Shift and A ==> 'A' (ASCII 0x41)
+	user presses Return = > 'cr' (ASCII 0x0d)
+
+	Keyboard send on wire 1==start, 8-bit data, 0==stop
+	E.g. for 'a'   1011000010
+	Buffer at computer catches these bits
+
+Displays
+	Character display work with the reverve process (sort of)
+	Most displays today are "bit mapped" and work more like TVs
+
+Hard Disk -- A spinning disk (like a record or CD)
+	2-4 GB today
+	But
+		magnetic and read/write (like tape)
+		use both sides
+		may have a stack of platters
+
+	disk access:  queueing + seek + rotation + transfer
+		       depends	 10 ms    10 ms     1 ms
+
+	Electronic ==> ns = 10^-9 s   
+	Mechanical ==> ms = 10^-3 s  a million times slower!
+
+
+Problems
+	How does CPU ask for a char to be printed?
+	Which printer?  which display (mine or yours?)
+
+	When is printer ready for the next char?
+	When does keyboard have the next char?
+
+	What about the million times slower?
+
+
+
+Users see
+	get, getc, put, putc, puts
+
+Simulator only support input from one keyboard and output
+to one display
+
+To hide details from users and to protect users from each other
+many systems manage details of I/O in the operating system
+
+"putc char" is really
+
+	lb $4, char	# $4 char to be printed
+	li $2, 11	# li + syscall == jal operating_system_function_11
+	syscall
+
+"getc char" is
+
+	li $2, 12	# li + syscall == jal operating_system_function_12
+	syscall
+	sb $2, char	# returns with char read in $2
+
+We don't use jal because
+	OS doesn't trust user to provide the correct address
+	Want to switch into OS mode, where more things are allowed
+
+OS catches syscall and uses value is $2 to determine what to do
+(like a case statement)
+
+
+
+OS will not allow
+	users to read each other's keyboards
+	users to send infinite jobs to printers
+
+But how does the OS do I/O?
+
+What instruction causes an I/O (e.g., print a char)?
+
+	could have special instructions --
+		but hard to anticipate all possibilties
+
+	solution:  overload memory and loads and stores
+
+Called memory-mapped I/O (I made up the specific addresses used below.)
+
+	 0x00000000	+-----+   Real memory
+			|     |
+			|     |
+			|     |
+			|     |
+			|     |
+			|     |
+	 0xffff0000	+-----+
+
+	 0xffff0008     <============ from keyboard
+
+
+	 0xffff0010     ============> to display
+
+
+Set label KeyboardData to 0xffff0008
+	  DisplayData  to 0xffff0010
+
+
+Implementation Pix:
+
+	CPU	Mem	
+	 |       |
+	 +=======+=====+==================+
+		       |		  |
+		 ==0xffff0008?	   ==0xffff0010?
+		 keyboard buffer   display buffer
+
+(Other keyboards, displays, and I/O devices can be mapped as other addresses.)
+
+
+operating_system_function_12:	# getc char and put it in $2
+	
+	lw  $2, KeyboardData
+	"return from syscall"
+
+
+operating_system_function_11:	# putc char, where char is in $4
+	
+	sw  $2, DisplayData
+	"return from syscall"
+
+But is there a new char to read?
+But is the display (printer) done with the last char?
+
+
+
+Need I/O device "status" to coordinate (synchronize)
+
+Special instrns?  No ==> memory map it
+
+	 0x00000000	+-----+   Real memory
+			|     |
+			|     |
+			|     |
+			|     |
+			|     |
+			|     |
+	 0xffff0000	+-----+
+
+	 0xffff0008     <============ DATA from keyboard 
+	 0xffff000c     <============ STATUS from keyboard
+
+
+	 0xffff0010     ============> to display
+	 0xffff0014     <============ STATUS from display
+
+Set label KeyboardStatus to 0xffff000c
+          DisplayStatus  to 0xffff0014
+
+Assume Status is word where MSB=1 (2SC word negative) implies ready
+			    MSB=0 (2SC word non-negative) implies busy
+
+
+operating_system_function_12:	# getc char and put it in $2
+
+WaitLoop12: lw $14, KeyboardStatus
+	bgez  $14, WaitLoop12	# keep waiting if $14 non-negative
+
+	lw  $2, KeyboardData    # same as before
+	"return from syscall"
+
+
+operating_system_function_11:	# putc char, where char is in $4
+
+WaitLoop11: lw $14, DisplayStatus
+	bgez  $14, WaitLoop11	# keep waiting if $14 non-negative
+	
+	sw  $4, DisplayData	# same as before
+	"return from syscall"
+
+But how much of the time do we spend spinning?
+
+We can putc or getc in much less than 100 instructions: 20 ns * 100 = 2 us
+
+Mechanical devices take ms -- e.g. 20 ms = 20000 us
+
+Therefore,	time waiting	      20000 us
+		------------  =  ----------------  =  99.99% !!!!!
+		total time	  20000 us + 2 us
+
+But we don't have to busy wait (spin)
+
+
+
+We could go back to the program, do useful work and periodically return
+and deal with the next char
+
+	printstring  -- enqueued a string for printing & returns
+	printnextchar -- print next char (if any) and return
+
+(Analogous scheme possible to getstring.)
+
+Pseudo-code for (part of) example on page 301-302:
+
+putqueue:  array[0..255] of char;
+/*
+** head put queue pointer (index): points just before valid data
+*/
+integer hpqp; /* initialized to 0 */
+/*
+** tail put queue pointer (index): points at last valid data
+*/
+integer tpqp; /* initialized to 0 */
+/*
+** note: hpqp = tpqp ==> put queue empty
+*/
+
+putstring(string)
+/*
+** If room avaiable in queue, string to it.
+** Otherwise, return "overflow"
+** May also print first char.
+*/
+<not shown>
+
+
+putnextchar()
+begin
+	/*
+	**  Is display ready?
+	**
+	**	yes ==> print a char (if any) & return
+	**      no  ==> return
+	*/
+	if (DisplayStatus < 0)
+	then begin
+		/*
+		** Return if queue empty
+		*/
+		if (hpqp != tpqp)
+		then begin
+			/*
+			** Invariant: head ptr points just before valid data
+			**
+			** Update head ptr and print
+			*/
+			hpqp = (hpqp + 1) rem 256;
+			DisplayData := putqueue[hpqp];
+		end
+	end
+	return()
+end
+
+
+Do example on page 301-302....
+
+
+  on DMA (Direct Memory Access)
+---------------------------------
+
+The scheme presented so far really only deals with transfers of a
+single byte or word.  There are plenty of devices (networks, disks)
+that transfer larger blocks of data.  These devices also tend to
+operate much faster than the displays and keyboards and mice.
+
+Having the OS spin wait, or even poll a high speed I/O device
+(like a disk) would be really inefficent.  Spin waiting to transfer
+a relatively large quantity of data ties up
+the processor, and polling couldn't be done often enough to make
+it efficient (for high-speed devices).
+
+The solution desired will allow block transfers at the speed that
+the device can handle.
+
+  So, set up a simple computer (a controller) that can directly
+  access main memory.
+
+
+    -----------          -----------------           --------------
+    |         |          |               |           |            |
+    | disk    |<-------->|  controller   |<--------->| memory     |
+    |         |          -----------------     / \   |            |
+    |         |                                 |    |            |
+    -----------                                 |    --------------
+						|
+					       \ /
+                                         ---------------
+					 |             |
+					 | processor   |
+					 |             |
+                                         ---------------
+
+The processor sets everything up for a DMA transfer.
+It tells the controller
+     a starting disk address
+     a starting memory address
+     # of bytes to transfer
+And, then it tells the controller to do the transfer.
+The controller does the tranfer (at the speed that the disk can handle).
+The processor checks every once in a while to see if the tranfer
+is complete.
+
+
+An issue to ponder:
+  While the disk is reading/writing memory, the processor cannot
+  access memory.  How will the processor do anything productive
+  if it cannot access memory?
+
+  Solutions:
+  -- set up a protocol for the access to memory.  Give the processor
+     priority. -- NO
+  -- design a memory that can handle 2 requests at the same time.
+     (Note that this is not practical from a design standpoint.)
+  -- don't worry about it, since the disk doesn't need every cycle
+     of memory access time.  And, if the processor has a cache (ch. 13)
+     the processor won't need much access to memory anyway.
+
+  on polling
+---------------
+
+to make a system work, the OS will need to check regularly if
+its devices have become ready.  This is called polling.
+
+The OS runs at regular intervals (say, once per millisecond)
+to check each device to see if it is ready.  If ready, then the
+OS further deals with the device.
+  For a keyboard, the character is placed into a queue.
+  For a display, the queue is checked.  If not empty, then the next
+    character in the queue is sent to the device.
+
+
+Difficulties with this:
+
+-- how often to get the OS to poll?
+   Too little, and input devices may loose data.
+   Too much, and lots of time is wasted checking devices when they are
+   not yet ready.
+-- How does the OS code get run?
+   The user-level program shouldn't have the responsibility.  It has
+   no notion of time.
+   What happens to the user-level program while the OS is polling?
+
+
+Transition for Chapter 12
+
+    Why have SW repeatedly ask a device, "Are you ready?" (polling).
+    Instead have device tell SW, "I am ready!" (interrupt)
+
+</pre>
+<HR> <!-- ------------------------------------------------ -->
+
+</BODY>
+</HTML>
+

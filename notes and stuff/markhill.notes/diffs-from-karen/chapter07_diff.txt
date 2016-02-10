@@ -1,0 +1,777 @@
+1,4c1
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 7 - Data Structures</title>
+< </head>
+---
+> <!--#include virtual="style1.html" -->
+6,7c3,4
+< <BODY>
+< <h1> Chapter 7 -- data structures</h1>
+---
+> Lecture Notes for
+> Chapter 7 -- Data Structures <!-- EDIT CHAPTER INFO -->
+9c6
+< <pre>
+---
+> <!--#include virtual="style2.html" -->
+10a8
+> Tuesday, October 9, 2001 <!-- EDIT LAST UPDATE DATE -->
+12,18c10
+< DATA STRUCTURES
+< ---------------
+< 
+< A common theme in programming:
+<   SPACE vs. TIME tradeoff
+<        space is memory space
+<        time is time to execute program
+---
+> <!--#include virtual="style3.html" -->
+20,23c12
+<   It is often possible to write a program such that it 
+<     1. executes very fast, but wastes/utilizes more memory
+<      or
+<     2. utilizes little memory, but executes quite slow
+---
+> </PRE><b>NOT YET UPDATED FOR FALL 2003</b><PRE>
+25d13
+<   data structures can make memory usage efficient or inefficient
+26a15,19
+> Outline
+> 	memory as an array
+> 	arrays
+> 	stacks
+> 	queues
+28,29d20
+< data structures we will discuss:
+<   arrays, stacks, and queues  (in that order)
+31c22
+< ARRAYS
+---
+> Memory
+34,46c25,27
+< Array implementation is important because
+<  1. most assembly languages have no concept of arrays
+<  2. from an array, any other data structure we might want can be built
+< 
+< Properties of arrays:
+<  1. each element is the same size (char = 1 byte, integer = 1 word)
+<  2. elements are stored contiguously, with the first element
+<     stored at the smallest memory address
+< 
+< so, the whole trick in assembly language is
+<   1.  allocate correct amount of space for an array
+<   2.  an ADDRESS tells the location of an element
+< 
+---
+> 	Before we considered individual memory locations
+> 	Identified by label or address
+> 	Now we will consider what all of memory is
+49,50c30,31
+< memory can be thought of as an array
+<     it is a giant array of bits or bytes or words (picture needed here!)
+---
+> memory is an array
+>     it is a giant array of bytes (picture needed here!)
+54,55c35,36
+<     Addressability refers to the size of memory elements that are
+<     given consecutive addresses.
+---
+> In C:
+> 	char m[size_of_memory];
+57c38,39
+<     If each byte has a unique address, we have BYTE ADDRESSING.
+---
+> In Pascal:
+> 	m: array [0..size_of_memory-1] of char;
+59,60c41
+<     If each word is given a unique address, but the bytes within a single
+<     word cannot be distinguished, we have WORD ADDRESSING.
+---
+> In Sal, you don't have to declare m[]!
+61a43,54
+> Example
+> 
+> 	.data
+>  mychar:	.byte 
+>  newline:	.byte '\n'
+> 	...
+> 	.text
+> 	...
+> 	get mychar
+> 	beq mychar, newline, found_newline
+> 	...
+> found_newline: ...
+63d55
+< 
+64a57,58
+> 	address 	memory		comment
+> 	------		------		-------
+66,67c60,61
+<        byte                    word
+<     addressable              addressable
+---
+> 	20		0x00		mychar w/ initial value '\0'
+> 	21		0x0c		newline w/ value '\n'
+69,82c63
+<        -------               -------
+<      0 |     |             0 |     |
+<        -------               -------
+<      1 |     |             1 |     |
+<        -------               -------
+<      2 |     |             2 |     |
+<        -------               -------
+<      3 |     |             3 |     |
+<        -------               -------
+<      4 |     |             4 |     |
+<        -------               -------
+<      5 |     |             5 |     |
+<        -------               -------
+<        |     |               |     |
+---
+> 	.text
+83a65,68
+> 	get 20				# address of mychar for result
+> 	beq m[20], m[21], found_newline # compare values, not addresses
+> 	...
+> found_newline: ...
+85,89d69
+< Notice that these diagrams look the same.  The difference is
+< in the number of bits that is contained in the box.  Given in
+< SAL's precisions, there are 8 bits in each box of the byte
+< addressable diagram, and there would be 32 bits in each box of the
+< word addressable diagram.
+92c72,77
+< SAL (and MAL, and MIPS in general) is byte addressable.
+---
+>     m[address]    refers to the element at address
+>     m[20]   is the byte numbered address 20, the 21-st byte of memory.
+> 	  
+> 	  important:  20 is the address
+> 		      m[20] is the contents of the byte at address 20
+> 
+93a79,82
+> What about integers?
+> 	Use 4-bytes beginning at address that is multiple of 4
+> 	So at address 20, want bytes 20, 21, 22, and 23
+> 	Denote with M[20] vs. m[20]
+94a84
+> 	Like m[], need not declare M[]
+96d85
+< An interesting, and possibly useful diversion. . .
+98,99c87,90
+< Numbering bits/bytes/words
+< ---------------------------
+---
+> [[Chapter 7 mixes introducing addresses with introducing arrays.  
+> This example introduces addresses to expose "what's really happening".
+> Note that the careful student may notice some incorrect details (e.g., the 
+> destination of the add should be an address not a value).]]
+101,102c92,96
+< If we have an integer-sized piece of data, we may want to identify
+< the various bits.  This can be done by numbering the bits.
+---
+> 		  .data
+> 	n:	  .word  1
+> 	n2:	  .word  -1
+> 	newline:  .byte	'\n'
+> 	str1:	  .asciiz "Enter number "
+104c98,101
+< Start numbering from 0, on the right side (least significant end)
+---
+> 		  .text
+> 	__start:  puts str1
+> 		  get n
+> 		  add n2, n, n
+106,109d102
+<       31   30   29                 2    1    0
+<     ---------------------------------------------
+<     |    |    |    |  .   .   .  |    |    |    |
+<     ---------------------------------------------
+111c104
+<      this is called little endian numbering (of bits)
+---
+> The assembler/linker will expand the .data segment to:
+114,115c107,108
+< Equally valid and logical would be to start numbering from 0,
+< on the left side (most significant end)
+---
+> 	address 	memory		comment
+> 	------		------		-------
+117,120c110,124
+<       0    1    2                  29   30   31
+<     ---------------------------------------------
+<     |    |    |    |  .   .   .  |    |    |    |
+<     ---------------------------------------------
+---
+> 	40		0x00		n: 1 in 2SC
+> 	41		0x00
+> 	42		0x00
+> 	43		0x01	
+> 	44		0xff		n2: -1 in 2SC
+> 	45		0xff
+> 	46		0xff
+> 	47		0xff	
+> 	48		0x0c		newline: '\n' in ASCII
+> 	49		0x45		str1: 'E' in ASCII
+> 	50		0x6e		      'n' in ASCII
+> 	...		...
+> 	60		0x72		      'r' in ASCII
+> 	61		0x20		      ' ' in ASCII
+> 	62		0x00		      '\0' in ASCII
+122d125
+<      this is called big endian numbering (of bits)
+123a127,130
+> 		  .text
+> 	__start:  puts 49 		# expects address for a string (str1)
+> 		  get 40		# expects an address (n)
+> 		  add M[44], M[40], M[40] # expects "values"
+125,126c132
+< We can discuss similar numbering issues when considering the bytes
+< within words (integer-sized data) on a byte-addressable machine.
+---
+> 	Real machine codes have addresses for variables, not labels.
+128,137c134,136
+<    word
+<    address
+<           ---------------------------------
+<       0   |       |       |       |       |
+<           ---------------------------------
+<       4   |       |       |       |       |
+<           ---------------------------------
+<       8   |       |       |       |       |
+<           ---------------------------------
+< 
+---
+> 	Later, we will show how to store instructions and get rid
+> 	of branch labels.  Then the .text segment with look similar
+> 	to the .data segment.
+138a138,140
+> Endian-ness (c.f., Gullivers Travels)
+> -----------
+> If you always 
+140,141c142,143
+<    If the machine is byte addressable, then each byte has a unique
+<    address.  Which is byte 0 (within word 0)?
+---
+> * store a word at address A (a multiple of 4) then load a word from address A 
+> * store a byte at address A then load a byte from address A 
+143c145
+<    big endian numbering of bytes within (32-bit) words is
+---
+> then this section can be ignored.
+145,152c147
+<           ---------------------------------
+<       0   |       |       |       |       |
+<           ----^-------^-------^-------^----
+<               |       |       |       |
+<               |       |       |       --- byte 3
+<               |       |       --- byte 2
+<               |       --- byte 1
+< 	      --- byte 0
+---
+> But what happens if:
+153a149,151
+>         .data
+>   n:    .word 0x61626364 # ASCII for 'a', 'b', 'c', 'd'
+>   addr:	.word
+154a153,157
+>         .text
+>  __start: la addr, n
+>         put m[addr]
+> 	put '\n'
+>         done
+156c159
+<    little endian numbering of bytes within (32-bit) words is
+---
+> Do you print 'a' or 'd'?
+158,165c161
+<           ---------------------------------
+<       0   |       |       |       |       |
+<           ----^-------^-------^-------^----
+<               |       |       |       |
+<               |       |       |       --- byte 0
+<               |       |       --- byte 1
+<               |       --- byte 2
+< 	      --- byte 3
+---
+> Answer: 'a' since simp/sim on Sun SPARC is Big Endian
+167c163,166
+< 
+---
+> 	40: 0x61
+> 	41  0x62
+> 	42  0x63
+> 	43  0x64
+169c168
+< SAL access of the array that is memory
+---
+> Big Endian -- smallest address is most sigificant -- IBM, Motorola, Sun
+171c170
+<     We can access any element (byte) of memory, by using the syntax:
+---
+> Little Endian -- smallest address is least significant -- DEC VAX, Intel
+173,177c172
+<     m[address]    refers to the byte (contents) at address
+<     m[20]   is the byte numbered address 20, the 21st byte of memory.
+< 	  
+< 	  important:  20 is the address
+< 		      m[20] is the contents of the byte at address 20
+---
+> Answer: 'd'
+178a174,177
+> 	40: 0x64
+> 	41  0x63
+> 	42  0x62
+> 	43  0x61
+180c179,180
+<     We can access any element (word) of memory
+---
+> Note: simp/sim inherits endianness from the underlying machine, so if
+> you run simp/sim on an Intel PC it is Little Endian.
+182,183c182
+<     M[address]    refers to the element (contents) at address
+<     M[20]   is the word at byte address 20, the 21st-24th byte of memory.
+---
+> Bi-endian -- have to to select -- DEC Alpha???, MIPS???
+185,187c184,185
+<     It is common to have byte-addressability, and access words.
+<     A word address is defined to be the smallest byte address of the 
+<     bytes within that word.
+---
+> ARRAYS
+> ------
+188a187,198
+> array implementation is important
+>  1. most assembly languages have no concept of arrays
+>  2. from an array, any other data structure we might want can be built
+> 
+> Properties of arrays:
+>  1. each element is the same size (char = 1 byte, integer = 1 word)
+>  2. elements are stored contiguously, with the first element
+>     stored at the smallest memory address
+> 
+> so, the whole trick in assembly language is
+>   1.  allocate correct amount of space for an array
+>   2.  an ADDRESS tells the location of an element
+190,191d199
+< 
+<     
+204,205c212,213
+< 	   index numbering ALWAYS starts at 0
+<        initvalue is an initial value given to each element of the array
+---
+> 	   numbering ALWAYS starts at 0
+>        initvalue is a value given to each element of the array
+215c223
+<    examples:
+---
+>    example:
+235,237c243
+<        want the 5th element,
+< 
+<        byte address of array1[10] =   25 + (10 - 6)
+---
+> 	byte address of array1[10] =   25 + (10 - 6)
+241a248,253
+> In C:
+> ============
+> Arrays always start with 0.
+> 
+> 	char array1[7];
+> 
+246c258
+<         0   1   2   3   4   5   6    <---- element index
+---
+>         0   1   2   3   4   5   6
+268,269c280,281
+<      This is where it is extremely important to understand and keep
+<      clear the difference between an address and the contents at
+---
+>      this is where it is extremely important to understand and keep
+>      clear the difference between an address and the contents of
+272c284
+<      to reference array1[4] (the 5th element) in SAL, write the code,
+---
+>      to reference array1[4] in SAL, write the code,
+277,278c289,290
+< 	# then, if  we wanted to place the character 'Q' there,
+< 	move  m[elem4], 'Q'
+---
+> 	# then if  we wanted to decrement element number 4
+> 	sub m[elem4], m[elem4], 1
+286c298,299
+<   word (integer-sized) elements --
+---
+>   word (integer) elements --
+>       in Pascal:
+288a302,305
+>       in C:
+>       int array[6];
+> 
+> 
+291c308,309
+<       (or array2:  .space 24)
+---
+>       (or array2:  .align    <== needed to insure proper alignment of integers
+> 		   .space 24)
+294c312
+<         0   1   2   3   4   5      <-- implied index
+---
+>         0   1   2   3   4   5      <-- index
+296c314,315
+<       | 0 | 0 | 0 | 0 | 0 | 0 |
+---
+>       |   |   |   |XXX|   |   |
+>       |   |   |   |XXX|   |   |
+303,308d321
+<      to reference array2[3] (the 4th element) in SAL, write the code,
+< 
+< 	la  baseaddr, array2
+< 	add addr, baseaddr, 12     # 3*4=12
+< 	# then, if  we wanted to subtract 1 from the value there
+< 	sub  M[addr], M[addr], 1
+310,311c323,324
+<       In general, we need to know
+< 	1.  where the array starts (called the base address)
+---
+>       SO, we need to know
+> 	1.  where the array starts (called base address)
+318,365d330
+<      If indices are always numbered starting from 0, then
+<      there is one fewer arithmetic operation needed in computing
+<      the address of an element.
+< 
+< 
+< An example with SAL code that deals with an array.
+< 
+< Suppose we had a 50 element array of integers.  We want to
+< initialize the array elements such that each element is the
+< additive inverse of its index.
+< 
+< A diagram of what we want the code to do:
+< 
+<     0    1    2    3             48    49    <---- index
+<   --------------------         -------------
+<   | 0 | -1 | -2 | -3 |  . . . .| -48 | -49 |
+<   --------------------         -------------
+< 
+< 
+<    # SAL code fragment to initialize elements of the array
+<    .data
+<    array:  .word  0:50   # an array of 50 integers
+<    #  could have declared this as    
+<    #    array:  .space 200         
+<    inverse:  .word   0   # additive inverse of array index
+<    i:        .word   0   # array index and loop induction variable
+<    elemi:    .word       # address of element i
+< 
+<    .text
+< 
+<            la   elemi, array
+<    for:    beq  i, 50, end_forloop   # iterate 50 times
+< 	   sub  inverse, 0, i
+<            mov  M[elemi], inverse    # place value into array
+< 	   add  elemi, elemi, 4      # address changed by 4: 4 bytes per word
+< 	   add  i, i, 1              # increment loop induction variable
+< 	   b    for
+<    end_forloop:
+< 
+< 
+< 
+< Notes:
+<   1.  The two lines:
+< 	   sub  inverse, 0, i
+<            mov  M[elemi], inverse    # place value into array
+<       could have been done with the single instruction
+< 	   sub  M[elemi], 0, i
+< 
+372c337
+< There are more issues for 2 dimensions than for 1 dimensional arrays.
+---
+> There are more issues here, than for 1 dimensional arrays.
+374c339
+< First, how to map a 2-dimensional array onto a 1-dimensional memory?
+---
+> First, how to map a 2 dimensional array onto a 1 dimensional memory?
+386,397d350
+< 
+<              0     1   <(column index)
+<           -------------
+<         0 |     |     |
+<           -------------
+<         1 |     |     |
+<           -------------
+<         2 |     |  X  |               X is element [2,1]
+<           -------------
+<         3 |     |     |
+<         ^ -------------
+<       (row index)
+405c358
+<   row major order:
+---
+> row major order:
+430c383
+<   column major order:
+---
+> column major order:
+436,442c389,395
+<         | 0,0 | --
+< 	-------   |
+<         | 1,0 |   |
+< 	-------   |--- one column
+<         | 2,0 |   |
+< 	-------   |
+<         | 3,0 | --
+---
+>         | 0,0 |
+> 	-------
+>         | 1,0 |
+> 	-------
+>         | 2,0 |
+> 	-------
+>         | 3,0 |
+472,475c425,427
+<                                  |                        |
+<                                  |                        |
+< 		  (size)(y - first_row) (# columns)       |
+<                                                           |
+---
+> 
+> 		  (size)(y - first_row) (# columns)
+> 
+487,490c439,441
+<                                  |                        |
+<                                  |                        |
+< 		  (size)(x - first_col) (# rows)          |
+<                                                           |
+---
+> 
+> 		  (size)(x - first_col) (# rows)
+> 
+503a455,456
+> 
+> Do example on page 179 ; maybe 181 as well.
+530,531c483,484
+< 		 first_row = 0
+< 		 first_col = 0
+---
+> 		 first_row = 1
+> 		 first_col = 1
+533,534c486
+< 	  what is the address of element[1, 4]
+< 	    (assume row major ordering)
+---
+> 	  what is the address of element[2, 5]
+538,539c490,491
+<      addr of [1, 4] = base + 1(1)(3) + 1(4)
+< 		    = base + 7
+---
+>      addr of [2, 5] = base + 1(2 - 1)(3) + 1(5)
+> 		    = base + 8
+542c494
+<      this actually gives the address of element [2, 1],
+---
+>      this actually gives the address of element [3, 3],
+546,558d497
+<        0  1  2 (3 4)
+<      ----------
+<    0 |  |  |  |
+<      ----------
+<    1 |  |  |  |  |X|
+<      ----------
+<    2 |  |  |  |
+<      ----------
+<    3 |  |  |  |
+<      ----------
+<    4 |  |  |  |
+<      ----------
+< 
+573c512
+< Also called Last In First Out, LIFO.
+---
+> Also dubbed Last In First Out, LIFO.
+575,584c514,523
+<        |       |      |       |      |       |
+<        |-------|      |-------|      |-------|
+<        |       |      |       |      |       |
+<        |-------|      |-------|      |-------|
+<        |       |      |       |      |       |
+<        |-------|      |-------|      |-------|
+<        |       |      |       |      |   Y   |
+<        |-------|      |-------|      |-------|
+<        |       |      |   X   |      |   X   |
+<        |-------|      |-------|      |-------|
+---
+>        |       |
+>        |-------|
+>        |       |
+>        |-------|
+>        |       |
+>        |-------|
+>        |       |
+>        |-------|
+>        |       |
+>        |-------|
+586,587d524
+<                       (after 1       (after 2
+< 		        PUSH)          PUSHES)
+591d527
+< These are the 2 operations defined for a stack.
+612a549
+> 
+618c555
+<     address of TOP OF STACK (tos), often called a stack pointer (sp).
+---
+>     index of TOP OF STACK (tos), often called a stack pointer (sp).
+631c568
+<    (next available) at the top of the stack.
+---
+>    at the top of the stack.
+635a573,584
+> Do example w/o [ ] statments first.
+> 
+>        .data
+>        stack:  .word  0:50
+>        sp:     .word 
+> 
+>        .text
+>        la  sp, stack  # initialize stack pointer to address of stack
+> 
+> A faster way to ask this is:
+> 
+>        .data
+637,638c586,589
+<        sp:     .word  stack  # initializes sp to contain the address
+<                              # assigned for label stack
+---
+>        sp:     .word  stack  # static version of la  sp, stack
+>      [ stackend: .word stack+4*50 ]
+> 
+> 
+640,653d590
+<   OR
+<        stack:  .space  200   # there are 4 bytes per word, so 50*4=200
+<        sp:     .word  stack
+< 
+< 
+<    New use of a directive for initial contents of sp.
+<    The address (label) stack gets put into the variable sp.
+<    Identical to use of
+<        la  sp, stack       # initialization of stack pointer
+<               (Initialization within the declaration is called
+< 	       a static initialization.  It occurs before the
+< 	       program runs/executes.
+< 	       Initialization while the program is running is called
+< 	       dynamic initialization.)
+657a595
+>     [ bge     sp, stackend, overflow ]
+663a602
+>     [ ble     sp, stackend, underflow ]
+665a605,607
+> 
+> 
+> Add in [ ] statments to get bounds checking.
+695,697c637,639
+<   The stack could "grow" from the end of the array's memory
+<   allocation towards the beginning.  (Note that which end of
+<   the array the stack grows toward is independent of what sp points to.)
+---
+>   The stack could "grow" from the end of the array towards
+>   the beginning.  (Note that which end of the array the stack
+>   grows toward is independent of what sp points to.)
+702c644
+<   How do you know when the stack is empty?
+---
+>   How do you know when there are no more items in the stack?
+710c652
+< Whereas a stack is LIFO,
+---
+> whereas a stack is LIFO,
+713c655
+< A real life analogy is a line (called a queue in British English).
+---
+> a real life analogy is a line (called a queue in British English).
+718c660
+< Getting into the queue is an operation called ENQUEUE.
+---
+> getting into the queue is an operation called ENQUEUE.
+721c663
+< It takes 2 pointers to keep track of the data structure,
+---
+> it takes 2 pointers to keep track of the data structure,
+724,725d665
+< An example where head=tail implies an empty queue, the head
+< points to a full location, and the tail points to an empty location.
+767c707
+< but correct use of the structure does not access it.
+---
+> but correct use of the structure cannot access it.
+772c712
+< the queue, the pointer will eventually run off the end of the
+---
+> the queue, the points will eventually run off the end of the
+775d714
+< This re-uses the space allocated for the queue.
+780c719
+<   queue with one element that is called a DUMMY.  It is never used
+---
+>   queue with one element that is a DUMMY.  It is never used
+785c724
+<   manner, in order to make the test (code) for full/empty queues
+---
+>   manner, in order to make the test for full/empty queues
+787d725
+< </pre>
+788a727,777
+> 
+> Optional example in more detail
+> 
+>      head	 tail
+>       | 	  |
+>      \ /         \ /
+>     -----------------------------
+>     |   |   |   |   |   |   |   |  ...
+>     -----------------------------
+> 
+> 
+>    head points to first item in queue (next to be dequeued)
+>    unless head = tail, which implies queue empty
+> 
+>    tail points to empty location (for next enqueued item)
+> 
+> 
+> Do example w/o [ ] statments first.
+> 
+> 
+>   storage:
+> 
+>        queue:  .word  0:infinity	# assume infinite for now
+>      [ queue:  .word  0:50 ]
+>      [ queue_end: .word queue+4*50 ]
+>        head:	.word  queue	# static version of: la head, queue
+>        tail:    .word  queue
+> 
+>   enqueue (item):
+> 
+>        move 	M[tail], item
+>        add	tail, tail, 4
+>      [ blt	tail, queue_end, continue1 ]
+>      [ la	tail, queue	# wrap around tails gets address of queue]
+>  [ continue1: ]
+>      [[ beq	head, tail, queue_overflow   # undo and fail? ]]
+> 
+>   dequeue (item):
+> 
+> 	beq	head, tail, queue_empty
+> 	move	item, M[head]
+> 	add	head, head, 4
+>      [ blt	head, queue_end, continue2 ]
+>      [ la	head, queue		# wrap around ]
+>  [ continue2: ]
+> 
+> 
+> For finite queues, add [ ] statements (wrap around)
+> and then [[ ]] (overflow).
+> 
+> <!--#include virtual="style4.html" -->

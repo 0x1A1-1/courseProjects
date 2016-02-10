@@ -1,0 +1,24 @@
+Name:Xiaojun He	
+Section:1
+
+The questions that go with Assignment 0, Fall 2015:
+
+1. Which section of CS/ECE 354 are you enrolled in?
+1
+2. What is the name of your instructor?
+Jason Power
+3. Have you completed the prerequisites for CS/ECE 354 (CS 302 and CS/ECE 252) ?
+YEs
+4. Have you taken CS 367?
+I am taking it along with this course
+5. What was the C program's compiler error that you got initially?
+undeclared identifier warning
+6. What was the C program's corrected output?
+The alphabet:
+abcdefghijklmnopqrstuvwxyz
+7. Mention the commands you used for the following:
+   a. listing files in a directory:ls
+   b. changing directory          :cd
+   c. making a new directory      :mkdir
+   d. copying a file              :cp
+

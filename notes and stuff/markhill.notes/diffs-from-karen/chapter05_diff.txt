@@ -1,0 +1,786 @@
+1,4c1
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 5 - Integer Arithmetic</title>
+< </head>
+---
+> <!--#include virtual="style1.html" -->
+6,7c3,4
+< <BODY>
+< <h1> Chapter 5 -- integer arithmetic</h1>
+---
+> Lecture Notes for
+> Chapter 5 -- Arithmetic and Logical Operations <!-- EDIT CHAPTER INFO -->
+9c6
+< <pre>
+---
+> <!--#include virtual="style2.html" -->
+11,12c8
+< all about integer arithmetic.
+< -------------------------------
+---
+> Wednesday, August 29, 2001 <!-- EDIT LAST UPDATE DATE -->
+13a10,15
+> <!--#include virtual="style3.html" -->
+> 
+> </PRE><b>NOT YET UPDATED FOR FALL 2003</b><PRE>
+> 
+> 
+> Operations we'll get to know (and love):
+15d16
+< operations we'll get to know (and love):
+20c21
+<     logical operations (not, and, or, nand, nor, xor, xnor)
+---
+>     logical ops
+22a24,26
+> --------
+> ADDITION
+> --------
+24,25d27
+< the rules for doing the arithmetic operations vary depending
+< on what representation is implied.
+29,30c31
+<   an overview for unsigned integers
+< 
+---
+>   an overview.
+32,42d32
+< 	carry in  a  b | sum  carry out
+< 	---------------+----------------
+< 	   0      0  0 |  0    0
+< 	   0      0  1 |  1    0
+< 	   0      1  0 |  1    0
+< 	   0      1  1 |  0    1
+< 	   1      0  0 |  1    0
+< 	   1      0  1 |  0    1
+< 	   1      1  0 |  0    1
+< 	   1      1  1 |  1    1
+<                        |
+53,55c43,44
+<     1 + 1 = 2  which is 10 in binary, sum is 0 and carry the 1.
+<     1 + 1 + 1 = 3  sum is 1, and carry a 1.
+< 
+---
+>     1 + 1 = 2  which is 10 in binary, sum is 1 and carry the 1.
+>     1 + 1 + 1 = 3  sum is 0, and carry a 1.
+56a46,54
+> 	carry in  a  b   sum  carry out
+> 	   0      0  0    0    0
+> 	   0      0  1    1    0
+> 	   0      1  0    1    0
+> 	   0      1  1    0    1
+> 	   1      0  0    1    0
+> 	   1      0  1    0    1
+> 	   1      1  0    0    1
+> 	   1      1  1    1    1
+59,60c57,60
+< ADDITION
+< --------
+---
+> Ignore overflow for now.
+> 
+> Addition w/ unsigned
+> --------------------
+62d61
+< unsigned:
+72c71
+<   Ignore (throw away) carry out of the msb.
+---
+>       (ignoring overflow)
+74,76d72
+<   We do unsigned addition with the assumption that we are
+<   working of a fixed precision value. Fixed precision means
+<   that the number of bits can not change.
+78a75,89
+> Addition w/ 2SC
+> ---------------
+> 
+> For non-negatives (0 and positives) ==> just like unsigned add
+> 
+> 
+> Assume 5-bit and observe:
+> 
+> 
+>     00011 (3)         101000  (-24)        111111 (-1)
+>   + 11100 (-4)      + 010000  (16)       + 001000 (8)
+>   ------------      --------             --------
+>     11111 (-1)        111000  (-8)        1 000111 (7)
+> 
+>     Ignore carry-outs (and overflow)
+80c91,93
+< sign magnitude:
+---
+> 
+> Add w/ sign magnitude:
+> ---------------------
+83c96
+<     - do unsigned addition on magnitudes only (do not carry into the sign bit)
+---
+>     - add magnitudes only (do not carry into the sign bit)
+101,104c114,115
+<   Again, we do sign magnitude addition with the assumption that we are
+<   working of a fixed precision value. Fixed precision means
+<   that the number of bits can not change.
+< 
+---
+> Add w/ one's complement:
+> -----------------------
+106,110c117
+< 
+< 
+< one's complement:
+< 
+<    by example (using the unsigned addition algorithm)
+---
+>    by example
+116c123
+<     01100 (12)      1 000000 (0) wrong!    1 11010 (-5) wrong!
+---
+>     01100 (12)      1 000000 (0) wrong!    1 11010 (-5) wrong
+119c126
+< 		      000001 (1) right!      11011 (-4) right!
+---
+> 		      000001 (1)             11011 (-4)
+122c129
+<    So, it seems that if there is a carry out of the msb, then
+---
+>    so it seems that if there is a carry out of the msb, then
+124,127c131
+<    result.  (Implementation in HW called an "end around carry.")
+< 
+< 
+< 
+---
+>    result.
+129d132
+< two's complement:
+131,147d133
+<    rules:
+<      - just do unsigned addition
+<      - throw away any carry out of the msb
+< 
+<    examples
+< 
+< 
+<     00011 (3)         101000               111111 (-1)
+<   + 11100 (-4)      + 010000             + 001000 (8)
+<   ------------      --------             --------
+<     11111 (-1)        111000             1 000111 (7)
+<                                          ^
+< 					 this bit is thrown away
+< 
+< After seeing examples for all these representations, you may see
+< why 2's complement addition requires simpler hardware than
+< sign mag. or one's complement addition.
+150c136
+< 
+---
+> -----------
+152a139
+> 
+159a147,148
+> But often we can do a - b as a + (-b)
+> 	i.e., replace substraction with additive inverse & addition
+161a151,152
+> Subtraction w/ 2SC
+> ------------------
+163,165c154,156
+< unsigned:
+<  
+<   -  it only makes sense to subtract a smaller number from a larger one
+---
+> Don't bother use addition:
+> 
+>        a - b  becomes   a + (-b)
+167c158
+<   example
+---
+>   - so, get the additive inverse of b, and do addition.
+169,172c160
+<      1011 (11)   must borrow
+<   -  0111 (7)
+<   ------------
+<      0100 (4)
+---
+>     examples
+173a162,214
+>    10110 (-10)
+>  - 00011 (3)    -->       00011
+>  ------------               |
+> 			   \|/
+> 			  11100
+> 			+     1
+> 			-------
+> 			  11101 (-3)
+> 
+> Apply to otherwise unused LSB carry in:
+> 
+>      10110 (-10)
+>    + 11101 (-3)
+>    ------------
+>   1  10011  (-13)
+>   (throw away carry out)
+> 
+> Actually use 1SC and apply 1 to otherwise unused LSB carry in:
+> 
+> 	 1 <------+
+>      10110 (-10)  |
+>    + 11100 <------+--- (-3)
+>    ------------
+>   1  10011  (-13)
+>   (throw away carry out)
+> 
+> 
+> Why use 2SC?  Can do a+b and a-b, with a positive or negative
+> and b positive or negative with adders and inverters.
+> 
+> 
+> 
+> Subtraction w/ unsigned
+> -----------------------
+> 
+> For n-bits use above 2SC method and overflow if negative
+> 
+>       11100 (+28)
+>     - 10110 (+22)
+>     -------------
+> 
+> ==>
+> 
+> 	  1
+>       11100 (+28)
+>     + 01001 (-22 w/ carry above)
+>     -------------
+>       00110 (+6)
+> 
+> 
+> 
+> Subtraction w/ sign magnitude
+> -----------------------------
+180,181c221,222
+<   - Compare magnitudes, then subtract smaller from larger.
+<     If the order is switched, then switch the sign too.
+---
+>   - compare magnitudes, then subtract smaller from larger
+>   - if the order is switched, then switch the sign too.
+200d240
+< 
+210,212c250
+< two's complement:
+< 
+<   - change the problem to addition!
+---
+> 
+214d251
+<        a - b  becomes   a + (-b)
+216d252
+<   - so, get the additive inverse of b, and do addition.
+218c254,255
+<     examples
+---
+> more on integer arithmetic
+> -------------------------
+220,237d256
+<    10110 (-10)
+<  - 00011 (3)    -->       00011
+<  ------------              
+< 			  11100 (after taking the 1's complement)
+< 			+     1
+< 			-------
+< 			  11101 (-3)
+<  so do
+< 
+<      10110 (-10)
+<    + 11101 (-3)
+<    ------------
+<      10011  (-13)
+<   (throw away carry out)
+< 
+< 
+< OVERFLOW
+< ---------
+257a277
+> 
+262c282
+< 		       9 cannot be represented in 4-bit 2's complement)
+---
+> 		       9 cannot be represented in 4 bit 2's complement)
+270c290
+<    unsigned -- never
+---
+>    unsigned -- if negative
+272,273c292,293
+<    2's complement -- We never do subtraction. If the addition operation
+<       causes overflow, then overflow occurs. 
+---
+>    2's complement -- we never do subtraction, so use the addition rule
+>       on the addition operation done.
+278c298,314
+< MULTIPLICATION of integers
+---
+> MULTIPLICATION of integers (non-negative)
+> 
+> 	  multiplicand
+> 	x   multiplier
+> 	--------------
+> 	       product
+> 
+> 	       0011 (+3)
+> 	     x 0110 (+6)
+> 	       ----
+> 	       0000
+> 	      0011
+> 	     0011
+> 	    0000
+> 	    -------
+> 	    0010010 (+18)
+> 
+287c323
+<      -- the result can require 2x as many bits as the larger operand
+---
+>      -- the result can require 2x as many bits as the larger multiplicand
+289,294c325
+<      -- in 2's complement, to always get the right answer without
+< 	thinking about the problem, sign extend both integers to
+< 	twice as many bits (as the larger).  Then take the correct number
+< 	of result bits from the least significant portion of the result.
+< 	Note that the HW that implements multiplication does not
+< 	use this algorithm.
+---
+>      For 2SC:
+296,298c327
+<  
+<     2's complement example:
+< 	  
+---
+>      If negative multiplicand, just sign-extend it.
+300,332c329,330
+< 	     1111 1111        -1
+< 	   x 1111 1001     x  -7
+<       ----------------    ------
+< 	      11111111         7
+< 	     00000000
+< 	    00000000
+<            11111111
+<           11111111
+<          11111111
+<         11111111
+<    +   11111111
+<        ----------------
+<         1  00000000111
+<               --------  (correct answer underlined)
+< 
+< 
+<       WRONG !                Sign extended:
+< 	0011 (3)               0000 0011 (3)
+<       x 1011 (-5)            x 1111 1011 (-5)
+<       ------                 -----------
+< 	0011                    00000011
+<        0011                    00000011
+<       0000                    00000000
+<    + 0011                    00000011
+<    ---------                00000011
+<      0100001               00000011
+<   not -15 in any          00000011
+<    representation!     + 00000011
+< 		      ------------------
+< 		              1011110001
+<                                 --------
+< 			  take the least significant 8 bits 11110001 = -15
+< 
+---
+>      If negative multiplier, take 2SC of both multiplicand and multiplier
+>      (-7 * -3 = 7 * 3;  7 * -3 = -7 * 3)
+334,335c332,334
+< more about integer multiplication.
+< -------------------------------------
+---
+>      Easier than book's method.
+> 	2x as many bits (as the larger).  Then take the correct number
+> 	of result bits from the least significant portion of the result.
+337,365d335
+<    multiplicand
+<  x   multiplier
+<  ----------------
+<     product
+< 
+< 
+< If we do NOT sign extend the operands (multiplier and multiplicand),
+< before doing the multiplication, then the wrong answer sometimes
+< results.  To make this work, sign-extend the partial products
+< to the correct number of bits.
+< 
+< To ease our work, classify which do work, and which don't.
+< 
+< 
+<     +          -            +            -      (muliplicands)
+<   x +        x +          x -          x -      (mulipiers)
+<   ----       ----         ----         ----
+<    OK        sign          |            |
+< 	   extend          | take       |
+< 	  partial          | additive   |
+< 	  products         | inverses   |
+< 
+< 			    -            +
+< 			  x +          x +
+< 			  ----          ----
+< 			  sign           OK
+< 	                extend
+< 	               partial
+< 	               products
+367a338
+> 	A simpler approach:  If multiplier negative, take 2SC of both
+369c340,355
+< Example:
+---
+>  
+>     2's complement example:
+> 	
+> 	  0011 (3)
+> 	* 1011 (-5)
+> 	-----------
+> 	
+> 	            1101 (-3)
+> 	          * 0101 (+5)
+> 	        -------------
+> 	     11111111101
+> 	     0000000000
+> 	     111111101
+> 	  +  00000000
+> 	  -------------------
+> 	     11111110001 (-18)
+371,372c357
+<   without                          with correct
+<   sign extension                   sign extension
+---
+> 
+374,381c359,361
+<       11100 (-4)                         11100
+<     x 00011 (3)                        x 00011
+<     ------------                      ---------
+<       11100                         1111111100
+<      11100                         1111111100
+<     ------------                ---------------
+<     1010100 (-36)                   1111110100  (-12)
+<      WRONG!                            RIGHT!
+---
+> DIVISION of integers
+> --------------------
+>      unsigned only!
+383c363
+< 
+---
+>      do example of 15 / 3         1111 / 011
+385a366,370
+> Logical operations
+> ------------------
+> Operate on raw bits 
+> 	1 == true
+> 	0 == false
+387d371
+< Another example:
+388a373,377
+> 	in1 in2		and  or	 nand   nor xor xnor (equal)
+> 	  0 0		 0   0    1	 1   0   1
+> 	  0 1		 0   1    1	 0   1   0
+> 	  1 0		 0   1    1	 0   1   0
+> 	  1 1		 1   1	  0      0   0   1
+390c379
+<     without adjustment              with correct adjustment
+---
+>     In Computer, done bitwise (in parallel for corresponding bits)
+392,404d380
+<       11101 (-3)                       11101 (-3)
+<     x 11101 (-3)                     x 11101 (-3)
+<    -------------                    -------------
+<       11101                           (get additive inverse of both)
+<     11101
+<    11101                               00011 (+3)
+<  +11101                              x 00011 (+3)
+<  -----------                        -------------
+<  1101001001 (wrong!)                   00011
+< 				    + 00011
+< 				   ---------
+< 				      001001 (+9) (right!)
+< 
+405a382,383
+>                      X =  0011
+>                      Y =  1010
+407,409c385,389
+< DIVISION of integers
+<      unsigned only in this class!
+<      (Don't worry, you'll do lots of division in CS/ECE 552!)
+---
+>        X  AND  Y is       0010
+>        X   OR  Y is       1011
+>        X  NOR  Y is       0100
+>        X  XOR  Y is       1001
+>                 etc.
+411,414d390
+< 	        quotient
+<              ----------------
+<      divisor | dividend
+<      
+416,438c392
+<      written as fractions:      dividend
+<                                 --------
+< 				divisor
+< 
+<      example:
+<       15 / 3         1111 / 011
+< 
+< 	       0101
+<              -----------
+<         011  | 1111
+< 	      -0 
+< 	      -- 
+< 	       11
+<              - 11
+< 	     ----
+< 	        01
+< 	        -0 
+< 	        -- 
+<                  11
+<                - 11
+< 	       ----
+<                   0  (remainder)
+< 
+---
+> SAL LOGICAL INSTRUCTIONS
+441,443c395
+<      another example:
+<      
+<       20 / 3         010100 / 011
+---
+>    operate bitwise on 32 .words
+444a397,403
+> 	not   x, y         x <-  NOT (y)
+> 	and   x, y, z      x <-  (y) AND (z)
+> 	or    x, y, z      x <-  (y) OR (z)
+> 	nor   x, y, z      x <-  (y) NOR (z)
+> 	nand  x, y, z      x <-  (y) NAND (z)
+> 	xor   x, y, z      x <-  (y) XOR (z)
+> 	xnor  x, y, z      x <-  (y) XNOR (z)
+446,466d404
+<                000110 (quotient = 6)
+<              -----------
+<         011  | 010100
+<               -0
+<              ---
+<                01
+<                -0
+<               ---
+<                010
+<                 -0
+<                ---
+<                0101
+<               - 011
+<                ----
+< 	       00100
+<                - 011
+<                 ----
+< 	         0010
+<                 -   0
+<                  ----
+< 		   10 (remainder = 2)
+468a407
+> Example:
+470,476c409,416
+< LOGICAL OPERATIONS
+< -------------------
+<    They are done bitwise.
+< 
+<    Bitwise means corresponding bits of the operands are operated
+<    on, with the single bit result going into the corresponding
+<    bit of the result.
+---
+>    a:	.word 0x00000003	# 0...0 0011
+>    b:	.word 0x0000000a	# 0...0 1010
+>    c:   .word
+>    d:   .word
+> 
+>    .text
+>    and c,a,b			# 0...0 0010
+>    or c,a,b			# 0...0 1011
+478d417
+<    bit 0 of X goes with bit 0 of Y, and the result goes in bit 0.
+480,481d418
+<                      X =  0011
+< 		     Y =  1010
+483,487c420
+<        X  AND  Y is       0010
+<        X   OR  Y is       1011
+<        X  NOR  Y is       0100
+<        X  XOR  Y is       1001
+< 		etc.
+---
+> Example:
+488a422,424
+>    abcd:  .word	0x61626364
+>    mask: .word	0x000000ff
+>    tmp:	  .word 
+490,493c426,429
+< SHIFT OPERATIONS
+< ----------------
+<   A way of moving bits around within a word.
+<   A shift by n places is the same as n shifts by 1 place.
+---
+>    .text
+>    and tmp,abcd,mask
+>    beq tmp,'d',found_d
+>    ...
+495,496c431,435
+<   3 types:     logical, arithmetic and rotate
+< 	       (each type can go either left or right)
+---
+> Add:
+>    mask2:  .word 0x0000ff00
+>    ...
+>    and tmp,abcd,mask
+>    beq tmp,'c',found_c WRONG!  Need shift
+498,500d436
+<   logical left - move bits to the left, same order
+< 	       - throw away the bit that pops off the msb
+< 	       - introduce a 0 into the lsb
+503c439,440
+< 	       00110101
+---
+> Shifts and Rotates
+> ------------------
+505c442
+< 	       01101010 (logically left shifted by 1 bit)
+---
+> USE PICTURES FROM pp. 118-120
+514,515c451
+< 	       00011010  (logically right shifted by 1 bit)
+< 
+---
+> 	       00011010
+517c453
+<   arithmetic left - move bits to the left, same order
+---
+>   logical left - move bits to the left, same order
+520,521d455
+< 	       - SAME AS LOGICAL LEFT SHIFT!
+< 
+523a458,462
+> 	       00110101
+> 
+> 	       01101010
+> 
+> 
+530c469
+< 	       00110101 ->  00011010 (arithmetically right shifted by 1 bit)
+---
+> 	       00110101        1100
+532c471
+< 	       1100 -> 1110   (arithmetically right shifted by 1 bit)
+---
+> 	       00011010        1110
+534a474,478
+>   arithmetic left - move bits to the left, same order
+> 	       - throw away the bit that pops off the msb
+> 	       - introduce a 0 into the lsb
+> 	       - SAME AS LOGICAL LEFT SHIFT!
+> 
+540,541c484,486
+< 	       00110101 -> 01101010 (rotated left by 1 place)       
+< 	       1100 -> 1001 (rotated left by 1 place)
+---
+> 	       00110101        1100
+> 
+> 	       01101010        1001
+548,552c493,494
+< 	       00110101 -> 10011010 (rotated right by 1 place)        
+< 	       1100 ->  0110 (rotated right by 1 place)
+< 
+< 
+< 
+---
+> 	       00110101        1100
+> 	       10011010        0110
+554d495
+< SAL INSTRUCTIONS FOR LOGICAL AND SHIFT OPERATIONS
+556,566c497
+<    SAL has instructions that do bitwise logical operations and
+<    shifting operations (ON .word OPERANDS!).
+< 
+< 
+< 	not   x, y         x <-  NOT (y)
+< 	and   x, y, z      x <-  (y) AND (z)
+< 	or    x, y, z      x <-  (y) OR (z)
+< 	nor   x, y, z      x <-  (y) NOR (z)
+< 	nand  x, y, z      x <-  (y) NAND (z)
+< 	xor   x, y, z      x <-  (y) XOR (z)
+< 	xnor  x, y, z      x <-  (y) XNOR (z)
+---
+> SAL SHIFT AND ROTATE INSTRUCTIONS
+574d504
+< 
+575a506,519
+> the rules for doing the arithmetic operations vary depending
+> on what representation is implied.
+> 
+> 
+> Example:
+> 
+>    abcd:  .word	0x61626364
+>    mask2:  .word 0x0000ff00
+>    tmp:	  .word 
+> 
+>    .text
+>    and tmp,abcd,mask2
+>    srl tmp,tmp,8
+>    beq tmp,'c',found_c
+576a521,523
+> 
+> 
+> Optional Examples
+584c531
+<   Example:
+---
+>   Example 1:
+617c564
+<       The value 0xffffeff7 (or 0x00000020 in the previous example)
+---
+>       The value 0xffffeff7 (or 0x00000010 in the previous example)
+627c574
+<   A completely different example:
+---
+>   Example 2:
+665c612,643
+< </pre>
+---
+> Software / Hardware Trade Off
+> -----------------------------
+> 
+> Two implementations of integer multiply:
+> 
+> 	SW: Loop of add, masks, shifts (Figure 5.8 p. 132)
+> 
+> 	HW: Muliply hardware that does things directly
+> 
+> SW
+> 	+ no extra hardware
+> 	- slow: once around loop per multiplier bit
+> 		(ok if multiply uncommon)
+> 
+> HW	+ special logic -- may have opportunity cost
+> 	- fast (was 10 simple instrn times; now 2-4)
+> 
+> Today
+> 	enough extra chip area may HW worthwhile
+> 
+> 
+> 
+> Review
+> -------
+>     addition
+>     subtraction
+>     multiplication
+>     division
+>     logical ops
+>     shifting
+> 
+> <!--#include virtual="style4.html" -->

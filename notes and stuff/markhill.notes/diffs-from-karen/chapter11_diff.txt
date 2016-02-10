@@ -1,0 +1,727 @@
+1,4c1
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 11 - I/O</title>
+< </head>
+---
+> <!--#include virtual="style1.html" -->
+6,7c3,4
+< <BODY>
+< <h1> Chapter 11 -- I/O</h1>
+---
+> Lecture Notes for
+> Chapter 11 -- Input and Output <!-- EDIT CHAPTER INFO -->
+9c6
+< <pre>
+---
+> <!--#include virtual="style2.html" -->
+11,12c8
+< all about I/O
+< -------------
+---
+> Wednesday, November 21, 2001 <!-- EDIT LAST UPDATE DATE -->
+14,15c10
+< computers aren't useful unless we can put data into them,
+< and get results out.
+---
+> <!--#include virtual="style3.html" -->
+17,18c12
+<    input --   data to computer
+<    output --  data from computer
+---
+> </PRE><b>NOT YET UPDATED FOR FALL 2003</b><PRE>
+21c15,19
+<    computer model:
+---
+> I/O (w/o interrupts)
+> --------------------
+> 
+> We modeled a computer as (show w/o i/o first):
+> 
+34,35c32
+< examples of input devices:
+<    keyboard, mouse, network, disk,  scanner, camera, microphone, ??
+---
+> To be useful computers must communication with outside world
+37,38c34,35
+< examples of output devices:
+<    printer, (terminal) display, network, disk, speakers, ??
+---
+> 	input:  get data in
+> 		from keyboards, mice, disks, networks, microphones...
+39a37,38
+> 	output: get data out
+> 		to displays, printers, disks, networks, speakers...
+41,43c40
+< simulator has only 2 I/O devices,
+<   keyboard (for input)
+<   display  (for output)
+---
+> 	called I/O (input/output)
+46c43
+< ISSUES THAT MUST BE SOLVED:
+---
+> There example devices
+48,49c45,48
+< programmer interface -- simulator has 
+<  get, getc, put, putc, puts
+---
+> Keyboard
+> 	user presses A key ==> 'a' (ASCII 0x61 == 01100001)
+> 	user presses Shift and A ==> 'A' (ASCII 0x41)
+> 	user presses Return = > 'cr' (ASCII 0x0d)
+51,55c50,52
+<  these are actually OS implemented procedures.
+<  (The OS is the program that interfaces between the programmer
+<   or application user and the actual hardware.  For us on the
+<   sol/nova machines, it is UNIX.)
+< 
+---
+> 	Keyboard send on wire 1==start, 8-bit data, 0==stop
+> 	E.g. for 'a'   1011000010
+> 	Buffer at computer catches these bits
+56a54,56
+> Displays
+> 	Character display work with the reverve process (sort of)
+> 	Most displays today are "bit mapped" and work more like TVs
+57a58,63
+> Hard Disk -- A spinning disk (like a record or CD)
+> 	2-4 GB today
+> 	But
+> 		magnetic and read/write (like tape)
+> 		use both sides
+> 		may have a stack of platters
+59,80c65,66
+< protection issues --
+<   in a real system, there could be more than one terminal
+<   (terminal is a keyboard and display together)
+< 
+<   Should one user be able to display characters on another's
+<   display?  Lock up another's keyboard?  Send a file of
+<   infinite length to the printer, effectively shutting
+<   all others out?
+< 
+<   In practice, the OS's job is "resource management,"
+<   allocating all portions of the processor.  Examples
+<   of resources are the CPU and all I/O devices.
+< 
+< 
+< physical issues --
+<   a computer today (1999) can complete an instruction at
+<   the rate of about 1 each 10 nsec. (100MHz, or 100 MIPS).
+<   Unfortunately, typical I/O devices are much slower, often
+<   requiring 10s of milliseconds to deal with a single
+<   character. That is more than 1 million times slower!
+<   This situation is dubbed the "access gap."
+< 
+---
+> 	disk access:  queueing + seek + rotation + transfer
+> 		       depends	 10 ms    10 ms     1 ms
+81a68,69
+> 	Electronic ==> ns = 10^-9 s   
+> 	Mechanical ==> ms = 10^-3 s  a million times slower!
+83,84d70
+< disk - a real, live, physical device
+< ------------------------------------
+86c72,74
+< Vocabulary, to form a picture of a disk (ch 11, p294)
+---
+> Problems
+> 	How does CPU ask for a char to be printed?
+> 	Which printer?  which display (mine or yours?)
+88c76,77
+<   PLATTER -- sort of like a phonograph record, or a CD.
+---
+> 	When is printer ready for the next char?
+> 	When does keyboard have the next char?
+90,91c79
+<   data is stored on a SURFACE of a platter. Each platter can have
+<     one or two surfaces.
+---
+> 	What about the million times slower?
+93,94c81
+<   all platters are tied together and rotate around the SPINDLE
+<     at a fixed speed.
+---
+> 
+96c83,84
+<   each surface has one or more READ/WRITE HEADS.
+---
+> Users see
+> 	get, getc, put, putc, puts
+98,99c86,87
+<   Platters are broken down into TRACKS.  A single track is
+<     one of many concentric circles on the platter.
+---
+> Simulator only support input from one keyboard and output
+> to one display
+101,102c89,90
+<   All the corresponding tracks on all surfaces, taken together,
+<     form a CYLINDER.
+---
+> To hide details from users and to protect users from each other
+> many systems manage details of I/O in the operating system
+104c92
+<   Each track is broken down into SECTORS.
+---
+> "putc char" is really
+105a94,96
+> 	lb $4, char	# $4 char to be printed
+> 	li $2, 11	# li + syscall == jal operating_system_function_11
+> 	syscall
+107,109c98
+< How we read/write to a sector.
+<   Given:  the sector position on the cylinder. (looked up in a
+<   table, or calculated from the disk address).
+---
+> "getc char" is
+111c100,102
+<   -- the disk is spinning.
+---
+> 	li $2, 12	# li + syscall == jal operating_system_function_12
+> 	syscall
+> 	sb $2, char	# returns with char read in $2
+113,116c104,106
+<   -- the read/write head is moving to the correct cylinder (track).
+<      THIS TAKES A LONG TIME RELATIVE TO THE OTHER STUFF.  It is
+<      the physical movement, acceleration, etc. that takes lots of
+<      time.  This is SEEK time.
+---
+> We don't use jal because
+> 	OS doesn't trust user to provide the correct address
+> 	Want to switch into OS mode, where more things are allowed
+118,128c108,109
+<   -- once the read/write head is over the correct cylinder, there
+<      is bound to be some time to wait until the correct sector
+<      is under the head.  This is ROTATIONAL LATENCY.
+<      The worst case is that the desired sector has just partially
+<      gone by the read/write head.  To read the sector, we must
+<      wait until the disk spins all the way around to come back
+<      to the start of the desired sector.
+< 
+<   -- Even at the correct sector, it still takes some time for
+<      the data to be read/written.  This is the READ or WRITE
+<      time.
+---
+> OS catches syscall and uses value is $2 to determine what to do
+> (like a case statement)
+130,131d110
+< 
+<      time to read a sector =   seek time + rotate time + read time.
+133a113,115
+> OS will not allow
+> 	users to read each other's keyboards
+> 	users to send infinite jobs to printers
+135,136c117
+< So, the nitty gritty issue is:  how does the OS accomplish
+<   I/O requests?  There are 2 possibilities.
+---
+> But how does the OS do I/O?
+138,153c119
+<   1.  have special I/O instructions
+<       --  input
+< 	  need to know  which device, how much data, where the
+< 	  data is to go
+<       --  output
+< 	  need to know  which device, how much data, where the
+< 	  data currently is
+< 
+<       How does the CPU know that the instruction has completed?
+< 	(Is there any need to wait?)
+<       What happens if the device encounters an error?
+<         (Does this halt the computer?)
+< 
+<   2.  the solution of choice
+<       
+<       overload memory locations to use as communication channels.
+---
+> What instruction causes an I/O (e.g., print a char)?
+155,161c121,122
+<       for example,
+<        address
+<        0x0000 0000  -|
+<        .             |   real memory
+<        .             |
+<        .             |
+<        0xffff 0000  -|
+---
+> 	could have special instructions --
+> 		but hard to anticipate all possibilties
+163c124
+<        0xffff 0008  - data from keyboard (Keyboard_Data)
+---
+> 	solution:  overload memory and loads and stores
+165c126
+<        0xffff 0010  - data to display (Display_Data)
+---
+> Called memory-mapped I/O (I made up the specific addresses used below.)
+167,170c128,135
+<    then, by reading (loading) from location 0xffff0008, data
+<    is requested from the keyboard
+<    then, by writing (storing) to location 0xffff0010, data
+<    is sent to the display
+---
+> 	 0x00000000	+-----+   Real memory
+> 			|     |
+> 			|     |
+> 			|     |
+> 			|     |
+> 			|     |
+> 			|     |
+> 	 0xffff0000	+-----+
+172c137
+<      the syscall code in the OS must be (in essence)
+---
+> 	 0xffff0008     <============ from keyboard
+174,175d138
+<      lw  $2, Keyboard_Data     # getc syscall
+<      return from syscall
+177c140
+<        and
+---
+> 	 0xffff0010     ============> to display
+179,180d141
+<      sw  $2, Display_Data      # putc syscall
+<      return from syscall
+182,183c143,144
+< 
+<      This method of I/O is called MEMORY-MAPPED I/O.
+---
+> .eq KeyboardData 0xffff0008
+> .eq DisplayData  0xffff0010
+186,190c147
+< Problems with memory-mapped I/O as currently given:
+<  -- getc presumably returns once a character has been typed.
+<     What happens if the user does not type a character?
+<     Types it on the wrong keyboard?  Goes to get a drink
+<     of water?
+---
+> Implementation Pix:
+192,193c149,154
+<     What happens to the data if the user types 2 characters
+<     before getc has been called?
+---
+> 	CPU	Mem	
+> 	 |       |
+> 	 +=======+=====+==================+
+> 		       |		  |
+> 		 ==0xffff0008?	   ==0xffff0010?
+> 		 keyboard buffer   display buffer
+195c156
+<     How does the computer know if a character has been typed?
+---
+> (Other keyboards, displays, and I/O devices can be mapped as other addresses.)
+197,199d157
+<  -- putc and puts:  how does the computer know that the device
+<     is ready to print out a second character?  What if the
+<     printer jams?  (printers and terminals are SLOW!)
+201,203c159,162
+<  What is needed is a way to convey information about the
+<  STATUS of I/O devices.  This status information is used
+<  to coordinate and SYNCHRONIZE the useage of devices.
+---
+> operating_system_function_12:	# getc char and put it in $2
+> 	
+> 	lw  $2, KeyboardData
+> 	"return from syscall"
+205,210d163
+<        address
+<        0x0000 0000  -|
+<        .             |   real memory
+<        .             |
+<        .             |
+<        0xffff 0000  -|
+212,213c165,168
+<        0xffff 0008  - data from keyboard (Keyboard_Data)
+<        0xffff 000c  - STATUS from keyboard (Keyboard_Status)
+---
+> operating_system_function_11:	# putc char, where char is in $4
+> 	
+> 	sw  $4, DisplayData
+> 	"return from syscall"
+215,216c170,171
+<        0xffff 0010  - data to display (Display_Data)
+<        0xffff 0014  - STATUS from display (Display_Status)
+---
+> But is there a new char to read?
+> But is the display (printer) done with the last char?
+218,222c173
+<   assume that the MSB is used to tell the status of a device.
+<     MSB = 1 means device ready
+<     MSB = 0 means device is busy (not ready)
+<   note that we can check for device ready/busy by looking to see
+<     if the Status word is negative (2's comp) or not.
+---
+> 
+224,225c175
+<     for the keyboard, a 1 means that a character has been typed
+< 		      a 0 means that no character is available
+---
+> Need I/O device "status" to coordinate (synchronize)
+227,229c177
+<     for the display,  a 1 means that a new character may be sent
+< 		      a 0 means that the device is still disposing
+< 		         of a previous character
+---
+> Special instrns?  No ==> memory map it
+230a179,186
+> 	 0x00000000	+-----+   Real memory
+> 			|     |
+> 			|     |
+> 			|     |
+> 			|     |
+> 			|     |
+> 			|     |
+> 	 0xffff0000	+-----+
+232c188,189
+< Then, the syscall code in the OS must be more like
+---
+> 	 0xffff0008     <============ DATA from keyboard 
+> 	 0xffff000c     <============ STATUS from keyboard
+235,238c192,193
+<      getc_loop: lw $8, Keyboard_Status   # getc syscall
+< 		bgez $8, getc_loop
+<                 lw  $2, Keyboard_Data    
+<                 return from syscall      # back to the user-level application
+---
+> 	 0xffff0010     ============> to display
+> 	 0xffff0014     <============ STATUS from display
+239a195,196
+> .eq KeyboardStatus 0xffff000c
+> .eq DisplayStatus  0xffff0014
+241,244c198,199
+<      putc_loop: lw $8, Display_Status    # putc syscall
+< 		bgez $8, putc_loop
+<                 sw  $4, Display_Data
+<                 return from syscall      # back to the user-level application
+---
+> Assume Status is word where MSB=1 (2SC word negative) implies ready
+> 			    MSB=0 (2SC word non-negative) implies busy
+247,249c202
+<    This scheme is known as BUSY WAITING, or SPIN WAITING.
+<    The little loop is called a SPIN WAIT LOOP.
+< 
+---
+> operating_system_function_12:	# getc char and put it in $2
+250a204,205
+> WaitLoop12: lw $14, KeyboardStatus
+> 	bgez  $14, WaitLoop12	# keep waiting if $14 non-negative
+252,261c207,208
+< Something that is not well explained (at this level) is how
+< these status bits get set and cleared.  The spin wait loop
+< reads the status word, but does not change it.
+< 
+<   The device (its CONTROLLER) sets and clears the bit.
+<   An implied function is that the device sets the bit
+<   when it becomes ready to work on another character.
+< 
+<   AND, a load from Keyboard_Data also clears the MSB of Keyboard_Status
+<   AND, a store to Display_Data also clears the MSB of Display_Status
+---
+> 	lw  $2, KeyboardData    # same as before
+> 	"return from syscall"
+263a211
+> operating_system_function_11:	# putc char, where char is in $4
+265,289c213,217
+<       -------------                           -------------
+<       |processor  |  <--------------------->  |  memory   |
+<       -------------                   |       -------------
+<                                       |
+<                                       |
+<                      controller       |
+<      -----------      ----------      |
+<      | display | <--> | Status |<---->|
+<      -----------      |  Data  |      |
+<                       ----------      |
+<                                       |
+<                                       |
+<                      controller       |
+<     ------------      ----------      |
+<     | keyboard | <--> | Status |<---->|
+<     ------------      |  Data  |      |
+<                       ----------      |
+<                                       |
+< 
+< Note that each device is "hooked up" and operates the same way
+< with respect to the interaction between processor and memory and
+< the device.  In fact, any new device that can operate in this manner
+< can be added to this computer system.  This is an important feature.
+< 
+< 
+---
+> WaitLoop11: lw $14, DisplayStatus
+> 	bgez  $14, WaitLoop11	# keep waiting if $14 non-negative
+> 	
+> 	sw  $4, DisplayData	# same as before
+> 	"return from syscall"
+290a219
+> But how much of the time do we spend spinning?
+292c221
+< PROBLEMS with this programmed I/O approach:
+---
+> We can putc or getc in much less than 100 instructions: 20 ns * 100 = 2 us
+294c223
+< -- much time is wasted spin waiting.
+---
+> Mechanical devices take ms -- e.g. 20 ms = 20000 us
+296,297c225,227
+<    if it takes 100 instructions to program this, and each
+<    instruction takes 20ns to execute, then it takes
+---
+> Therefore,	time waiting	      20000 us
+> 		------------  =  ----------------  =  99.99% !!!!!
+> 		total time	  20000 us + 2 us
+299c229
+<      100 * 20nsec = 2000nsec = 2 usec    to execute this code
+---
+> But we don't have to busy wait (spin)
+301,302c231
+<      if a device takes 2msec (=2000usec) to deal with one character,
+<         then the percent of time spent waiting is
+---
+> 
+304,306c233,234
+< 	time waiting       2000us
+< 	------------ = --------------- =  .999 = 99.9%
+< 	total time      2000us + 2usec
+---
+> We could go back to the program, do useful work and periodically return
+> and deal with the next char
+307a236,237
+> 	printstring  -- enqueued a string for printing & returns
+> 	printnextchar -- print next char (if any) and return
+309c239
+<    We'd like a solution that spent less time "doing nothing"
+---
+> (Analogous scheme possible to getstring.)
+311,313c241,298
+< -- if (somehow) a second key is pressed before the program does
+<    a getc, the first key pressed is lost.  There is only one
+<    character's worth of storage.
+---
+> Pseudo-code for (part of) example on page 301-302:
+> 
+> putqueue:  array[0..255] of char;
+> /*
+> ** head put queue pointer (index): points just before valid data
+> */
+> integer hpqp; /* initialized to 0 */
+> /*
+> ** tail put queue pointer (index): points at last valid data
+> */
+> integer tpqp; /* initialized to 0 */
+> /*
+> ** note: hpqp = tpqp ==> put queue empty
+> */
+> 
+> putstring(string)
+> /*
+> ** If room avaiable in queue, string to it.
+> ** Otherwise, return "overflow"
+> ** May also print first char.
+> */
+> <not shown>
+> 
+> 
+> putnextchar()
+> begin
+> 	/*
+> 	**  Is display ready?
+> 	**
+> 	**	yes ==> print a char (if any) & return
+> 	**      no  ==> return
+> 	*/
+> 	if (DisplayStatus < 0)
+> 	then begin
+> 		/*
+> 		** Return if queue empty
+> 		*/
+> 		if (hpqp != tpqp)
+> 		then begin
+> 			/*
+> 			** Invariant: head ptr points just before valid data
+> 			**
+> 			** Update head ptr and print
+> 			*/
+> 			hpqp = (hpqp + 1) rem 256;
+> 			DisplayData := putqueue[hpqp];
+> 		end
+> 	end
+> 	return()
+> end
+> 
+> 
+> Do example on page 301-302....
+> 
+> 
+> ****************************
+> GO OVER HW'S SPINWAIT KERNEL
+> ****************************
+315,319d299
+<    This problem is actually a "Catch-22."  The getc code has
+<    to be run often enough that no characters are lost, but
+<    executing this code spin waits until a character is pressed.
+<    The system could do nothing but getc calls!
+< 
+320a301,302
+> Hard Disks (important I/O Device)
+> ---------------------------------
+321a304
+> Vocabulary, to form a picture of a disk (ch 11, p294)
+323,344c306
+< Some problems are solved by the use of queues (buffers).
+<    The check for device ready is separated from the sending
+<    and receiving of characters.  Code for this is in the
+<    text, pages 301 and 302.
+< 
+<    FOR THE DISPLAY:
+<    putnextchar:  Print a character if there is one in the
+< 		 queue, and the device is ready.
+< 		 This routine must be called at regular intervals,
+< 		 so that there is progress toward emptying the queue.
+<    printstring:  put character(s) in queue and return.  This is called
+<                  by the user level program when it desires to do
+<                  a putc or puts.
+< 
+< 
+<    FOR THE KEYBOARD:
+<    getnextchar:  Get a character if one is available, and put
+< 		 it in a queue.
+< 		 This routine must be called at regular intervals,
+< 		 so that characters typed on the keyboard are not
+< 		 missed.
+<    getstring:    get character from queue (if available) and return
+---
+>   PLATTER -- sort of like a phonograph record.
+345a308
+>   data is stored on a SURFACE of a platter.
+346a310,311
+>   all platters are tied together and rotate around the SPINDLE
+>     at a fixed speed.
+348,363c313
+< Some difficulties are caused by this situation:
+<   
+<  -- Someone (user?  OS?) must call getnextchar regularly and
+<     often so as not to lose characters.
+< 
+<  -- What happens if the queue(s) become full?  Are characters
+<     lost?
+< 
+<  -- Someone (user?  OS?) must call putnextchar regularly to empty
+<     out the queue.
+< </pre>
+< 
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 11 - I/O</title>
+< </head>
+---
+>   each surface has one or more READ/WRITE HEADS.
+365,366c315,316
+< <BODY>
+< <h1> more on I/O and DMA</h1>
+---
+>   Platters are broken down into TRACKS.  A single track is
+>     one of many concentric circles on the platter.
+368c318,319
+< <pre>
+---
+>   All the corresponding tracks on all surfaces, taken together,
+>     form a CYLINDER.
+369a321
+>   Each track is broken down into SECTORS.
+371,372d322
+<   on polling
+< ---------------
+374,375c324,326
+< to make a system work, the OS will need to check regularly if
+< its devices have become ready.  This is called polling.
+---
+> How we read/write to a sector.
+>   Given:  the sector position on the cylinder. (looked up in a
+>   table, or calculated from the disk address).
+377,382c328
+< The OS runs at regular intervals (say, once per millisecond)
+< to check each device to see if it is ready.  If ready, then the
+< OS further deals with the device.
+<   For a keyboard, the character typed is placed into a queue.
+<   For a display, the queue is checked.  If not empty, then the next
+<     character in the queue is sent to the device.
+---
+>   -- the disk is spinning.
+383a330,333
+>   -- the read/write head is moving to the correct cylinder (track).
+>      THIS TAKES A LONG TIME RELATIVE TO THE OTHER STUFF.  It is
+>      the physical movement, acceleration, etc. comes into play.
+>      This is SEEK time.
+385c335,337
+< Difficulties with this:
+---
+>   -- once the read/write head is over the correct cylinder, there
+>      is bound to be some time to wait until the correct sector
+>      is under the head.  This is ROTATIONAL LATENCY.
+387,395c339,341
+< -- how often to get the OS to poll?
+<    Too little, and input devices may lose data.
+<    Too much, and lots of time is wasted checking devices when they are
+<    not yet ready.
+< -- How does the OS code get run?
+<    The user-level program shouldn't have the responsibility.  It has
+<    no notion of time.
+<    What happens to the user-level program while the OS is polling?
+< 
+---
+>   -- Even at the correct sector, it still takes some time for
+>      the data to be read/written.  This is the READ or WRITE
+>      time.
+397a344
+>      time to read a sector =   seek time + rotate time + read time.
+400,401c347,348
+<   on DMA (Direct Memory Access)
+< ---------------------------------
+---
+> On DMA (Direct Memory Access)
+> -----------------------------
+442c389
+< The processor checks every once in a while (polls) to see if the tranfer
+---
+> The processor checks every once in a while to see if the tranfer
+453c400
+<      priority.
+---
+>      priority. -- NO
+460c407,438
+< </pre>
+---
+>   on polling
+> ---------------
+> 
+> to make a system work, the OS will need to check regularly if
+> its devices have become ready.  This is called polling.
+> 
+> The OS runs at regular intervals (say, once per millisecond)
+> to check each device to see if it is ready.  If ready, then the
+> OS further deals with the device.
+>   For a keyboard, the character is placed into a queue.
+>   For a display, the queue is checked.  If not empty, then the next
+>     character in the queue is sent to the device.
+> 
+> 
+> Difficulties with this:
+> 
+> -- how often to get the OS to poll?
+>    Too little, and input devices may loose data.
+>    Too much, and lots of time is wasted checking devices when they are
+>    not yet ready.
+> -- How does the OS code get run?
+>    The user-level program shouldn't have the responsibility.  It has
+>    no notion of time.
+>    What happens to the user-level program while the OS is polling?
+> 
+> 
+> Transition for Chapter 12
+> 
+>     Why have SW repeatedly ask a device, "Are you ready?" (polling).
+>     Instead have device tell SW, "I am ready!" (interrupt)
+> 
+> <!--#include virtual="style4.html" -->

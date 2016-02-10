@@ -1,0 +1,395 @@
+1c1
+< <pre>
+---
+> <!--#include virtual="style1.html" -->
+3,4c3,16
+< ABOUT SAL
+< ---------
+---
+> Lecture Notes for
+> Chapter 2 -- SAL <!-- EDIT CHAPTER INFO -->
+> 
+> <!--#include virtual="style2.html" -->
+> 
+> <!--#echo var="LAST_MODIFIED" -->
+> 
+> <!--#include virtual="style3.html" -->
+> 
+> 
+> *******************************************************************
+> *  Students should read UPDATED Chapter 2 handout from web page,  *
+> *  which is more up to date than Chapter 2 in the textbook.       *
+> *******************************************************************
+29d40
+< ----
+65c76
+<   C:
+---
+>   C/C++/Java:
+71a83,91
+>   Can optionally initialize value:
+> 
+>   Java:
+>        type     variablename = value;
+> 
+>   SAL:
+>        variablename:  type value
+> 
+> 
+74,77c94
+< 		   .float     if floating point
+< 
+<      value is optional -- it gives the variable an initial value
+<      variablename is optional -- it gives a way of identifying the variable
+---
+> 		   .float     if real (floating point)
+94,95c111,112
+< 	                         # but then there is no name for the
+< 				 # variable!
+---
+>                                  # but then there is no name for the
+>                                  # variable!
+115,116c132
+< 				 string.)
+< 
+---
+>                                  string.)
+133,147c149,166
+< 	 .data       # identifies the start of the declaration section
+< 		     #   There can be more than 1 .data section in
+< 		     #     a program.
+< 		     #   There will be 1 global location where data
+< 		     #     from all .data sections is placed.
+< 
+< 
+< 	 .text       # identifies where instructions are
+< 		     #   There can be more than 1 .text section in
+< 		     #   a program.
+< 
+< 	 .asciiz  "a string.\n"  # places a string into memory
+< 				 # and null terminates the string.
+< 				 # This is a bunch of characters consecutively
+< 				 # allocated within memory.
+---
+>          .data       # identifies the start of the declaration section
+>                      #   There can be more than 1 .data section in
+>                      #     a program.
+>                      #   There will be 1 global location where data
+>                      #     from all .data sections is placed.
+> 
+> 
+>          .text       # identifies where instructions are
+>                      #   There can be more than 1 .text section in
+>                      #   a program.
+> 
+>          .asciiz  "a string.\n"  # places a string into memory
+>                                  # and null terminates the string.
+>                                  # This is a bunch of characters consecutively
+>                                  # allocated within memory.
+> 
+>          .ascii  "new string."   # places a string into memory
+>                                  # WITHOUT null termination.
+149,150d167
+< 	 .ascii  "new string."   # places a string into memory
+< 				 # WITHOUT null termination.
+159c176
+<      SAL             Pascal             C or C++ or Java
+---
+>      SAL             Pascal             C/C++/Java
+165,166c182,183
+<      div x, y, z     x := y div z;     x = y / z;  gives quotient
+<      rem x, y, z     x := y mod z;     x = y % z;  gives remainder
+---
+>      div x, y, z     x := y div z;     x = y / z;	gives quotient
+>      rem x, y, z     x := y mod z;     x = y % z;	gives remainder
+170c187
+< 	  3. y and/or z can be IMMEDIATES, constants in the code
+---
+> 	  3. y and/or z can be constants or IMMEDIATES
+175,177c192
+<       move  count, 0        # the zero is an immediate
+< 
+<       move  loop_count, init_count
+---
+>       move  count, 0
+181c196
+<       add   sum, 2, addend  # the 2 is an immediate
+---
+>       add   sum, 2, addend
+184,185c199,200
+< NOTE:  there are other instructions that implement boolean (logical)
+<        operations, but we don't cover them until Chapter 5.
+---
+> > NOTE:  there are other instructions that implement boolean functions,
+> >        but we don't cover them yet.
+188,191c203,271
+< On a real processor, an integer division operation gives two results:
+<   both the quotient and the remainder.  In SAL, we separate these
+<   into two instructions.
+< 
+---
+> GO OVER SIMPLE PROGRAM modified from REVISED Chapter 2 Figure 1 page 7
+> (and note that (20+13+82)/3 = 38.333...)
+> 
+> 
+> -------------------------------------------
+> avg3.c
+> -------------------------------------------
+> 
+> /* a simple C program to average 3 integers */
+> 
+> #include &lt;stdio.h&gt; <!-- really: #include <stdio.h> -->
+> 
+> void main()
+> {
+>    int avg;
+>    int i1 = 20;
+>    int i2 = 13;
+>    int i3 = 82;
+> 
+>    avg = (i1 + i2 + i3) / 3;
+> 
+>    printf("%d\n", avg);
+> }
+> 
+> -------------------------------------------
+> avg3.s
+> -------------------------------------------
+> 
+> # a simple SAL program to average 3 integers
+> 
+>         .data
+> avg:    .word
+> i1:     .word 20
+> i2:     .word 13
+> i3:     .word 82
+> 
+>         .text
+> 
+> __start: add avg, i1, i2
+>          add avg, avg, i3
+> 	 div avg, avg, 3
+> 	 put avg
+> 	 put '\n'
+> 	 done
+> 
+> -------------------------------------------
+> 
+>         Show assembly code
+>         Assembler translates to executable -- machine language
+>         (multiple source files need "linker" -- much later)
+> 
+>         To Run
+>                 loader puts executable into memory and makes
+>                 CPU jump to first instruction or __start:
+>                 execute
+>                 executing done returns control to OS
+> 
+>         Repeat last step to run again -- usually with different data
+> 
+>         simp combines all of the above
+> 
+> Explain
+>         # comment follows and end at end of line
+>         .data   # data follows
+>         .text   # instructions follow
+> 
+>         __start:        label to start program
+>         done            syscall to end program
+> 
+199c279
+<   In a HLL, the simplest form is a go-to.  (Always discouraged.)
+---
+>   HLL -- simplest form is a go-to.  (Always discouraged.)
+211c291
+< C  or JAVA  if-then-else
+---
+> C/C++/Java if-then-else
+237d316
+< 
+245,279d323
+< 
+< 
+< 
+< 
+< EXAMPLE:
+< --------
+< 
+<   Pascal if-then-else:
+< 
+<        if (count < 0) then
+<        begin
+< 	   count := count + 1;
+<        end;
+< 
+< 
+<   C/Java equivalent:
+< 
+<        if (count < 0)
+< 	   count = count + 1;
+< 
+< 
+< 
+<   SAL equiv to if-then-else:
+< 
+<                 bltz count, ifstuff
+< 	        b endif
+<       ifstuff:  add count, count, 1
+<       endif:      # next program instruction goes here
+< 
+< 	 -- OR --
+< 
+<                 bgez count, endif
+< 	        add count, count, 1
+<       endif:      # next program instruction goes here
+< 
+282,284d325
+<     WHICH ONE OF THESE IS BETTER?
+< 
+< 
+315a357,389
+> 
+> 
+> 
+> EXAMPLE:
+> --------
+>   Pascal if-then-else:
+> 
+>        if (count < 0) then
+>        begin
+> 	   count := count + 1;
+>        end;
+> 
+>   C equivalent:
+> 
+>        if (count < 0)
+> 	   count = count + 1;
+> 
+> 
+> SAL equiv to if-then-else:
+> 
+>                 bltz count, ifstuff
+> 	        b endif
+>       ifstuff:  add count, count, 1
+>       endif:      # next program instruction goes here
+> 
+> 	 -- OR --
+> 
+>                 bgez count, endif
+> 	        add count, count, 1
+>       endif:      # next program instruction goes here
+> 
+> 
+>     WHICH ONE OF THESE IS BETTER?
+327d400
+< 
+336d408
+< 
+345,346c417
+< 
+<   C/Java:
+---
+>   C:
+353d423
+< 
+372,376c442,446
+< 	   if (aa < bb) then
+< 	      aa := a + 1;
+< 	   if (aa > bb) then
+< 	      aa := aa - 1;
+<        until aa = bb;
+---
+> 	   if (a < b) then
+> 	      a := a + 1;
+> 	   if (a > b) then
+> 	      a := a - 1;
+>        until a = b;
+383,387c453,457
+< 	   if (aa < bb)
+< 	       aa++;
+< 	   if (aa > bb)
+< 	       aa--;
+<        } while( aa != bb);
+---
+> 	   if (a < b)
+> 	       a++;
+> 	   if (a > b)
+> 	       a--;
+>        } while( a != b);
+392,396c462,466
+<       repeat:    bge aa, bb, secondif
+<                  add aa, aa, 1
+<       secondif:  ble aa, bb, until
+< 	         sub aa, aa, 1
+<       until:     bne aa, bb, repeat
+---
+>       repeat:    bge a, b, secondif
+>                  add a, a, 1
+>       secondif:  ble a, b, until
+> 	         sub a, a, 1
+>       until:     bne a, b, repeat
+401,402d470
+< 
+< 
+410,411c478
+< 
+<   C/Java:
+---
+>   C:
+417,418d483
+< 
+< 
+456,457c521,522
+<                  add  a, a, i
+<                  add  i, i, 1       # increment loop induction variable
+---
+>                  add  a, a, i       # increment loop induction variable
+>                  add  i, i, 1
+474a540
+> 
+478c544
+<     places  first integer variable it "finds" into intvariable,
+---
+>     places first integer variable it "finds" into intvariable,
+485c551
+<     places the first character variable it has into charvariable
+---
+>     placed the first character variable it has into charvariable
+501c567
+<   another example with the same input:
+---
+>   OR:
+508c574
+<   another example with the same input:
+---
+>   OR:
+517c583
+< a single line, you must read input in character by character, and
+---
+> a single line, you must read in character by character, and
+577d642
+< 
+600c665
+<  __start:  puts prompt1
+---
+>            puts prompt1
+631c696
+< Another simple SAL example program
+---
+> Another simple SAL example program (optional)
+857c922,934
+< </pre>
+---
+> 
+> Key ideas
+> 	assembly vs execution
+> 	SAL language
+> 		declatations
+> 		arithmetic
+> 		conditional
+> 		looping
+> 		I/O
+> 		procedures
+> 
+> 
+> <!--#include virtual="style4.html" -->

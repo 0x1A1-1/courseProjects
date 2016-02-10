@@ -1,0 +1,776 @@
+<!--#include virtual="style1.html" -->
+
+Lecture Notes for
+Chapter 10 -- The Assembly Process <!-- EDIT CHAPTER INFO -->
+
+<!--#include virtual="style2.html" -->
+
+<!--#echo var="LAST_MODIFIED" -->
+
+<!--#include virtual="style3.html" -->
+
+
+THE ASSEMBLY PROCESS
+--------------------
+
+ -- a computer understands machine code
+ -- people (and compilers) write assembly language
+
+  assembly     -----------------       machine
+  source  -->  |  assembler    | -->   code
+  code         -----------------
+
+an assembler is a program -- a very deterministic program --
+  it translates each instruction to its machine code.
+
+
+
+  in the past, there was a one-to-one correspondence between
+  assembly language instructions and  machine language instructions.
+
+  this is no longer the case.  Assemblers are now-a-days made more
+  powerful, and can "rework" code.
+
+
+
+MAL --> TAL
+-----------
+
+MAL -- the instructions accepted by the assembler
+TAL -- a subset of MAL.  These are instructions that
+	can be directly turned into machine code.
+
+There are lots of MAL instructions that have no direct TAL
+equivalent.
+
+How to determine whether an instruction is a TAL instruction or not:
+
+   look in appendix C.  If the instruction is there, then
+   it is a TAL instruction.
+
+
+The assembler takes (non MIPS) MAL instructions and synthesizes
+them with 1 or more MIPS instructions.
+
+Some examples:
+    mul $8, $17, $20
+      becomes
+    mult  $17, $20
+    mflo  $8
+
+    why?  because the MIPS architecture has 2 registers that
+    hold results for integer multiplication and division.
+    They are called HI and LO.  Each is a 32 bit register.
+
+    mult places the least significant 32 bits of its result
+    into LO, and the most significant into HI.
+
+    operation of mflo,  mtlo,  mfhi,  mthi
+                 |||                  |||
+                 ||-- register lo     ||- register hi
+                 |--- from            |-- to
+                 ---- move            --- move
+	
+	Data is moved into or out of register HI or LO.
+
+	One operand is needed to tell where the data is coming from
+	or going to.
+
+
+
+
+    addressing modes do not exist in TAL!
+
+    lw  $8, label
+      becomes
+
+    la  $8, label
+    lw $8, 0($8)
+      which becomes
+
+    lui $8, 0xMSpart of label
+    ori $8, $8, 0xLSpart of label
+    lw $8, 0($8)
+
+      or
+    lui $8, 0xMSpart of label
+    lw $8, 0xLSpart of label($8)
+
+
+    instructions with immediates are synthesized with other
+    instructions
+
+    add $sp, $sp, 4
+      becomes
+    addi $sp, $sp, 4
+
+         because an add instruction requires 3 operands in registers.
+	 addi has one operand that is immediate.
+
+	 these instructions are classified as immediate instructions.
+	 On the MIPS, they include:
+	   addi, addiu, andi, lui, ori, xori
+
+
+ add $12, $18  is expanded back out to be
+   add $12, $12, $18
+
+
+
+TAL implementation of I/O instructions:
+
+
+putc $18     becomes
+
+   li $2, 11
+   move $4, $18	# not a TAL instruction
+   syscall
+
+   OR     addi $2, $0, 11
+	  add  $4, $18, $0
+	  syscall
+
+
+
+getc $11     becomes
+
+   li $2, 12
+   syscall
+   move $11, $2	# not a TAL instruction
+
+   OR     addi $2, $0, 12
+	  syscall
+	  add  $11, $2, $0
+
+
+
+puts $13     becomes
+
+   li $2, 4
+   move $4, $13	# not a TAL instruction
+   syscall
+
+   OR     addi $2, $0, 4
+	  add  $4, $13, $0
+	  syscall
+
+
+
+done         becomes
+
+   li  $2, 10
+   syscall
+
+   OR     addi $2, $0, 10
+	  syscall
+
+
+Summary of MAL-->TAL
+
+	MAL				TAL
+	---				---
+
+	move $4, $3			add $4, $3, $0
+
+	add $4, $3, 15 # not $15	addi $4, $3, 15
+					# also andi, ori, etc.
+
+	mul $8, $9, $10			mult $9, $10  # $HI || $LO <-- product
+						      # never overflow
+					mflo $8	      # $8 <-- $LO
+						      # ignore $HI!
+
+	div $8, $9, $10			div $9, $10   # $LO <-- quotient
+						      # $HI <-- remainder
+					mflo $8
+
+	rem $8, $9, $10			div $9, $10
+					mfhi $8
+
+	branches:
+	bltz,bgez,blez,bgtz,beqz,bnez,	bltz,bgez,blez,bgtz,
+	blt,bge,ble,bgt,beq,bne		beq,bne
+
+	beqz $4, loop			beq $4, $0, loop
+
+	blt $4, $5, target		slt $at, $4, $5	# $at is 1 if $4 < $5
+							# $at is 0 otherwise
+					bne $at, $0, target
+
+
+	I/O instructions:
+
+	put,puts,putc,			Really "procedure call to OS"
+	get,getc,done			Assume  $2 <-- call type
+					Assume  $4 <-- input parameters
+
+	putc $12			addi $2, $0, 11 # putc is syscall 11
+							# see p. 262
+					add $4, $12, $0 # char to putc
+					syscall		# call OS
+
+	done				addi $2, $0, 10 # done is syscall 10
+					syscall
+
+
+
+ASSEMBLY
+---------
+ the assembler's job is to 
+   1. assign addresses
+   2. generate machine code
+
+
+ a modern assembler will
+  -- on the fly, translate (synthesize) from the accepted assembly
+     language to the instructions available in the architecture
+
+  -- assign addresses
+
+  -- generate machine code
+
+  -- it generated an image of what memory must look like for the
+     program to be executed.
+
+
+ a simple assembler will make 2 complete passes over the data
+ to complete this task.  
+    pass 1:  create complete SYMBOL TABLE
+	     generate machine code for instructions other than
+	       branches, jumps, jal, la, etc. (those instructions
+	       that rely on an address for their machine code).
+    pass 2:  complete machine code for instructions that didn't get
+	     finished in pass 1.
+
+assembler starts at the top of the source code program,
+and SCANS.   It looks for
+  -- directives   (.data  .text  .space  .word  .byte  .float )
+  -- instructions
+
+  IMPORTANT:
+  there are separate memory spaces for data and instructions.
+  the assembler allocates them IN SEQENTIAL ORDER as it scans
+  through the source code program.
+
+  the starting addresses are fixed -- ANY program will be assembled
+  to have data and instructions that start at the same address.
+
+
+
+EXAMPLE
+    .data
+a1: .word 0xffffffff
+a2: .byte '\n'
+a3: .space 5
+a4: .byte 'a'
+a5: .word 0x12345678
+
+       address     contents
+     0x10010000    0xffffffff
+     0x10010004    0x0a000000
+     0x10010008    0x00006100   <-- LSB undefined
+     0x1001000c    0x12345678  
+
+
+simple example of machine code generation for simple instruction:
+     assembly language:      addi  $8, $20, 15
+
+                              ^     ^   ^    ^
+			      |     |   |    |
+
+			    opcode rt   rs  immediate
+
+     machine code format
+      31                      15             0
+      -----------------------------------------
+      | opcode |  rs  |  rt  |  immediate     |
+      -----------------------------------------
+
+       opcode is 6 bits -- it is defined to be 001000
+
+       rs is 5 bits,    encoding of 20, 10100
+       rt is 5 bits,    encoding of  8, 01000
+			     
+      so, the 32-bit instruction for addi $8, $20, 15  is
+       001000 10100 01000 0000000000001111
+
+       re-spaced:
+       0010 0010 1000 1000 0000 0000 0000 1111
+	 OR
+     0x  2    2   8    8    0    0    0    f
+
+
+
+
+Let's look at 552 notes and all of MIPS Formats
+
+E.g., http://www.cs.wisc.edu/~markhill/cs552/Notes/ch3.pdf
+
+
+AN EXAMPLE:
+
+ .data
+a1: .word 3
+a2: .word 16:4
+a3: .word 5
+
+ .text
+__start: la $6, a2
+loop:    lw $7, 4($6)
+         mult $9, $10
+         b loop
+         done
+
+SOLUTION:
+
+    Symbol table
+    symbol      address
+    ---------------------
+    a1         1001 0000
+    a2         1001 0004
+    a3         1001 0014
+    __start    0040 0000
+    loop       0040 0008
+
+
+
+     memory map of data section
+address     contents
+	    hex          binary
+1001 0000   0000 0003    0000 0000 0000 0000 0000 0000 0000 0011 
+1001 0004   0000 0010    0000 0000 0000 0000 0000 0000 0001 0000
+1001 0008   0000 0010    0000 0000 0000 0000 0000 0000 0001 0000
+1001 000c   0000 0010    0000 0000 0000 0000 0000 0000 0001 0000
+1001 0010   0000 0010    0000 0000 0000 0000 0000 0000 0001 0000
+1001 0014   0000 0005    0000 0000 0000 0000 0000 0000 0000 0101
+
+
+
+     translation to TAL code
+ .text
+__start: lui $6, 0x1001      # la $6, a2
+         ori $6, $6, 0x0004
+loop:    lw $7, 4($6)
+         mult $9, $10
+         beq $0, $0, loop    # b loop
+         ori $2, $0, 10      # done
+         syscall
+
+
+
+     memory map of text section
+address      contents
+	     hex          binary
+0040 0000    3c06 1001    0011 1100 0000 0110 0001 0000 0000 0001 (lui)
+0040 0004    34c6 0004    0011 0100 1100 0110 0000 0000 0000 0100 (ori)
+0040 0008    8cc7 0004    1000 1100 1100 0111 0000 0000 0000 0100 (lw)
+0040 000c    012a 0018    0000 0001 0010 1010 0000 0000 0001 1000 (mult)
+0040 0010    1000 fffd    0001 0000 0000 0000 1111 1111 1111 1101 (beq)
+0040 0014    3402 000a    0011 0100 0000 0010 0000 0000 0000 1010 (ori)
+0040 0018    0000 000c    0000 0000 0000 0000 0000 0000 0000 1100 (syscall)
+
+
+
+
+
+EXPLANATION:
+
+The assembler starts at the beginning of the ASCII source
+code.  It scans for tokens, and takes action based on those
+tokens.
+
+---  .data
+   A directive that tells the assembler that what will come next
+   are to be placed in the data portion of memory.
+---  a1:  
+   A label.  Put it in the symbol table.  Assign an address.
+   Assume that the program data starts at address 0x0040 0000.
+
+
+
+
+
+
+branch offset computation.
+    
+    at execution time (for taken branch):
+     contents of PC + sign extended offset field | 00 --> PC
+
+     PC points to instruction after the beq when offset is added.
+
+    
+    at assembly time:
+
+    byte offset = target addr - ( 4 + beq addr )
+
+		= 00400008 - ( 00000004 + 00400010 )  (hex)
+
+
+
+                    (ordered to give POSITIVE result)
+		 0000 0000 0100 0000 0000 0000 0001 0100
+	      -  0000 0000 0100 0000 0000 0000 0000 1000
+	      ------------------------------------------
+		 0000 0000 0000 0000 0000 0000 0000 1100 (byte offset)
+
+		 1111 1111 1111 1111 1111 1111 1111 0011
+	       +                                       1
+	       -----------------------------------------
+		 1111 1111 1111 1111 1111 1111 1111 0100  (-12)
+
+
+		 we have 16 bit offset field.
+		 throw away least significant 2 bits
+		   (they should always be 0, and they are added
+		    back at execution time)
+
+	 1111 1111 1111 1111 1111 1111 1111 0100 (byte offset)
+	  becomes
+	                  11 1111 1111 1111 01   (offset field)
+
+
+
+jump target computation.
+
+    at execution time:
+     most significant 4 bits of PC || target field | 00 --> PC
+					(26 bits)
+
+
+    at assembly time, to get the target field:
+	 take 32 bit target address,
+	   eliminate least significant 2 bits (word address!)
+	     eliminate most significant 4 bits
+
+	 what remains is 26 bits, and it goes in the target field
+
+
+More Complete Picture of Assembly 
+---------------------------------
+
+C.f., Larus's appendix to:
+
+%T Computer Organization and Design:  The Hardware and Software Interface
+%A John L. Hennessy
+%A David A. Patterson
+%I Morgan Kaufmann
+%C San Mateo, California
+%D 2nd Edition, 1997
+%Y topic: CS552
+
+Levine
+Linkers and Loaders
+Morgan Kaufmann
+1999
+
+To eventually run (execute) a program, the following things
+are done:
+  1.  write source code
+  2.  assemble source code, producing machine code
+  [show left half of picture below] 
+  3.  link and load machine code
+  4.  set PC to point to address of first instruction within code.
+      (This is a jump to the first instruction in the program)
+
+We've talked about steps 1. and 2.
+
+A picture
+
+	---- assembler
+
+	==== linker
+
+	**** loader
+			    	obj of libs
+	src1 ----->  obj1  =====+     ||
+				V     VV
+	src2 ----->  obj2  ======>  linker ------> executable ******> a process
+				^
+	src3 ----->  obj3  =====+
+
+
+  linking and loading
+  -------------------
+
+Big Picture
+    object file
+	header 		-- start / size of other parts
+	text   		-- ML
+	data   		-- static data
+	relocation info -- instrn & data w/ abs addrs
+	symbol table	-- addr of external labels
+	debugging info 
+
+    Linker
+	search libs
+	relocate code/data
+	resolve extern refs
+
+    Loader
+	create address spaces for text & data
+	copy text & data in memory
+	init stack and copy args
+	init regs (maybe)
+	jump to startup routine (& then addr of __start)
+
+
+Assembly just produces enough information about what goes where
+in memory to make the code run.  It does not actually put the
+stuff in memory.  Linking and loading puts all the stuff into 
+memory at the right places.
+
+WHAT goes into memory?
+  the data is put into the correct locations
+  the code is put into the correct locations
+
+WHERE are the correct locations?
+
+  Exactly where the assembler assigns them.
+
+  For example,
+
+  The data section starts at 0x10010000 for the MIPS RISC processor.
+
+  So, if we had source code with,
+
+    .data
+    a1:  .word 15
+    a2.  .word -2
+
+
+    then the assembler needs to specify that memory will need to be
+    initially set up with
+
+    address        contents
+    0x10010000     0000 0000 0000 0000 0000 0000 0000 1111
+    0x10010004     1111 1111 1111 1111 1111 1111 1111 1110
+
+
+  Like the data, the code needs to be placed starting at a specific
+  location to make it work.
+
+
+
+
+
+Here are some difficulties with this simplistic model.
+
+
+Consider the case where the assembly language code is split
+across 2 files.  Each is assembled separately.
+
+file 1:  
+
+         .data
+         a1:  .word 15
+         a2:  .word -2
+
+         .text
+         __start: la  $t0, a1
+                  add  $t1, $t0, $s3
+		  jal  proc5
+                  done
+
+
+file 2:  
+
+         .data
+         a3:  .word 0
+
+         .text
+         proc5:   lw   $t6, a1
+                  sub  $t2, $t0, $s4
+                  jr   $ra
+
+
+Problems with this
+------------------
+ 1.  Each file is assembled to start its data section and also its
+     code section at the same location as the other file.
+
+     a1 (in file1) is supposed to be placed at 0x10010000
+     a3 (in file2) is supposed to be placed at 0x10010000
+
+     __start (in file1) is placed at location 0x00400000
+     proc5   (in file1) is placed at location 0x00400000
+
+
+
+
+
+ 2.  When assembling file 1, symbol proc5 is never defined
+     (given an address).  That is because the label (symbol)
+     is defined in file 2.  The address assigned to proc5
+     is NEEDED to produce the machine code for the jal instruction
+     in file 1.
+
+     This same problem presents itself in the lw instruction
+     in file 2.  The address assigned to a1 is unknown when
+     assembling file 2.  This is because the symbol a1 is defined
+     (and given and address) in file 1.
+
+
+     The real problem here is that there are ABSOLUTE ADDRESSES
+     needed to produce the machine code.
+
+
+
+Solutions to the problems
+-------------------------
+
+1.  A really BAD solution that no one would ever implement.
+    Define the problem away, by not allowing separate files to
+    contain assembly language source code.
+
+    A single program (all code and data) MUST be all in one file.
+
+    Why is this bad?
+
+2.  Allow the step of linking and loading to
+    -- relocate pieces of data and code sections
+    -- finish the machine code where symbols were left undefined
+
+    To accomodate linking and loading, the information produced
+    by the assembler must include:
+      -> symbol table
+      -> machine code that is finished
+      -> list of all locations within the code that require
+	 absolute addresses for their resolution.
+      
+      This last one is something new, not discussed yet.
+
+
+
+
+LINKING and LOADING
+-------------------
+
+  Have the assembler
+   -> start both data and code sections at address 0, for all files.
+   -> keep track of the size of every data and code section.
+   -> keep track of all absolute addresses within the file.
+
+  Linking and loading will:
+   -> assign starting addresses for all data and code sections,
+      based on their sizes.  The blocks of data and code go at
+      non-overlapping locations.
+   -> fix ALL absolute addresses in the code
+   -> place the fixed-up code and data in memory at the locations
+      assigned.
+
+
+Larus' example
+
+-------------------------------------------------------------------------
+sum.c
+-------------------------------------------------------------------------
+
+#include <stdio.h>
+
+int
+main (int argc, char *argv[])
+{
+  int i;
+  int sum = 0;
+
+  for (i = 0; i <= 100; i++) sum += i * i;
+  printf ("The sum from 0 .. 100 is %d\n", sum);
+}
+
+-------------------------------------------------------------------------
+sum.s
+-------------------------------------------------------------------------
+
+	.text
+	.align	2
+	.globl	main
+	.ent	main 2
+main:
+	subu	$sp, 32
+	sw	$31, 20($sp)
+	sd	$4, 32($sp)
+	sw	$0, 24($sp)
+	sw	$0, 28($sp)
+loop:
+	lw	$14, 28($sp)
+	mul	$15, $14, $14
+	lw	$24, 24($sp)
+	addu	$25, $24, $15
+	sw	$25, 24($sp)
+	addu	$8, $14, 1
+	sw	$8, 28($sp)
+	ble	$8, 100, loop
+	la	$4, str
+	lw	$5, 24($sp)
+	jal	printf
+	move	$2, $0
+	lw	$31, 20($sp)
+	addu	$sp, 32
+	j	$31
+	.end	main
+
+	.data
+	.align	0
+str:
+	.asciiz	"The sum from 0 .. 100 is %d\n"
+
+
+-------------------------------------------------------------------------
+sum.nolabels
+-------------------------------------------------------------------------
+
+addiu	sp,sp,-32
+sw	ra,20(sp)
+sw	a0,32(sp)
+sw	a1,36(sp)
+sw	zero,24(sp)
+sw	zero,28(sp)
+lw	t6,28(sp)
+lw	t8,24(sp)
+multu	t6,t6
+addiu	t0,t6,1
+slti	at,t0,101
+sw	t0,28(sp)
+mflo	t7
+addu	t9,t8,t7
+bne	at,zero,-9
+sw	t9,24(sp)
+lui	a0,4096
+lw	a1,24(sp)
+jal	1048812
+addiu	a0,a0,1072
+lw	ra,20(sp)
+addiu	sp,sp,32
+jr	ra
+move	v0,zero
+
+-------------------------------------------------------------------------
+sum.machine_lang
+-------------------------------------------------------------------------
+
+00100111101111011111111111100000
+10101111101111110000000000010100
+10101111101001000000000000100000
+10101111101001010000000000100100
+10101111101000000000000000011000
+10101111101000000000000000011100
+10001111101011100000000000011100
+10001111101110000000000000011000
+00000001110011100000000000011001
+00100101110010000000000000000001
+00101001000000010000000001100101
+10101111101010000000000000011100
+00000000000000000111100000010010
+00000011000011111100100000100001
+00010100001000001111111111110111
+10101111101110010000000000011000
+00111100000001000001000000000000
+10001111101001010000000000011000
+00001100000100000000000011101100
+00100100100001000000010000110000
+10001111101111110000000000010100
+00100111101111010000000000100000
+00000011111000000000000000001000
+00000000000000000001000000100001
+
+<!--#include virtual="style4.html" -->

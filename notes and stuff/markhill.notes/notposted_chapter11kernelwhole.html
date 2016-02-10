@@ -1,0 +1,170 @@
+<!--#include virtual="style1.html" -->
+
+Chapter 11 -- Spin-Wait Kernel <!-- EDIT CHAPTER INFO -->
+
+<!--#include virtual="style2.html" -->
+
+<!--#echo var="LAST_MODIFIED" -->
+
+<!--#include virtual="style3.html" -->
+
+
+# kernel file for spin-waiting I/O
+
+# assign fixed addresses to labels
+    .eq KeyboardData    0xbfff0000
+    .eq	KeyboardStatus  0xbfff0004
+    .eq	DisplayData     0xbfff0008
+    .eq	DisplayStatus   0xbfff000c
+    .eq	KeyboardData2   0xbfff0010
+    .eq	KeyboardStatus2 0xbfff0014
+    .eq	DisplayData2    0xbfff0018
+    .eq	DisplayStatus2  0xbfff001c
+    .eq ClockStatus     0xbfff0020
+
+    .kdata
+
+
+Tmpat: .word 0                  # temporary storage $at
+
+     #
+     # other temporary register storage would be setup here...
+     #
+
+
+    .ktext
+
+    .space 0x80                 # skip space so kernel starts at 0x80000080
+
+Service:
+                                # save registers
+
+    .set noat                   # turn off assembler warnings for $at
+     move $k1, $at              # move $at
+    .set at                     # turn on assembler warnings for $at
+     sw	$k1, Tmpat              # save $at register
+
+     #
+     # other registers would be saved here...
+     #
+	sub 	$sp, $sp, 32
+	sw	$s0, 4($sp)
+	sw	$s1, 8($sp)
+	sw	$s2, 12($sp)
+	sw	$s3, 16($sp)
+	sw	$s4, 20($sp)
+	sw	$s5, 24($sp)
+	sw	$s6, 28($sp)
+	sw	$s7, 32($sp)
+
+
+     mfc0 $k0, $13              # get the Cause register
+     and  $k0, 0x3c             # mask out the ExcCode bits in the Cause register
+     beq  $k0, 0x20, HandleSys  # is it a syscall exception?
+                                # if the exception is some other type
+                                # do nothing and return to the user
+     #
+     # other exception tests would go here...
+     #
+
+    mfc0	$5, $12			# Get the Status_Reg
+    and		$5, 0xffff00fa		# Turn off all interrupts
+    mtc0	$5, $12			# Set the Status_Reg
+
+Return:
+                                # restore registers
+
+     #
+     # other registers would be restored here...
+     #
+
+	lw	$s0, 4($sp)
+	lw	$s1, 8($sp)
+	lw	$s2, 12($sp)
+	lw	$s3, 16($sp)
+	lw	$s4, 20($sp)
+	lw	$s5, 24($sp)
+	lw	$s6, 28($sp)
+	lw	$s7, 32($sp)
+	add	$sp, $sp, 32
+	
+
+    .set noat                   # turn off assembler warnings for $at
+     lw	$at, Tmpat              # restore $at
+    .set at                     # turn on assembler warnings for $at
+
+     mfc0 $k0, $14              # get the EPC register
+     rfe                        # return from exception
+     jr $k0
+
+HandleSys:
+                                # syscall
+
+     mfc0 $k1, $14              # get the EPC register
+     add  $k1, 4                # increment PC past syscall instruction
+     mtc0 $k1, $14              # set the EPC register
+
+     beq  $2, 10, Exit          # is it a done syscall?
+
+     #
+     # other tests for syscalls would go here...
+     #
+
+     beq  $2, 12, Getc
+     beq  $2, 4, Puts
+     beq  $2, 11, Putc	
+
+
+     j     Return               # unknown syscall, do nothing and return
+
+Getc:
+				# Spin wait until keyboard ready
+     lw    $t0,KeyboardStatus
+     bgez  $t0,Getc
+				# Keyboard ready - get character from keyboard
+     lw    $v0,KeyboardData
+
+				# Echo character - put into $4 and execute putc code
+     move  $a0,$v2
+     j     Putc
+
+Putc:
+     				# Spin wait until display is available	
+     lw    $t0, DisplayStatus
+     bgez  $t0, Putc
+     				# Display is ready, print character
+     sw    $a0, DisplayData			
+     j     Return
+
+Puts:
+				# Get character to send to display 
+      lbu   $t0,0($a0)
+				# If null character, then we're done
+      beq   $t0,0,Return
+				# Otherwise, spin wait until display ready
+WaitforDisplay: 
+      lw    $t1,DisplayStatus
+      bgez  $t1,WaitforDisplay
+				# Display ready, print character
+      sw    $t0,DisplayData
+				# Increment to next character
+      add   $a0,$a0,1
+      j     Puts 
+
+
+Exit:
+                                # exit routine
+
+     li $2, 13                  # special exit syscall
+     syscall                    # this syscall never returns
+     #
+     # other syscalls could be added here...
+     #
+
+    .text
+    .globl __start
+
+     #
+     # the user program will be added here...
+     #
+<!--#include virtual="style4.html" -->

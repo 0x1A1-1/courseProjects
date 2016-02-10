@@ -1,0 +1,1475 @@
+1,27c1
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 14 - Architectures</title>
+< </head>
+< 
+< <BODY>
+< <h1> Chapter 14 -- Architectures</h1>
+< 
+< <pre>
+< 
+< PERSPECTIVE ON ARCHITECTURE DESIGN
+< ----------------------------------
+< 
+< Some factors in computer design:
+<    speed
+<        as fast as possible, of course
+<        dependent on technology and cost
+<    cost/price
+<        profit, non-profit, mass market, single use
+<    useablility
+<        shared/single user, size of machine, OS/software issues,
+<        power requirements, weight, portability
+<        depends on intended use!
+<    intended market
+<        mass market, scientific research, home use, multiple users,
+<        instructional, application specific
+<    technology
+---
+> <!--#include virtual="style1.html" -->
+28a3,4
+> Lecture Notes for
+> Chapter 14 -- Architecture Examples <!-- EDIT CHAPTER INFO -->
+29a6
+> <!--#include virtual="style2.html" -->
+30a8
+> <!--#echo var="LAST_MODIFIED" -->
+32,237c10
+< price/performance curve
+< 
+<        ^  |
+<  perf. |  |         x
+<           |           x          Want to be to the "left"  of these,
+<           |      x               to have higher performance for the
+<           |                      price.  "More bang for the buck."
+<           |    x   x
+<           _________________
+< 		    
+< 		    price ->
+< 
+< 
+< 
+< 
+< technology -- a perspective
+< ----------
+< 
+<     electromechanical (1930) -- used mechanical relays
+< 
+<     vacuum tubes (1945)
+<       space requirement:  room
+<           Manchester Mark 1 (late 1940s)
+< 
+<     transistors
+<       discrete (late 1950s)
+<          space requirement:  a large cabinet to a room
+< 	 Examples:
+< 	    CDC 6600
+< 	    B 5000
+< 	    Atlas (?)
+< 	    PDP 11/10
+< 
+<       SSI,    MSI (mid-late 1960s)
+<       1-10   10-100 transistors on a single chip
+<          space requirement:  a cabinet
+< 	 Examples:
+< 	   Cray 1
+< 	   VAX 11/780
+< 
+<       LSI   (early 1970s)
+<       100-10,000 transistors on a single chip
+<          space requirement:  a board
+< 	 Examples:
+< 
+<       VLSI  (late 1970s - today)
+<       >10,000 transistors on a single chip
+<          space requirement:  a chip, or chip set, board
+< 	 Examples:
+< 	    MIPS R2000 (the floating point was done on a second chip)
+< 	    Intel 386 (~275,000 transistors)
+< 	    Sparc
+< 	    Pentium (~4 million transistors)
+< 	    PowerPC (~4 million transistors)
+< 	    PentiumPro (17 million transistors)
+< 
+< 
+< 
+< 
+< RISC vs. CISC
+< -------------
+< 
+<  RISC - Reduced Instruction Set Computer
+<    The term was first used to name a research architecture at
+<    Berkeley:  the RISC microprocessor.  It has come to (loosely) mean a
+<    single chip processor that has the following qualities:
+<      1. load/store architecture
+<      2. very few addressing modes
+<      3. simple instructions
+<      4. pipelined implementation
+<      5. small instruction set -- easily decoded instructions
+<      6. fixed-size instructions
+< 
+<  CISC - Complex Instruction Set Computer
+<    This term was coined to distinguish computers that were not RISC.
+<    It generally is applied to computers that have the following
+<    qualities:
+<      1. complex instructions
+<      2. large instruction set
+<      3. many addressing modes
+< 
+< difficulties with these terms
+< 
+<  - not precisely defined
+< 
+<  - term introduced/applied to earlier machines
+< 
+<  - "RISC" became a marketing tool
+< 
+< 
+< single chip constraint
+< ----------------------
+< 
+< As technologies advanced, it became possible to put a processor
+<  on a single VLSI chip.  Designs became driven by how much
+<  (how many transistors) could go on the 1 chip.
+< 
+<  Why?  1.  The time it takes for an electrical signal to cross a
+<   chip are significantly less than the time for the signal to
+<   get driven off the chip to somewhere else.
+<        2.  The number of pins available was limited.
+< 
+<   So, the desire is to have as little interaction of the chip
+<    with the outside world as possible.  It cannot be eliminated,
+<    but it can be minimized.
+< 
+< 
+< The earliest of single processors on a chip had to carefully
+< pick and choose what went on the chip.  Cutting-edge designs
+< today can fit everything but second-level caches and
+< main memory on the chip.
+< 
+< 
+< 
+< 
+< how the world has changed
+< -------------------------
+<   earliest computers had their greatest difficulties in getting
+<   the hardware to work --
+<     technology difficulties 
+<        space requirements
+<        cooling requirements
+<   the software on these earliest computers was non-existant.
+< 
+<   given a working computer, scientists would jump through whatever
+<     hoops necessary to use it.
+< 
+< 
+<   as hardware has gotten (much) faster and cheaper, most attention has
+<   been diverted to software.
+<       OS
+<       compilers
+<       optimizers
+<       IPC (inter-process communication)
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 1 instruction at a time isn't enough.  The technology
+< isn't "keeping up."  So, do more than one instruction
+< at a time:
+< 
+< parallelism
+< -----------
+<   instruction level (ILP) -- pipelining
+<   superscalar -- more than one instruction at a time
+< 
+<   multis
+<   VLIW
+<   supercomputer
+< 
+<   WHICH OF THESE IS "BEST" and "FASTEST" DEPENDS ON WHAT PROGRAM
+<   IS BEING RUN -- THE INTENDED USEAGE.
+< 
+< 
+< 
+< 
+< on the 68000 Family
+< --------------------
+< 
+< - released in the late 1970's
+< - an early "processor on a chip"
+< - a lot of its limitations have to do with what could fit on a VLSI
+<   chip in the late 1970's
+< 
+< INSTRUCTIONS
+<  - a relatively simple set (like the MIPS) but NOT a load/store arch.
+<  - a two-address architecture
+<  - most instructions are specified in 16 bits -- fixed size.
+<  - tight encoding, it is difficult to distinguish opcode from operands,
+<    but the m.s. 4 bits are always part of the opcode.
+< 
+<  integer arithmetic
+<    different opcode for varying size data
+<    (add.b    add.w      add.l)
+<  logical
+<    different opcode for varying size data
+<  control instructions
+<    conditional branches, jumps
+<    (condition code mechanism used --  where most instructions
+<     had the effect of setting the condition codes)
+<  procedure mechanisms
+<    call and return instructions
+<  floating point ??
+<  decimal string
+<    arithmetic presuming representation of binary coded decimal
+< 
+< 
+< 
+< REGISTERS
+<   16 32-bit general purpose registers,
+<   only one is not general purpose (it is a stack pointer)
+<   the PC is not part of the general purpose registers
+< 
+<   the registers are divided up into two register files of 8,
+<     one is called the D (data) registers, and the other
+<     is called the A (address) registers.  This is a distinction
+<     similar to the CRAY 1.
+< 
+<   A7 is the stack pointer.
+< 
+< 
+---
+> <!--#include virtual="style3.html" -->
+239c12
+<   diagram of register files:
+---
+> </PRE><b>NOT YET UPDATED FOR FALL 2003</b><PRE>
+241,257d13
+<          --------------         --------------
+<      A0  |            |     D0  |            |
+<          --------------         --------------
+<      A1  |            |     D1  |            |
+<          --------------         --------------
+<          |            |         |            |
+<          --------------         --------------
+<          |            |         |            |
+<          --------------         --------------
+<          |            |         |            |
+<          --------------         --------------
+<          |            |         |            |
+<          --------------         --------------
+<          |            |         |            |
+<          --------------         --------------
+<      A7  |            |     D7  |            |
+<          --------------         --------------
+258a15
+> For the most part, these notes do NOT follow the book.
+260,263c17,18
+< DATA TYPES
+<  byte
+<  word (16 bits)
+<  longword (32 bits)
+---
+> Selected Current Instruction Set Architectures
+> ----------------------------------------------
+265,270c20,21
+<  addresses are really their own data type.
+<    arithmetic on A registers is 32 bit arithmetic.  However,
+<    pin limitations on the VLSI chip required a reduced
+<    size of address.  Addresses that travel on/off chip are
+<    24 bits -- and the memory is byte-addressable.  So
+<    a 24-bit address specifies one of 16Mbyte memory locations.
+---
+> MIPS -- SGI and embedded -- RISC
+> x86 / IA-32 -- Intel and see below -- IBM PC
+272c23,29
+< each instruction operates on a fixed data type
+---
+> RISCs
+> ----
+> PowerPC -- IBM -- Macintosh
+> StrongArm / Xscale -- embedded
+> SPARC -- Sun
+> PA-RISC -- HP but sun-setted?
+> Alpha -- DEC/Compaq but sun-setted
+273a31
+> Itanium / IA-64 -- Intel and see below
+275d32
+< OPERAND ACCESS
+277,299c34,42
+<  the number of operands for each individual instruction
+<  is fixed
+< 
+<  like the VAX, the addressing mode of an operand does not
+<  depend on the instruction.  To simplify things, one of the
+<  operands (of a 2 operand instruction) must usually come from
+<  the registers.
+< 
+<  the number/type of addressing modes is much larger than
+<  the MIPS, but fewer than the VAX.
+< 
+< 
+<  the text has a detailed discussion of the 68000 addressing modes.
+<  READ IT!
+< 
+< 
+< PERFORMANCE
+<   ?, they got faster as new technologies got faster.
+< 
+< SIZE
+<   1 64-pin VLSI chip (a huge number of pins at that time)
+< 
+<   the 68020 had 88 pins
+---
+> Outline
+> -------
+> History
+> Intel Architecture-32 (IA-32)
+>     Registers
+>     Accessing Memory
+>     Addressing Modes
+>     Instruction Set
+>     Example
+301c44
+< 
+---
+> MMX (Optional)
+302a46
+> IA-64/Itanium (Optional)
+304,305d47
+< the Intel iAPX 86 (also correctly called the IA-32 (x86) Architecture
+< ---------------------------------------------------------------------- 
+308c50
+< 
+---
+> -------
+325d66
+< 	        (compatible with earlier 8085 chip set)
+335c76
+< 	1985	80386 32b registers and addresses
+---
+> 	1985	80386 32b registers and addresses (IA-32 ARCHITECTURE)
+340a82,85
+> 	1998-2000 Pentium II, III, etc.
+> 
+> 	2001 Pentium IV
+> 
+348,349c93
+< 	Instruction decode translates machine code into "RISC OPS"
+<          	(like decoded MIPS instrns)
+---
+> 	Instruction decode translates in "RISC OPS" (like decoded MIPS instrns)
+356a101,102
+>    Pentium IV is the first totally new pipeline since Pentium Pro
+> 
+358,359c104,105
+< About the Pentium Architecture
+< ------------------------------
+---
+> About the IA-32 Architecture
+> ----------------------------
+365,368c111,113
+< 	16bit, 32bit operations on memory and registers
+< 	decoding nightmare: a single machine code instruction
+< 	  can be from 1 to 17 bytes long w/ prefixes & postfixes
+< 	But, mainline (most common) 386 instructions not terrible
+---
+> 	16b, 32b ops on mem and regs
+> 	decoding nightmare: instrn 1 to 17 bytes w/ prefixes & postfixes
+> 	but mainline 386 instrns not terrible
+442c187
+<  There are 2 memory models supported in the Pentium architecture.
+---
+>  There are 2 memory models supported in the IA-32 architecture.
+452c197
+<   -- The memory model that every one else uses.
+---
+>   -- The memory model that every other manufactures' processors use.
+847c592
+< Pentium code to add 1 to each element
+---
+> IA-32 code to add 1 to each element
+887,888d631
+< 
+< 
+908c651
+<     The goal is 2x performance in audio, video, etc.
+---
+>     Goal 2x performance in audio, video, etc.
+910c653
+<     Key observation: precision of data required << 32 bits
+---
+>     Key observation: precision of data << 32 bits
+912d654
+<     For video,
+920,921c662,663
+<     (This is an example of a general technique called
+<       "single instruction multiple data", or SIMD)
+---
+>     (Example of general technique called "single instruction multiple data"
+>      or SIMD)
+934c676
+<     Example, ADDB (B stands for byte)
+---
+>     E.g., ADDB (for byte)
+936,937c678,679
+<           17   87  100 ... 5 more
+<         + 17   13  200 ... 5 more
+---
+>           17   87  100 ... 6 more
+>         + 17   13  200 ... 6 more
+942,944d683
+< 	 This can be used to do arithmetic/logical operations on
+< 	 more than 1 pixel's worth of data in 1 instruction.
+< 
+954c693
+< 	comparision with Intel IA-32 gives:
+---
+> 	Intel IA
+956,963c695,702
+< 	->  32 loads
+< 	->  16 *
+< 	->  15 + 
+< 	->  12 loop ctrl
+<   	   ---
+<    	    76 instructions
+<    	    int ==> 200 cycles
+<    	    fp  ==> 76 cycles
+---
+> 	*  32 loads
+> 	*  16 *
+> 	*  15 + 
+> 	*  12 loop ctrl
+>   	---
+>    	76 instructions
+>    	int ==> 200 cycles
+>    	fp  ==> 76 cycles
+967,968c706,707
+< 	->  16 instructions
+< 	->  12 cycles (6x better than fp)
+---
+> 	*  16 instructions
+> 	*  12 cycles (6x better than fp)
+978c717
+< 	   Example,  "make 0xff if equal"
+---
+> 	   E.g.  "make 0xff if equal"
+987c726
+< 		* film weatherperson in front of blue background (0x15)
+---
+> 		* film weatherperson in from of blue background (0x15)
+990c729
+< 			wthmsk==00 -- weatherperson
+---
+> 			wthmsk==00 -- 
+992c731
+< 		image = (~wthmsk & weatherperson ) | (wthmsk & weathermap)
+---
+> 		image = (~wthmsk & weatherperson ) | (wthmsk & waethermap)
+994d732
+<              (What happens if weatherperson wears suit of color 15?)
+1009,1012c747,748
+< 
+< 
+< IA-64/Merced/Itanium (Optional)
+< ------------
+---
+> IA-64/Itanium (Optional)
+> -------------
+1042,1043c778
+<         example, whether instrn1 shares no registers or memory
+< 	  locations w/ instrn0
+---
+>         e.g., whether instrn1 shares no regsters or memory locations w/ instrn0
+1047c782
+<     Example,
+---
+>     E.g.,
+1057,1059c792,794
+<               bge $1, $2, else
+<               mov $3, $4
+<               b endif
+---
+>         bge $1, $2, else
+>         mov $3, $4
+>         b endif:
+1070,2010c805
+< Aren't you glad we did not teach 354 with IA-64/Merced?
+< 
+< 
+< 
+< all about the Cray 1
+< --------------------
+< 
+< 
+< 
+<   There has always been a drive to design the best, fastest computer in
+<   the world.  Whatever computer is the fastest has generally been called
+<   a supercomputer.
+< 
+<   The Cray 1 earned this honor, and was the fastest for a relatively long
+<   period of time.
+< 
+<   The man who designed the machine,  Semour Cray, is a bit of an eccentric,
+<   but he can get away with it because he's so good.  The Cray 1 has an
+<   exceptionally "clean" design, and that makes it fast.  (This is probably
+<   a bit exaggerated due to my bias -- the Cray 1 is probably my favorite
+<   computer.)
+< 
+<   Mostly my opinion:
+<   To make the circuitry as fast as possible, the Cray 1 took 2 paths
+<     1.  Physical -- a relatively "time-tested" technology was used, but
+< 	much attention was paid to making circuits physically close
+< 	(Semour was aware of the limits imposed by the speed of light.)
+< 	and the technology was pushed to its limits.
+<     2.  Include only what was necessary, but on that, a "don't spare the
+< 	horses" philosophy was used.
+< 	This means that extra hardware was used (not paying attention to
+< 	the cost) wherever it could to make the machine faster.  And, at
+< 	the same time, any functionality that wasn't necessary (in Semour's
+< 	opinion) was left out.  We'll see soon what that really means.
+<   Just remember:
+<     if something seems out of place to you, or some functionality of a
+<     computer that you think is essential and was not included in the Cray 1,
+<     it wasn't necessary!  And, leaving something out made the machine
+<     faster.
+< 
+<   What the Cray 1 is good for:
+<     it was designed to be used for scientific applications that required
+<     lots and lots of floating point manipulations.  It wouldn't make
+<     a good instructional machine (don't want to hook lotsa terminals up
+<     to it!), and it wouldn't be much fun to try to implement a modern
+<     operating system on.
+< 
+<   How it is used:
+<     most often, a separate (not as fast/powerful) computer was hooked up
+<     as what is commonly called a host computer.  The host is where you do
+<     all you editing and debugging of programs.  The host also maintains a
+<     queue of jobs to be run on the Cray.  One by one the jobs are run, so
+<     the only thing that the Cray is doing is running the final jobs -- often
+<     with LOTS of data.  Although its operating system would allow it,
+<     the "multi-tasking" (had more than 1 program running simultaneously)
+<     ability was not often used.
+< 
+< 
+< 
+< 
+<  instruction set
+<    fixed length instructions
+<      either 16 or 32 bit (no variablility that depends on
+<       the number of operands)
+<    number of operands possible for an instruction
+<      0-3
+<    number and kind of instructions
+< 	     op codes are 7 bits long -- giving 128 instrucitons
+< 	      This includes complete integer and floating point
+< 	      instructions.
+< 
+< 	      Notice that missing from the instruction set are:
+< 		  character (byte) manipulation, duplicates
+< 		  of anything (!), integer divide, etc.
+< 
+<    Data representation is simpified from what we've
+<       seen so far!  There are ONLY 2's complement integers,
+<       unsigned integers (for address manipulations),
+<       and floating point numbers!
+< 
+<       ALL accesses to memory are done in WORD chunks.  A word
+<       on the Cray 1 is 64 bits.  All instructions operate on
+<       a single size of data -- Either a 64 bit word, or on an
+<       address (24 bits).
+< 
+<    addressing modes (strikingly similar to MIPS)
+<      Register Mode.  An instruction (op code) specifies exactly where
+<            the data is.
+<      Base Displacement Mode.  Used only for load and store instructions.
+< 
+< 
+< 
+<    REGISTERS:
+<      There are an ENORMOUS number of registers.
+<      There are 5 types of registers.
+< 
+< 	      S registers --  'S' stands for scalar.  These are 64-bit
+< 	      registerss.  They are used for all sorts of data, but
+< 	      not addresses.  There are 8.
+< 
+< 	      T registers -- 
+< 	      These are 64 64-bit backup registers for the S registers.
+< 	      If you were to do some heavy programming on the Cray 1,
+< 	      you'd find these registers very useful.  This is partially
+< 	      because you run out of S registers quickly, so you
+< 	      need temporary storage, but don't want your program
+< 	      to store to main memory (slow!).  There's also an
+< 	      instruction that allows you to load a block of memory
+< 	      to the T registers.  That's 1 instruction to do up to 64
+< 	      loads.
+< 
+< 	      A registers --  'A' stands for address.  These are
+< 	      24-bit registers.  They are used for addresses, and to a
+< 	      rather limited extent, integer counters.
+< 
+< 	      B registers --
+< 	      These are backups to the A registers and are used in the
+< 	      same manner as the T registers.
+< 
+< 	      V registers -- 'V' stands for vector. 
+< 	      There are 8 sets of V registers.  Each set has 64 64-bit
+< 	      registers!  That is a lot!  They are used mainly for
+< 	      processing large quantities of "array" data.  Their use
+< 	      makes the Cray 1 very fast.  A single instruction that uses
+< 	      a vector register (1 set) will cause something to happen
+< 	      to each of the 64 registers within that set.
+< 	      (SIMD)
+< 
+< 
+< 
+<     So, if we had parallel arrays of data, and wanted to add
+<     corresponding elements of the arrays, storing the sum in
+<     the corresponding element of a third array, this would be
+<     essentially 4 instructions on the Cray-1.
+< 
+<     1. block load (of part or all of first array) to V0
+<     2. block load (of part or all of second array) to V1
+<     3. vector add,   V0 + V1 --> V2
+<        Note that the vector add can do the add (using lots of pipelining)
+<        to all of a vector register (64 adds), or to just a subset of
+<        the vector (starting with element 0).
+<     4. block store (of part or all of first array) of V2
+< 
+< 	      V0                     V1                V2
+<          --------------         --------------      --------------
+<        0 |            |    +    |            |  =   |            |
+<          --------------         --------------      --------------
+<        1 |            |    +    |            |  =   |            |
+<          --------------         --------------      --------------
+<          |            |         |            |      |            |
+< 	       .                       .                  .
+< 	       .                       .                  .
+< 	       .                       .                  .
+<          --------------         --------------      --------------
+<          |            |    +    |            |  =   |            |
+<          --------------         --------------      --------------
+<      63  |            |    +    |            |  =   |            |
+<          --------------         --------------      --------------
+< 
+< 
+<     For accomplishing this same operation where the arrays contain more
+<     than 64 elements, put these 4 instructions into a loop, where each
+<     iteration of the loop works on 64 of the elements.
+< 
+< 
+< 
+< 
+<    hardware stack
+< 	      no support for stack accesses at all!  There is no
+< 	      special stack pointer register.
+<    cache
+< 	      none.  There are so many registers that there isn't
+< 	      really a need for one.
+< 
+<    size of machine
+< 	     A bit bigger than 2 refridgerators.
+<    speed of machine
+< 	     Significantly faster than the VAX and 68000.
+< 	      For a while, it was the fastest machine around.
+< 
+<    price of machine
+< 	     As an analogy to some very pricey restaurants:
+< 	      If you need to see the prices on the menu, you can't
+< 	      afford to eat there.
+< 
+< 	      Probably about $3 million for the basic machine when
+< 	      they first came out.
+< 
+< 	      A Cray 1 came with a full time hardware engineer,
+< 	      (a field service person).  Why?  Down time on a Cray
+< 	      is very expensive due to the way they are expected to
+< 	      be used.  Waiting for field service to come was
+< 	      considered too expensive.
+<    how many instructions get executed at one time
+< 	 its debatable.  There can be more than 1 instruction
+< 	  at some point in its execution at 1 time.  It is a
+< 	  pipelined machine. This can only go so far (only
+< 	  1 new instruction can be started each clock cycle).
+<   complexity of ALU
+< 	  There are actually quite a few ALU's in the machine.
+< 	  Cray calls them functional units.  Each one is a specialized
+< 	  piece of hardware that does its own job as fast as can
+< 	  be done.  Each of them could conceivably be working at
+< 	  the same time.
+< 
+< 
+< 
+< 
+< on the VAX
+< ----------
+< 
+< The VAX was a popular and commercially successful computer
+< put out in the early 1970's by DEC (Digital Equipment Corp).
+< 
+< It might be characterized by the term CISC.
+<     RISC (Reduced Instruction Set Computer)
+<     CISC (Complex Instruction Set Computer)
+< 
+< A CISC computer is often characterized by
+<   1.  many instructions
+<   2.  lots of addressing modes
+<   3.  (this one is debatable) variable length instructions
+<   4.  memory-to-memory architecture
+< 
+< Some details of the VAX:
+< 
+<   It used microcode to control its operation.  Microcode is a hardware
+<   implementation of a program.  For each clock cycle, something happens.
+<   That something is that bits that control ALL the different aspects
+<   of a processor's operation need to be set.
+< 
+< there were LOTS OF INSTRUCTIONS
+<  integer arithmetic
+<    different opcodes for varying size data
+<  logical
+<    different opcodes for varying size data
+<  address manipulations
+<  bit manipulations
+<  control instructions
+<    conditional branches, jumps, looping instructions
+<  procedure mechanisms
+<    call and return instructions (there were more than 1!)
+<    (they do it all in a single instruction, like saving registers,
+<    saving the return address, and jumping to the first instruction
+<    within the procedure)
+<  floating point
+<    Operations on 4 different representations of floating point numbers.
+<    Remember that the VAX came out long before the IEEE standard on 
+<    floating point arithmetic.
+<  character string manipulations
+<  crc (Cyclic Redundancy Check)
+<  decimal string
+<    arithmetic presuming representation of binary coded decimal
+<  string edit
+< 
+<  overall:  more than 200 instructions
+< 
+<  opcodes were of variable length, but always a multiple
+<  of 8 -- most opcodes were specified in the first 8 bits
+<  of an instruction.
+< 
+< 
+< 
+< 
+< REGISTERS
+<   16 32-bit general purpose registers,
+<   except that they really weren't all general purpose
+<     R15 is the PC -- note that the user can change the
+< 		     PC at will!
+<     R14 is a stack pointer
+<     R13 is a frame pointer
+<     R12 is an argument pointer (address of where a procedure's
+< 	  parameters are stored -- sometimes on the stack,
+< 	  and sometimes in main memory)
+< 
+< DATA TYPES
+<  byte
+<  word (16 bits)
+<  longword (32 bits)
+<  quadword (64 bits)
+<  octaword (128 bits)
+< 
+<  F floating point (32 bits -- 7 bits of exponent)
+<  D floating point (64 bits -- 7 bits of exponent)
+<  G floating point (64 bits -- 10 bits of exponent)
+<  H floating point (128 bits -- 15 bits of exponent)
+< 
+<  character string (consecutive bytes in memory, specified always
+< 		   by a starting address and the length in bytes)
+<  numeric string  (the ASCII codes that represent an integer)
+<  packed decimal string (consecutive sequence of bytes in memory
+<      that represent a BCD integer.  BCD digits are each in
+<      4-bit quantities (a "nibble")
+< 
+<        example:  the integer +123 is represented by
+< 	       0001     0010   0011       1100
+< 	       (1)      (2)    (3)        (+)
+<    numbering   a<7-4> a<3-0>  a+1<7-4>  a+1<3-0>
+< 
+< 
+< each instruction operates on a fixed data type
+< 
+< 
+< 
+< OPERAND ACCESS
+< 
+<  the number of operands for each individual instructions
+<  is fixed
+< 
+<  the location of operands is definitely not fixed,
+<    they can be in memory, or registers, and the variety
+<    of addressing modes that specify the location of an
+<    operand is large!
+< 
+<  equivalent of  MIPS     add $2, $3, $4
+< 
+<     addl3  R3, R4, R2
+<        ^^
+<        ||-- 3 operands
+<        |
+<        |--- operate on a 32 bit quantity
+< 
+<  There is also  addb3, addw3,  addb2, addw2, addl2 for 2's complement
+<    addition.
+<  There is also  addp4, addp6  for bcd addition.
+<  There is also  addd3, addd2, addf3, addf2, addg3, addg2, addh3, addh2,
+<    for floating point addition.
+< 
+< 
+< 
+<  This is a VERY simple use of addressing modes.
+<  The syntax of operand specification allows MANY possible
+<    addressing modes -- every one discussed in chapter 8,
+<    plus more!
+< 
+<    for example
+<        addl3 (R3), R4, R2
+< 	 uses Register Direct addressing mode for the first
+< 	 operand --
+< 	 operation
+< 	   the address of the first operand is in R3,
+< 	   load the operand at the address, add to the
+< 	   contents of R4, and place the result into R2
+< 
+<   The addressing mode for each operand can (an often is)
+<   be different!
+< 
+< 
+< 
+< One type addressing mode (not discussed in the text) sticks out --
+< auto-increment and auto-decrement
+<   They have the side effect of changing the address used to get
+<   an operand, as well as specifying an address.
+< 
+<     addl3 (R3)+, R4, R2
+<     operation
+<       the address of the first operand is in R3,  load
+<       the operand at the address, then increment the contents
+<       of R3 (the address), then add data loaded from memory
+<       to the contents of R4 and place the result into R2
+< 
+<       the amount added to the contents of R3 depends on the
+<       size of the data being operated on.  In this case, it
+<       will be 4 (longwords are 4 bytes)
+< 
+< 
+< 
+< MACHINE CODE
+< 
+< Together with each operand is an addressing mode specification.
+< Each operand specification requires (at least) 1 byte.
+< 
+< Format for the simple  addl3 R3, R4, R2
+< 
+<    8-bit opcode   0101 0011    0101 0100   0101 0010
+< 		   ^    ^       ^    ^      ^    ^
+< 		   |    |       |    |      |    |
+< 		   ---- | ---------- | --------- | -- mode (register = 5)
+< 		        |            |           |
+< 		        |------------|-----------|--- which register
+< 
+< 
+< Format for the     addl3 (R3), R4, R2
+< 
+<       same
+<    8-bit opcode   0110 0011    0101 0100   0101 0010
+< 		   ^    ^       ^    ^      ^    ^
+< 		   |    |       |    |      |    |
+< 		   ---- | ---------- | --------- | -- mode
+< 		        |            |           |
+< 		        |------------|-----------|--- which register
+< 
+< 
+< Each instruction has an 8-bit opcode.
+< There will be 1 8-bit operand specifier for each operand that
+<   the instruction specifies.
+< 
+< Because of the large number and variety of addressing modes,
+< an operand specification can be much more than 1 byte.
+< Example:  Immediates are placed directly after their specification
+< within the code.
+< 
+< 
+< 
+< Here's an example that will help to show the powerful way that these
+< addressing modes can reduce the size of the code (fewer instructions
+< when compared to a RISC architecture).
+< 
+< 
+< Suppose we had the following problem.
+<   We want to add the constant 220 to each element of an array.
+< 
+<   On the MIPS, we would place into a loop the following instructions:
+< 
+< 	 # assumes that $s0 initially contains the address of the
+< 	 # first element of the array.  The initialization is
+< 	 # outside the loop.
+<          lw   $t0, ($s0)
+< 	 addi $t0, $t0, 220
+< 	 sw   $t0, ($s0)
+< 	 addi $s0, $s0, 4
+< 
+<   On the VAX, the contents of this loop can be a single instruction!
+< 	 # assumes that R3 initially contains the address of the
+< 	 # first element of the array.  The initialization is
+< 	 # outside the loop.
+< 	 addl3  (R3), #220, (R3)+
+< 
+< 	 The constant to be added can be placed directly into the code.
+< 	 The autoincrement mode updates the address of the array element
+< 	 after the current address is used.  And the memory location
+< 	 for the result is also given.
+< 
+< 
+< The machine code for this VAX instruction:
+< 
+<    addl3        (R3)       #220                           (R3)+
+< 8-bit opcode   
+< 1100 0011      0110 0011   1000 1111  00. . .010110100   1000 0011
+<                mode reg    mode reg   ^^32-bit immed^^   mode reg
+< 
+< A comparison of VAX to MIPS reveals,
+<    8 bytes total for encoding on the VAX
+<    4 instructions * 4 bytes per instruction = 16 bytes on the MIPS
+< 
+< 
+< 
+< PERFORMANCE
+< 
+<   the term MIPS (millions of instructions per second) really came
+<   from the VAX -- 
+<     the VAX 11 780 ran at just about 1 MIPS
+<   note that this term is misleading --
+<     Instructions take variable times to fetch and execute,
+<     so the performance depends on the program
+< 
+< 
+< 
+< SIZE
+<   one version:  the VAX11 730 was about the size of a bread box, and
+<                 it was really slow!
+<   another version:  the VAX11 750 was about the size of a large-capacity
+< 		washing machine, and 1 person could keep it busy easily.
+<   yet another version:  the VAX11 780 was about the size of 2 refridgerators,
+< 		standing side by side.  This one was the "work horse" of
+< 		the 1980s.
+< 
+< 
+< the SPARC architecture
+< ----------------------
+< 
+< 
+< SPARC, an acronym from Scalable Processor ARChitecture
+< 
+< introduced by Sun Microsystems in 1985
+<   goal: to be easy to use for an optimizing compiler, and to allow
+<   for easily pipelined implementations (this is from the SPARC-V8
+<   Architecture Manual, copyright 1991)
+< 
+<   now called SPARC-V8 (32-bit version)
+<              SPARC-V9 (64-bit version)
+<              
+<              
+< 
+< the SPARC-V8 architecture
+< --------------------------
+< 
+< info on web at http://www.sparc.com/standards/V8.pdf
+< 
+< an architecture similar to the MIPS RISC architecture.
+< 
+<   -- load/store architecture
+<   -- all machine code instructions (like the MIPS) are exactly 32 bits long
+<   -- condition codes used with conditional control instructions
+<   -- 3-address instruction set
+<   -- an unusual (compared to MIPS) 32 register file (for non-floating point)
+<   -- delayed branch technique (similar to MIPS)
+<   -- follows IEEE 754 standard on floating point arithmetic
+<   -- memory is byte-addressable
+< 
+< 
+< 
+< DATA TYPES
+< 
+< integers are two's complement, and they come in various sizes
+<   (1, 2, 4, and 8 -byte sizes)
+< floating point values follow the IEEE 754 standard
+< characters are Unicode values
+< 
+< ADDRESSING MODES
+<   for a load/store instruction, there are 2 addressing modes use to
+<   produce an effective address.
+<   1.  base displacement (much like the MIPS)
+<       A small immediate value (the displacement) is in the instruction.
+<       It is added to the contents of a register to form the effective
+<       address.
+<   2.  Two registers are specified.  The effective address is the sum
+<       of the values from the registers.  One source calls this
+<       addressing mode Register-indirect with index.
+< 
+< REGISTERS
+<   the "unusual" and inovative aspect of the architecture.
+< 
+<   At any one time, a set of 32 (32-bit) registers is available for
+<   use within instructions.  Yet, there may be many more registers
+<   implemented (broken into 16-register sets). There will be 2-32 sets
+<   in the actual HW implementation.
+< 
+<   Of the 32 registers,
+<     8 are global
+<     8 are input arguments
+<     8 are for local variables
+<     8 are for output parameters
+<   
+<   The set of registers, other than the 8 global registers,
+<   forms a stack.  As a procedure is
+<   called, the REGISTER WINDOW, changes.  It works like a push
+<   of a new activation record.  At the return from a procedure,
+<   the register window changes, like a pop of an activation record.
+< 
+<   Which register window is currently being used is given by
+<   bits 4..0 of the PSR.
+< 
+< 
+< 
+<   A picture is worth much more than a thousand words in this case.
+<      Assume that A calls B, and B calls C.  Assume (for simplicity)
+<      that each passes 8 or fewer parameters.
+< 
+<      A diagram of the register file:
+< 
+< 
+<                       | R0 - R7 (global)    |
+<                       | (R0 is 0, like MIPS)|
+<                       |---------------------|
+<                    ---| 8 Parameter         | A: R8-R15, input parameters
+<                    |  |   registers         | 
+<                    |  |---------------------|
+<              A's   |  | 8 Locals            | A: R16-R24, local variables
+<            register|  |                     |
+<            window  |  |---------------------|
+<                  --|  | 8 Parameter         | A: R24-R31, outgoing params
+<                  | |--|   registers         | B: R8-R15, input parameters
+<                  |    |---------------------|
+<           B's    |    | 8 Locals            | B: R16-R24, local variables
+<       register   |    |                     |
+<       window     |    |---------------------|
+<                --|    | 8 Parameter         | B: R24-R31, outgoing params
+<                | |--- |   registers         | C: R8-R15, input parameters
+<                |      |---------------------|
+<        C's     |      | 8 Locals            | C: R16-R24, local variables
+<      register  |      |                     |
+<      window    |      |---------------------|
+<                |      | 8 Parameter         | C: R24-R31, outgoing params
+<                |------|   registers         |   (unused if C is a leaf)
+<                       |---------------------|
+< 		             |
+< 			    \ /  stack grows in this direction
+< 
+< 
+< So, what really happens is that at a procedure call, the set of
+< registers accessed as R8-R31 changes.  In comparison to the MIPS
+< processor, this may eliminate memory accesses for load and store
+< instructions in the case where input parameters are live across
+< a call.  It also eliminates memory accesses for those cases where
+< there are 5-8 parameters being passed.  MIPS requires these to
+< be in the activation record (on the stack, in memory).
+< 
+< The SPARC will introduce extra memory accesses in the case where
+< scoping rules nest "local" variables.  If a variable is local
+< to 2 procedures, a SPARC compiler would need to allocate memory
+< space for temporarily holding the local variable.  There will be
+< memory accesses (loads/stores) for both procedures to access the
+< variable.
+< 
+< There can also be a fair number of memory accesses generated if the
+< number of implemented (in HW, on the chip) register windows is
+< fewer than the number needed (due to the level nested calls).
+< 
+< 
+< 
+< INSTRUCTION SET
+< 
+< Conditional control instructions are based upon condition codes.
+< The condition codes are kept in a control register called the PSR
+< (Processor State Register).
+<   bits 23..20 of this register are used as
+<               23    22    21   20
+< 	      n     z     v    c
+< 	      |     |     |    |---  Carry
+< 	      |     |     |--------  overflow
+< 	      |     |-------------  zero (1 = zero)
+< 	      |------------------  negative (1 = negative)
+< 
+<   The mnemonic of the assembly language instructions identifies
+<   which instructions set the condition codes.  The string "cc"
+<   appended to the mnemonic indicates that the instruction sets
+<   condition codes.
+< 
+< EXCEPTION HANDLING
+< 
+< A trap causes the register window to change.  A copy of the
+< PC (before the trap) is saved in the new window.
+< 
+< A control register (called TBR, the Trap Base Register) forms
+< an address that is the first 4 instructions within a handler.
+< Part of the TBR is set as the machine is started up (booted).
+< 
+<           TBR
+< 
+<     bits   31                     12  11      4  3 2 1 0
+< 	  ------------------------------------------------
+< 	  |base address               trap type  0 0 0 0 |
+< 	  ------------------------------------------------
+< 
+<     The 2 least significant bits are 0s, since addresses are
+<     byte addressable, and instructions are 4 bytes long and
+<     (like the MIPS) they are word-aligned.  There are 4 instructions
+<     at each of these addresses (formed by the TBR), so 2 more
+<     bits of this address are 0s.
+< 
+< 
+< Bits 11..8 of the PSR identify a priority level for interrupts
+< above which interrupts will be handled.
+< 
+< Bit 7 of PSR is whether the processor is currently in 
+<   supervisor mode = 1
+<   user mode = 0
+<   (this is the equivalent of the K/U bit in the MIPS Status register)
+< </pre>
+< 
+< <html>
+< <head>
+< <title> Lecture notes - about Virtual Memory</title>
+< </head>
+< 
+< <BODY>
+< <h1> Virtual Memory</h1>
+< 
+< <pre>
+< 
+< 
+< Much of this subject straddles the areas of architecture and operating
+<   systems.  Must understand both to get it right.
+< 
+< 
+< 
+< Problems:
+< 
+<   -- Physical memory is too small.
+<      (Smaller than the address space of the machine,
+<       for example, 32-bit address = 4K Mbytes, or 4 Gbytes,
+<       but main memory is only 16 Mbytes.)
+< 
+<       We want to have just parts of a program in memory, not the
+<       entire (potentially very large) program
+< 
+<   -- Want ability to have multiple processes somewhere in their
+<      execution.  Want to increase throughput of computer by allowing
+<      multiprogramming, multitasking.
+< 
+<      The programs (processes) need to SHARE main memory.
+<         need RELOCATION, OS-controlled SWAPPING
+< 
+<   -- Large, inexpensive memory (disk) is slow.
+< 
+< 
+< Solution:
+< 
+<   Make main memory a cache for the larger disk.
+< 
+<   Give OS some "hooks" to ease its job.
+< 
+<   Introduce notion of an ADDRESS SPACE.
+< 
+< 
+< 
+< 
+< Address Space
+< -------------
+< Associated with every program (process) is a set of addresses
+<  that it may reference.
+< 
+<   PROCESS -- a program, together with some processor state.
+< 
+< 
+<  For a 32-bit address machine, want 32 bits of address space available
+<  to the program.  And, every process wants access to the full
+<  address space.
+< 
+<  To do this, introduce the notion of a VIRTUAL ADDRESS SPACE.
+< 
+<      virtual address            easily generated by SW
+< 
+<           |
+<           |
+<          \ /
+< 
+<        translation
+< 
+<           |
+<           |
+<          \ /
+< 
+<    physical address            used by HW to access memory
+<    (also called a real address)
+< 
+< 
+<   TO REMEMBER:  need the translation to be fast, since it must
+<                 be done for every memory access.
+< 		That means that it must be done by HW.
+< 
+< 
+< 
+< 
+< Base and Bounds
+< ---------------
+<  Give 2 HW registers, can implement virtual memory.
+<   
+<  base --  base address for a process -- a physical (real) address
+<  bounds -- last valid virtual address process may access
+<  virtual addresses generated by process are offsets from the base
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+<  
+<   -- for each reference, must check if the address is within bounds.
+<   -- each process has its own space
+<   -- each process must be allocated contiguously in memory
+<   -- cheap to implement in HW.  Addition and comparison can be
+<      done in parallel.
+< 
+<  Problems:
+<   -- impossible to share code between 2 programs (while keeping
+<      other code/data private to a program). This is because there
+<      is only 1 segment for each process. 
+< 
+< 
+< 
+< Segmentation
+< ------------
+< 
+<   Permit portions of process to be split into more than 1 area of
+<   memory (SEGMENTS)
+<      one for code
+<      another for heap
+<      another for stack
+< 
+<   Use separate base and bounds for each segment.
+<   Could add some sort of protection bit for each segment, to allow
+<     sharing.
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+<   Problems:
+< 
+<   -- Need table for segments/base/bounds info.  Could get big.
+<   -- External fragmentation of memory.
+< 
+< 
+< 
+< Paging
+< ------
+<   break up main memory into evenly sized PAGES.
+< 
+<   PAGE TABLE give address of either
+<      1) base of physical page in main memory
+<   or 2) address of page on disk
+< 
+<     each entry also has PRESENT bit (called VALID bit in book,
+<     to draw an analogy to cache's valid bit).  Present bit
+<     identifies whether physical page is resident in main memory
+<     or not.
+< 
+<   Have one page table for each process.  Its base address is kept in
+<     a register in the CPU.
+< 
+<   Placement of pages in memory is easy.  OS keeps a free list, and
+<     just take one from list.  
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+<   Problems:
+< 
+<   -- It takes 2 memory accesses to get one piece of data.
+<          One to access the page table entry.
+<          One to get the data.
+<      Solution:
+<          TLB (Translation Lookaside Buffer) as a cache for page table.
+<   -- For reasonable size memory, page table is huge.
+<      Solutions:
+<        Keep base/bounds for page table, so only have pages needed
+<        in table
+<   -- Internal fragmentation. (Page size is aways wrong for some
+<        processes.
+< 
+< 
+< 
+< PAGING AND SEGMENTATION
+< -----------------------
+< 
+<   To reduce table sizes, use 2 levels of mapping.
+< 
+<   Each segment contains an integral number of pages.  The number of
+<     pages can vary for each segment.
+< 
+<   Keep a page table for each segment.
+< 
+<   Both external and internal fragmentation are kept at bay.
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+<   Problems:
+< 
+<   -- If tables are in memory, can take more than one memory access
+<      to get at a piece of data.
+<      Solution:   TLB
+< 
+< 
+< 
+< TLB (Translation Lookaside Buffer)
+< -----
+< 
+<   A process typically accesses only a few of its pages at time, and
+<   accesses them repetitively.  (Showing both spacial and temporal
+<   locality.)
+< 
+< 
+<   TLB conatins a mapping of virtual page number (the TAG) to a
+<     physical page number.
+< 
+<   Also included,
+<      Present bit
+<      Referenced bit(s) - To help know chose victim if no free pages.
+<      Protection - to facilitate sharing
+<      Dirty bit - done at page level, not cache level.
+<      Process ID - sometimes added so that the TLB does not have
+<         to be flushed at each context switch.
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+< 
+<   TLB typically contains 98% or more of the pages accessed.
+< 
+<   Typical size is 64-128 entries.  Small TLB can be made
+<     fully associative.
+< 
+<   There is a difference between miss in the TLB and a page fault.
+< 
+< 
+< 
+---
+> Aren't you glad we did not teach 354 with IA-64/Itanium?
+2012,2040c807
+< PAGE FAULTS
+< -----------
+<   What happens if the page is not resident in main memory.
+< 
+<  - In translation, present bit is off.
+< 
+<    - Many machines trap (take an exception).
+< 
+<      - OS invoked to allocate free physical page from free list,
+<       or choose a "victim,"  the physical page to be thrown out
+<       of main memory to make room for faulted page.  Have to
+<       write current victim page to disk if dirty.
+< 
+<        - OS initiates disk access (really slow, 1msec or more),
+<          brings page into memory, updates page table and TLB,
+<          sets present bit
+< 
+<          - Instruction that cause page fault is restarted.
+< 
+< 
+<  Note that restarting instructions can be a tricky business.
+<     IBM 370 ran "long" instructions twice,
+<          First time just to access each memory location (read),
+<          to generate any potential page faults.
+<          Second time to do the actual instruction, guaranteed not
+<          to page fault.
+<     Z8000 solution, have 2 processors, one just for handling page
+<          faults.
+< </pre>
+---
+> <!--#include virtual="style4.html" -->

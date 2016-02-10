@@ -1,0 +1,1327 @@
+1,4c1
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 13 - Performance features</title>
+< </head>
+---
+> <!--#include virtual="style1.html" -->
+6,7c3,88
+< <BODY>
+< <h1> Chapter 13 -- performance features</h1>
+---
+> Lecture Notes for
+> Chapter 13 -- Architectural Performance <!-- EDIT CHAPTER INFO -->
+> 
+> <!--#include virtual="style2.html" -->
+> 
+> <!--#echo var="LAST_MODIFIED" -->
+> 
+> <!--#include virtual="style3.html" -->
+> 
+> </PRE><b>NOT YET UPDATED FOR FALL 2003</b><PRE>
+> 
+> 
+> Technology History & Moore's Law
+> --------------------------------
+> 
+> Computers have been implemented with many technologies
+> 
+>     mechanical switches
+>     vacuum tubes
+>     transistors
+>     transistors integrated into chips
+> 
+> 
+>    Moore's Law
+>    -----------
+> 
+>    Why are things so exciting?
+> 
+>    Computer power has been doubling repeatedly every 1.5-2 year!
+> 
+>    Popularly called "Moore's Law"
+> 
+>    Actual Moore Law predicts that the number of transisors per chip
+>    doubles every 18 months for a compound annual growth rate of 60%.
+> 
+>    Absurd Example: (from Chapter 1 Notes)
+> 
+>       Base Annual Salary: $16
+>       Growth Rate:        60%
+> 
+>       Year   Salary          Comment
+>       ----   ------          -------
+>         0      16              Base
+> 	3      64              Still live at home
+>        15     $16K             Buy car
+>        24    $100K             Buy house
+>        36    $300M             ???
+> 
+>        But this has happened for transistors from the early 1960s
+>        to the early 2000s!
+> 
+>    Implications
+>    ------------
+> 
+>    Will continue but rate may change
+> 
+> 
+>    Must also consider other technologies
+> 
+>       Memory capacity, disk capacity, and network bandwith scaling well
+> 
+>       Delay to/across memory, disk, and network scaling poorly
+> 
+>       Must correct imbalance
+> 
+> 
+>    How to spend transistors to get faster computers?
+> 
+>       Designs that
+> 	 were too expensive
+> 	 become appropriate
+> 	 and then too cheap
+> 
+> 
+>      bit-level parallelism -- 16, 32, and 64 bits at a time
+> 
+>      instruction-level parallelism -- execute instructions concurrently
+> 				      while still looking sequential
+> 
+>      thread-level parallelism -- execute instructions from more than
+> 				 one thread, process, or program.
+> 
+> 
+>    What will faster and cheaper future computers be used for?
+> 
+>       FOR YOU TO ANSWER!
+9d89
+< <pre>
+14a95
+>   (loosely following chapter 13)
+28a110,115
+>   Others:
+> 	Power
+> 	Reliability 
+> 	Availability
+> 	Serviceability
+> 	etc.
+31c118
+<   (Chapter 13 discusses ways of increasing performance.)
+---
+>   (this chapter discusses ways of increasing performance)
+49c136
+<    from memory is an order of magnitude greater than a
+---
+>    from memory is a one-to-two orders of magnitude greater than a
+53c140,141
+<    then a load of a 32-bit word takes more than 10 time units.
+---
+>    then a load of a 32-bit word takes about 100 time units
+>    (e.g., 1.5 ns vs 150 ns).
+60c148
+<    where most instructions take operands only from registers.  We also
+---
+>    where most instructions take operands only from memory.  We also
+76,77c164
+< 
+<   LOCALITY -- something nearby.
+---
+>   LOCALITY -- nearby.
+108d194
+< 
+113d198
+< 
+116,117c201
+< 
+< It is located very close to the processor.  The cache contains COPIES of
+---
+> It is located very close to the CPU.  It contains COPIES of
+123,124c207
+<  Memory access is sent to the cache (first). It will be a READ or a WRITE,
+<    to accomplish an instruction fetch, a load, or a store.
+---
+>  instruction fetch (or load or store) goes to the cache.
+126,128c209
+<   For a read, the data is returned to the processor, and the memory access
+<   is completed.
+< 
+---
+>   The data is handed over to the CPU, and the memory access is completed.
+130,134c211,212
+<    The memory access must be sent on to main memory.
+< 
+< 
+<  On average, the time to do a memory access for a machine with a
+<    single cache is
+---
+>    The instruction fetch (or load or store) is then sent on
+>    to main memory.
+136c214
+<        AMAT = cache access time + (% misses  *  memory access time)
+---
+>  On average, the time to do a memory access is
+138c216
+< AMAT stands for Average Memory Access Time.
+---
+>        = cache access time + (% misses  *  memory access time)
+144c222,223
+< 
+---
+> For a two-level cache hierarchy, the calculation is similar but
+> somewhat more complex:
+145a225,227
+> 	average memory access time =
+> 		cache access time + %L1missL2hit * L2 access time
+> 			+ %L1andL2miss * (L2 access time + memory access time)
+147c229
+< A cache is managed by hardware.
+---
+> This equation ignores some details, but is correct to the first order.
+149,150c231
+< 	Keep recently-accessed blocks in the cache -- this exploits
+< 	temporal locality.
+---
+> 
+152,153d232
+< 	Break memory into aligned blocks (lines) of more than one
+< 	word, to exploit spatial locality.
+155c234
+< 	Transfer data to/from the cache in blocks.
+---
+> cache is managed by hardware
+157,158c236
+< 	put block in "block frame"
+< 	  A simplified cache with 4 block frames may look like this:
+---
+> 	Keep recently-accessed block -- exploits temporal locality
+160,210c238,239
+< 	  ---------------------------------
+< 	  |    one block fits here        |
+< 	  ---------------------------------
+< 	  |    a second block fits here   |
+< 	  ---------------------------------
+< 	  |    a third block fits here    |
+< 	  ---------------------------------
+< 	  |    a fourth block fits here   |
+< 	  ---------------------------------
+< 
+< 
+< Any cache has far fewer block frames (places to put blocks) than  
+<    main memory has blocks.  So, we need a way of knowing which
+<    block from main memory goes in which block frame.
+< 
+<    A simple implementation uses part of the address  (remember that
+<    all memory accesses include an address) to map each block from main
+<    memory to a specific block frame in the cache.  In this way, the
+<    address can be used to determine the block frame that a block would
+<    be in (if the block is actually in the cache).
+< 
+<    Here is a simple diagram of which main memory block maps to which
+<    block frame, if there are just 4 block frames in the cache:
+< 
+< 
+< 	    main memory blocks                        cache
+< 	  --------------------                 --------------------
+< 	  | maps to frame #1 |                 | frame #1         |
+< 	  --------------------                 --------------------
+< 	  | maps to frame #2 |                 | frame #2         |
+< 	  --------------------                 --------------------
+< 	  | maps to frame #3 |                 | frame #3         |
+< 	  --------------------                 --------------------
+< 	  | maps to frame #4 |                 | frame #4         |
+< 	  --------------------                  --------------------
+< 	  | maps to frame #1 |
+< 	  --------------------
+< 	  | maps to frame #2 |
+< 	  --------------------
+< 	  | maps to frame #3 |
+< 	  --------------------
+< 	  | maps to frame #4 |
+< 	  --------------------
+< 	  | maps to frame #1 |
+< 	  --------------------
+< 	  | maps to frame #2 |
+< 	  --------------------
+< 	  | maps to frame #3 |
+< 	  --------------------
+< 	        etc. (there are many more main memory blocks)
+< 
+---
+> 	Break memory into aligned blocks (lines) e.g. 32 bytes
+> 		-- exploits spatial locality
+211a241
+> 	transfer data to/from cache in blocks
+213,214c243,246
+<    For this simple example, where the cache has 4 block frames,
+<    we will need 2 bits of address as an INDEX # or LINE #.
+---
+> 	put block in "block frame"
+> 		state (e.g valid)
+> 		address tag
+> 		data
+216,274c248
+<    And, since a block contains more than one byte, and more than
+<    one word (to exploit spacial locality), we will need some of the
+<    bits from within the address to determine which byte or word
+<    of the block is desired.
+< 
+<    The address may be used by the cache as
+< 
+<              -------------------------------------------------
+< 	     |   ?     |  INDEX #   | BYTE/WORD within BLOCK |
+<              -------------------------------------------------
+< 
+< 
+< 
+<    The remaining bits of the address will be used by the cache
+<    as a TAG.  Each main memory block (and cache block frame) has
+<    a TAG associated with it.
+<    The TAG distinguishes which main memory block is in a specific
+<    cache block frame.  This is necessary because many main memory blocks
+<    map to the same block frame (many main memory blocks have
+<    the same INDEX #).  The cache needs to know which one (of the
+<    many) is in the cache.
+< 
+<    The address is used by the cache as
+< 
+< 
+<              -------------------------------------------------
+< 	     |  TAG    |  INDEX #   | BYTE/WORD within BLOCK |
+<              -------------------------------------------------
+< 
+< 
+<    Last item, then we have the whole picture.  It is possible
+<    (as when a program first starts), that nothing is in a cache's
+<    block frame.  The cache needs a way of distinguishing between
+<    an empty block frame and a full one.  A single bit per block
+<    called a VALID bit (or a PRESENT bit), determines if the block
+<    is currently empty or full.
+< 
+<    A diagram:
+< 
+<    address
+<    -------------------------------------------
+<    | TAG  | INDEX # | BYTE/WORD within BLOCK |
+<    -------------------------------------------
+<       |         |
+<       |         |     INDEX  VALID   TAG   DATA (BLOCK)
+<       |         |            ----------------------------------------
+<       |         |       00   |   |       |                          |
+<       |         |            ----------------------------------------
+<       |         |       01   |   |       |                          |
+<       |         |            ----------------------------------------
+<       |         ------> 10   |   |   .   |                          |
+<       |                      --------|-------------------------------
+<       |                 11   |   |   |   |                          |
+<       |                      --------|-------------------------------
+<       |                              |
+<       |                              |
+<       |    |--------------------------
+<       |    |
+<      \ /  \ /
+---
+> >>>> single block CACHE DIAGRAM here <<<<
+276c250,254
+<      comparison
+---
+>    ------------------------------------------------------------------
+>    |                 |   |                                          |
+>    |   Tag           | V |       Data block                         |
+>    |                 |   |                                          |
+>    ------------------------------------------------------------------
+278c256,257
+< 
+---
+>    if the tag matches, and if VALID bit active,
+>      then there is a HIT, and a portion of the block is returned.
+279a259,260
+>    if the tag does not match or the VALID bit is not active,
+>      then there is a MISS, and the block must be loaded from memory.
+281,305c262,264
+<   Using this diagram, here's how the address and cache are used:
+< 
+<    The processor sends a memory access to the cache.  This access
+<      includes an address.
+<    The INDEX field within the address is used to determine the block
+<      frame of the data.
+<    The VALID bit of the correct block frame is checked to see if the
+<      frame actually contains data.
+<    If VALID bit active,  then the TAG of the block that is in the
+<      cache is checked to see if it matches the TAG within the address.
+<          If the TAGs match,
+<            then there is a HIT, and the least significant bits of the address
+<            are used to get the correct byte/word from within the block.
+< 
+<          If the TAGs do NOT match,
+<            then there is a MISS.
+< 
+<    If VALID bit is NOT active,  then there is no data in the block
+<      frame, and there is a MISS.
+<      
+<    In the case of a MISS, the memory access is sent to main
+<      memory, which responds by providing the block corresponding to
+<      the address.  The block is placed in the cache, the VALID bit set,
+<      the data is placed in the block frame, and the TAG of the block
+<      is placed in the TAG portion of the block frame.
+---
+>      The block is placed in the cache (valid bit set, data written)
+>      AND
+>      a portion of the block is returned.
+308a268
+> Example
+309a270
+> 	Memory words:
+311,312c272,277
+< An Unrealistic, Simplified Example to promote understanding of
+<  how a cache works:
+---
+> 		0x11c	0xe0e0e0e0
+> 		0x120	0xffffffff
+> 		0x124	0x00000001
+> 		0x128	0x00000007
+> 		0x12c	0x00000003
+> 		0x130	0xabababab
+314,361c279
+<    Addresses are 5 bits.
+<    Blocks are 4 bytes.
+<    Memory is byte addressable.
+<    There are 4 blocks in the cache.
+<    Assume that all accesses are to READ a single byte.
+< 
+<    Assume the cache is empty at the start of the example.
+< 
+<      (index #)
+<      (line #)     valid  tag  data (in hex)
+<        00           0     ?   0x?? ?? ?? ??
+<        01           0     ?   0x?? ?? ?? ??
+<        10           0     ?   0x?? ?? ?? ??
+<        11           0     ?   0x?? ?? ?? ??
+< 
+<    Memory is small enough that we can make up a complete
+<    example.  Assume little endian byte numbering.
+< 
+<      address   contents
+<      (binary)   (hex)
+<       00000    aa bb cc dd
+<       00100    00 11 22 33
+<       01000    ff ee 01 23
+<       01100    45 67 89 0a
+<       10000    bc de f0 1a
+<       10100    2a 3a 4a 5a
+<       11000    6a 7a 8a 9a
+<       11100    1b 2b 3b 4b
+< 
+<    (1)
+<    First memory reference is to the byte at address 01101.
+< 
+<    The address is broken into 3 fields:
+<      tag   index #       byte within block
+<       0        11             01
+< 
+<    On line 11, the block is marked as invalid, therefore
+<    we have a cache MISS.
+< 
+<    The block that address 01101 belongs to (4 bytes starting
+<    at address 01100) is brought into the cache, and the
+<    valid bit is set.
+< 
+<    (line number)  valid  tag  data (in hex)
+<        00           0     ?   0x?? ?? ?? ??
+<        01           0     ?   0x?? ?? ?? ??
+<        10           0     ?   0x?? ?? ?? ??
+<        11           1     0   0x45 67 89 0a
+---
+> 	A 16-byte cache block frame:
+363,365c281,282
+<    And, now the data requested can be supplied to the processor.
+<    It is the value 0x89.
+< 
+---
+> 		state	tag	data (16 bytes == 4 words)
+> 		invalid	0x????	??????
+366a284
+> 	lw $4, 0x128
+368,369c286
+<    (2)
+<    Second memory reference is to the byte at address 01010.
+---
+> 	Is tag 0x120 in cache?  (0x128 mod 16 = 0x128 & 0xfffffff0)
+371,402c288
+<    The address is broken into 3 fields:
+<      tag   index #       byte within block
+<       0        10             10
+< 
+<    On line 10, the block is marked as invalid, therefore
+<    we have a cache MISS.
+< 
+<    The block that address 01010 belongs to (4 bytes starting
+<    at address 01000) is brought into the cache, and the
+<    valid bit is set.
+< 
+<    (line number)  valid  tag  data (in hex)
+<        00           0     ?   0x?? ?? ?? ??
+<        01           0     ?   0x?? ?? ?? ??
+<        10           1     0   0xff ee 01 23
+<        11           1     0   0x45 67 89 0a
+< 
+<    And, now the data requested can be supplied to the processor.
+<    It is the value 0xee.
+< 
+<    (3)
+<    Third memory reference is to the byte at address 01111.
+< 
+<    The address is broken into 3 fields:
+<      tag   index #       byte within block
+<       0        11             11
+< 
+<    This line within the cache has its valid bit set, so there
+<    is a block (from memory) in the cache.  BUT, is it the
+<    block that we want?  The tag of the desired byte is checked
+<    against the tag of the block currently in the cache.  They
+<    match, and therefore we have a HIT.
+---
+> 	No, load block
+404,406c290
+<    The value 0x45 (byte 11 within the block) is supplied to
+<    the processor.
+< 
+---
+> 	A 16-byte cache block frame:
+407a292,293
+> 		state	tag	data (16 bytes == 4 words)
+> 		valid	0x120	0xffffffff, 0x00000001, 0x00000007, 0x00000003
+409,410c295
+<    (4)
+<    Fourth memory reference is to the byte at address 11010.
+---
+> 	Return 0x0000007 to CPU to put in $4
+412,444c297
+<    The address is broken into 3 fields:
+<      tag   index #       byte within block
+<       1        10             10
+< 
+<    This line within the cache has its valid bit set, so there
+<    is a block (from memory) in the cache.  BUT, is it the
+<    block that we want?  The tag of the desired byte is checked
+<    against the tag of the block currently in the cache.  They
+<    do NOT match.  Therefore, the block currently in the cache
+<    is the wrong one.  It will be overwritten with the block
+<    (from memory) that we now do want.
+< 
+<    (line number)  valid  tag  data (in hex)
+<        00           0     ?   0x?? ?? ?? ??
+<        01           0     ?   0x?? ?? ?? ??
+<        10           1     1   0x6a 7a 8a 9a
+<        11           1     0   0x45 67 89 0a
+< 
+<    The value 0x7a (byte 10 within the block) is supplied to
+<    the processor.
+< 
+<    (5)
+<    Fifth memory reference is to the byte at address 11011.
+< 
+<    The address is broken into 3 fields:
+<      tag   index #       byte within block
+<       1        10             11
+< 
+<    This line within the cache has its valid bit set, so there
+<    is a block (from memory) in the cache.  BUT, is it the
+<    block that we want?  The tag of the desired byte is checked
+<    against the tag of the block currently in the cache.  They
+<    match, and therefore we have a HIT.
+---
+> 	lw $5, 0x124
+446,448c299,301
+<    The value 0x6a (byte 11 within the block) is supplied to
+<    the processor.
+< 
+---
+> 	Is tag 0x120 in cache?
+> 
+> 	Yes, return 0x00000001 to CPU
+450c303
+< MISS RATIO =  fraction of total memory accesses that miss
+---
+> MULTIPLE BLOCK FRAMES
+452c305,306
+< HIT RATIO =  fraction of total memory accesses that hit = 1 - miss ratio
+---
+> Fully-associative cache
+> 	Any memory block can go in any block frame in cache
+454,457c308
+< Often
+< 	cache:  instruction cache 1 cycle
+< 	        data cache 1 cycle
+< 	main memory 20 cycles
+---
+> 	Show picture
+458a310,311
+> Direct-mapped cache
+> 	Each memory block can go in exactly ONE block frame in cache
+460,463c313,314
+<  average memory access time
+<                   (AMAT) = cache-access + miss-ratio * memory-access
+< 			 =       1     +   0.02     *  20
+< 			 =       1.4
+---
+> 	Use some address bits to select which block frame
+> 	This is called the index
+464a316
+> 	Tag does NOT need to include the index
+465a318,319
+> 	number of block frames = 2^number of index bits
+> 	block size = 2^number of offset bits
+467c321,326
+< Beyond the scope of this class:
+---
+> 	Address
+> 	-----------------------------------
+> 	|    Tag         | Index | Offset |
+> 	-----------------------------------
+> 
+> Set-associative caches: Beyond scope of class
+469,470c328,329
+< 	  classes) to speed lookup.
+< 	terms: fully-associative, set-associative, direct-mapped
+---
+> 	classes) to speed lookup.
+> 
+471a331,363
+> Cache hierarchies:
+> 	Most modern CPUs have more than one level of cache.
+> 	L1 Instruction Cache:  16K-64K bytes
+> 	L1 Data Cache:  16K-64K bytes
+> 	L2 Unified Cache: 512K-8M bytes
+> 	Memory: 32M-64G bytes
+> 
+> 	Some have 3 levels of cache
+> 
+> Typical (2001)
+> 	Level			access time		Size
+> 	-------------------------------------------------------
+> 	L1 instruction cache 	1 cycle			64 KB
+> 	L1 data cache 		1 cycle			64 KB
+> 	L2 cache 		10 cycles		2 MB
+> 	Main memory 		100+ cycles		512 MB
+> 
+> Roughly 10X difference in access time at each level, 10X (or more)
+> size difference.
+> 
+> 
+> Performance for data references w/ L1 miss ratio 0.05 and L2 miss ratio 0.10
+> 
+> 
+>         mean access 
+> 	       time = L1-access + %L1-miss * (L2-access + %L2-miss * memory)
+> 		    =       1     +   0.05 * (10        + 0.10     * 100)
+> 		    =       2.0
+> 		
+> Note that the L2 miss ratio is the fraction of references TO THE L2 CACHE
+> that miss.  But only 5% of the loads and stores miss in the L1 cache.
+> This means that only 0.5% of loads and stores miss in both the L1 and
+> L2 caches.
+474,477c366
+< Typical cache size is 64K bytes, given a 64Mbyte memory
+< 	cache is 20 times faster than main memory
+< 	cache has 1/1000 the capacity of main memory
+< 	cache often hits on 98% of the references!
+---
+> 
+499c388,389
+<   largest, slowest, cheapest (per bit) memory       (disk)
+---
+>   larger, slower, cheaper (per bit) memory         (disk)
+>   largest, slowest, cheapest (per bit) memory      (tape)
+508d397
+< 
+509a399,418
+> Virtual Memory
+> --------------
+> 
+> Questions
+> ---------
+> Did you ever wonder?
+> 
+> (a) Why you can run a program without knowing the memory size?
+> (b) Why two programs can be linked to use the same addresses with conflicting?
+> (c) Why user programs don't subvert the operating system or other programs?
+> (d) Why user programs don't write other peoples files by accessing
+> memory mapped disk address?
+> 
+> 
+> Answer: VIRTUAL MEMORY
+> 
+> Basic Idea
+> ----------
+> 
+> (1) Programs use "virtual addresses" to fetch instruction & access data
+510a420
+> 	lw $2, 0x100028($0) ==> generates virtual address 0x100028
+511a422
+> 	(like Telephone number; says WHO to call, not where they live)
+513,514c424
+< This hierarchical scheme works so well (reducing the AMAT),
+<   that many systems now include 2 levels of caches!
+---
+> (2) Hardware translates virtual address into physical address
+516c426
+<   diagram
+---
+> 	0x100028 ==> 0x3330128
+518,520c428
+<  -----------|----         ------        -------------
+<  |processor | L1|<------->| L2 |<------>|main memory|
+<  -----------|----         ------        -------------
+---
+> 	(physical address like where phone is)
+521a430,431
+> 	Translation actually done with a "page table" lookup 
+> 	with some page size (e.g., 4K bytes ==> 12 bits = 3 hex digits)
+522a433,442
+>         0x100028 = +--- 0x100  ||  0x028
+>                    |                 |
+>                    |  +------+       |
+>                    |  |      |       |
+>                    +->| 0x333|       |
+>                       |   |  |       |
+>                       +---+--+       |
+>                           |          |
+>                           V          V
+>                         0x333  ||  0x028 = 0x333028 
+523a444
+> (3) It is possible that a virtual address in NOT in memory
+524a446
+> 	Hardware raises synchronous trap called "page fault"
+525a448,450
+> 	Operating system invoked on "exception" to copy page
+> 	from disk into memory (possibly doing a replacement)
+> 	and resume the program 
+527a453,454
+> Answers
+> -------
+529,532c456
+< Another common cache enhancement: use not one L1 cache,
+< but two special purpose caches.  One cache exclusively
+< holds instructions (code), and the other holds data (everything
+< else).
+---
+> (a) Why you can run a program without knowing the memory size?
+534,543c458,505
+<   Benefits:
+<     -- Each of the two caches can be designed to work in parallel.
+<     This means that both an instruction fetch memory request, and
+<     a data load/store can occur at the same time.  This overlap
+<     results in a performance improvement.
+<     -- The instruction cache (often called I-cache) can be relatively
+<     small, and still exhibit a rather high hit ratio.  When an entire
+<     loop's code fits into the cache, and the loop is executed many
+<     times, (after the initial misses that bring the code into the
+<     cache) the hit ratio is 1 (perfect).
+---
+> 	The virtual memory system just "caches" the active part
+> 	of your program in the memory available.
+> 
+> (b) Why two programs can be linked to use the same addresses with conflicting?
+> 
+> 	Program 1's VA 1000 and program 2's VA 1000 map to different
+> 	physical addresses (e.g., P1's 1000 ==> 2000 and P2's 1000 ==> 3000)
+> 
+> 	DRAW PICTURE.  TWO VIRTUAL ADDRESS SPACES, ONE PHYSICAL MEMORY
+> 	SHOW THAT PROGRAM 1's and PROGRAM 2's VA 1000 MAP TO DIFFERENT PA.
+> 
+> (c) Why user programs don't subvert the operating system or other programs?
+> 
+> 	User page tables do not translate any virtual address to the 
+> 	physical addresses of OS or other users code and data.
+> 	(I oversimplify a little here.)
+> 
+> (d) Why user programs don't write other peoples files by accessing
+> memory mapped disk address?
+> 
+> 	User page tables do not translate any virtual address to the 
+> 	physical addresses for memory-mapped I/O devices.
+> 
+> 
+> Where does the page table live?
+> 	Page table lives in memory.
+> 	Different implementations using different data structures
+> 		Array (MIPS uses this)
+> 		Hash table (IBM uses this)
+> 		Tree  (Intel uses this)
+> 
+> Does a computer really access the page table in memory before accessing
+> the memory location in the cache?
+> 	No, we use a special type of cache to hold the page table.
+> 	Usually called a "Translation Lookaside Buffer"
+> 	Holds recently used page table entries, just like a cache holds
+> 	recently used instructions and data
+> 
+> 
+> 		 ---------           ---------
+> 		 |       |     PA    |       |
+> 	VA =====>|  TLB  |-----+---->| Cache |
+> 		 |       |     |     |       |
+> 		 ---------     |     ---------         ----------
+>                                |                       |        |
+> 			       +---------------------> | Memory |
+>                                                        |        |
+> 						       ----------
+545a508,509
+> Motivation for Pipelining
+> -------------------------
+557c521
+<   Program level parallelism:  Have one program run parts of itself
+---
+>   program level parallelism:  Have one program run parts of itself
+560c524
+<   Instruction level parallelism (ILP):  Have more than one instruction
+---
+>   instruction level parallelism (ILP):  Have more than one instruction
+570c534
+<    (Mark Hill's) EXAMPLE:  car wash
+---
+>    EXAMPLE:  car wash
+580d543
+<      SERIAL car wash:
+597a561,564
+>        black                P  W  R  D  X
+>        white                   P  W  R  D  X
+>                            ******
+> 
+611c578
+<     F -- instruction fetch (and PC update)
+---
+>     F -- instruction fetch
+635,636c602,604
+<  a popular pipelined implementation (used in MIPS R2000)
+<     (R6000 has 5 stages (but different), R4000 has 8 stages)
+---
+>  a currently popular pipelined implementation
+>     (R2000/3000 has 5 stages, R6000 has 5 stages (but different),
+>      R4000 has 8 stages)
+639c607
+< 	IF -- instruction fetch (and PC update)
+---
+> 	IF -- instruction fetch
+655c623,635
+< 
+---
+> 	data dependences
+> 		stall
+> 		register forwarding
+> 	control dependences
+> 		stall
+> 		move up control point
+> 		squash only if taken
+> 		prediction (static vs. dynamic)
+> 	ISA changes
+> 		condition codes
+> 		delayed branch
+> 	superscalar.
+> 
+659d638
+< 
+664c643
+<    lw   $8, 4($sp)
+---
+>    lw   $8, data1
+683c662
+< instruction   1   2   3   4   5   6   7   8   9 . . .
+---
+> instruction   1   2   3   4   5   6   7   8 . . .
+686c665
+<     addi          IF  ID  ID  ID  ID  EX  MA  WB
+---
+>     addi          IF  ID  ID  ID  EX  MA  WB
+692,701d670
+< 
+< The hardware that implements the stall essentially requires 1
+< bit per register.  This bit identifies if the register's contents
+< are not currently available for reading (due to an earlier instruction
+< not finished writing a value in that register).
+<   In the example, the ID stage of the lw instruction sets the bit for
+<   register $8, and the WB stage (or a counter of pipeline stages)
+<   resets the bit for $8.  The ID stage working on the addi instruction
+<   observes that register $8 is not available, and it stalls.  Each
+<   subsequent cycle, it checks again if register $8 is available.
+731c700
+<         b  label1
+---
+>         beqz $2  label1
+733,734d701
+< 	sub   $10, $11, $12
+< 	ori   $13, $14, 0xabcd
+737,738d703
+< 
+< AN INCORRECT SEQUENCE, TO ILLUSTRATE THE PROBLEM
+741c706
+<      b        IF  ID  EX  MA  WB
+---
+>      beqz     IF  ID  EX  MA  WB
+744,748c709
+< 		  ^^  (WRONG instruction fetched here!)
+<     sub               IF  ID  EX  MA  WB
+< 		      ^^  (another WRONG instruction fetched here!)
+<     ori                   IF  ID  EX  MA  WB
+< 		          ^^  (another WRONG instruction fetched here!)
+---
+> 		  ^^  (WRONG instruction may be fetched here!)
+751c712
+< 	Whenever the PC changes (except for PC <- PC + 4),
+---
+> 	whenever the PC changes (except for PC <- PC + 4),
+754,755c715,716
+< 	CONTROL DEPENDENCIES must be handled correctly by
+< 	pipelines.  They cause performance to plummet.
+---
+> 	CONTROL DEPENDENCIES break pipelines.  They cause
+> 	performance to plummet.
+772c733
+<  (Or, how to minimize the effect of control dependencies on pipelines.)
+---
+>  (or, how to minimize the effect of control dependencies on pipelines.)
+782c743
+<         b        IF  ID  EX  MA  WB
+---
+>         beqz     IF  ID  EX  MA  WB
+784c745
+<        addi          IF
+---
+>        addi          IF              IF  ID  EX  MA  WB
+786,787d746
+<        mult                          IF  ID  EX  MA  WB
+<                                      (correct instruction fetched)
+789c748
+<  branch Prediction (static or dynamic)
+---
+>  branch prediction (static or dynamic)
+803,806d761
+< 	 This can be done on the MIPS by disabling the WB stage
+< 	 from writing any results back to registers.  This must
+< 	 be done for all instructions that were incorrectly 
+< 	 started.
+824,853d778
+< Consider a generic sort of loop that we may write:
+< 
+< 
+<    loop:  b__  $?, $?, done_with_loop
+< 
+<           #instructions within the loop
+< 
+< 	  b    loop    # unconditional branch to top
+< 
+<    done_with_loop:     # more code would go here
+< 
+< 
+< Assume that this loop is to be executed many times.
+< 
+< 
+< Static branch prediction can have excellent performance
+< with the conditional branch at the top of the loop.
+< It correctly predicts that the branch will not be taken
+< every time through the loop.  It predicts wrong the one
+< time that the loop is exited.
+< 
+< Static branch prediction does not help with the unconditional
+< branch at the bottom of the loop.  It will always predict incorrectly.
+< 
+< It is sometimes possible for a compiler generating assembly language
+< code to generate code that takes some of this into account,
+< setting up loops such that the common case is for a branch
+< to be NOT taken.
+< 
+< 
+862,864d786
+< 
+< 
+< 
+868,870c790,792
+<    The concept:  prediction is always wrong sometime.
+<    There will be holes in the pipe when the prediction is wrong.
+<    So the goal is to reduce (eliminate?) the number of
+---
+>    The concept:  prediction is always wrong
+>    sometime.  There will be holes in the pipe when the prediction
+>    is wrong.  So the goal is to reduce (eliminate?) the number of
+882c804
+<       code example, the programmer writes:
+---
+>       code example:
+893,906c815
+< Note that in this code example, we want one of two possibilities
+< for the code that gets executed:
+<  1) 
+< 	  add $8, $9, $10
+< 	  beq $3, $4,  label
+< 	  move $18, $5
+< or 2)
+< 	  add $8, $9, $10
+< 	  beq $3, $4,  label
+<           sub $20, $21, $22
+< 
+< In both cases, the add and beq instructions are executed.
+< 
+<       This is turned into the following by a MIPS assembler:
+---
+>   is turned into the following by a MIPS assembler:
+928,929d836
+< The ordering of the add and beq are changed, but the effect
+< is the same.  Both are executed.
+938c845
+<   Delayed branching depends on a smart assembler (SW) to make
+---
+>   Delayed branching depends on a smart assembler (sw) to make
+940,941c847,848
+<   trend in the field of computer science.  Let the SW do more
+<   and more to improve performance of the HW.
+---
+>   trend in the field of computer science.  Let the sw do more
+>   and more to improve performance of the hw.
+953c860
+<    are/were used on MANY machines before pipelining became popular.
+---
+>    were used on MANY machines before pipelining became popular.
+979a887,907
+> Current state-of-the-art: "superscalar" and pipelined
+> ----------------------------------
+> 
+>          1   2   3   4   5   6
+>      i   IF  ID  EX  MA  WB
+>      i+1 IF  ID  EX  MA  WB
+>      i+2     IF  ID  EX  MA  WB
+>      i+3     IF  ID  EX  MA  WB
+> 
+> 
+> 
+> Emerging contender: VLIW  (Very Long Instruction Word)
+> Intel's IA-64 (Itanium) is a VLIW
+> ------------------------------------------------------
+>     Processor fetches "instruction bundles" that hold 3 instructions
+>     Issues all three instructions at the same time
+> 
+>     in VLIW ==> Compiler packs instructions into bundle
+>     in Superscalar ==> Hardware has to find independent instructions
+> 
+> 
+981a910,915
+> Performance
+> -----------
+> 
+>  time         instrns     cycles     time
+> --------  =  --------- * -------- * -------
+> program       program     instrn     cycle
+983,984c917
+< Superscalar processors
+< ----------------------
+---
+> Instructions per program (path length)
+986,987c919
+< We can make pipelining (parallelism at the instruction level)
+< one step better.
+---
+>         ISA and compiler
+989,991c921
+< IF we have 2 instructions that contain no dependencies, then
+< both instructions could be executed at the same time without causing
+< any problems.
+---
+> Cycles per instruction (CPI) = cycles / instrn
+993,995c923
+< For example purposes, use the given 5-stage pipeline.
+< We could duplicate the hardware of each stage, adding extra to
+< check for dependencies.
+---
+> 	ISA and organization (e.g., cache)
+996a925,926
+> 	SCPI = Stall Cycles Per Instruction
+> 	(Useful for identifying impact of one component, such as cache misses)
+998,999c928,929
+<   instr at PC       IF  ID  EX  MA  WB
+<   instr at PC+4     IF  ID  EX  MA  WB
+---
+> 	For data cache:
+> 		SCPI = %load_store instr * %data_miss * stall_cycles_per_miss
+1001,1002c931,932
+<   instr at PC+8         IF  ID  EX  MA  WB
+<   instr at PC+12        IF  ID  EX  MA  WB
+---
+> 	For instruction cache:
+> 		SCPI = %instr_miss * stall_cycles_per_miss
+1004,1005c934,935
+<   instr at PC+16            IF  ID  EX  MA  WB
+<   instr at PC+20            IF  ID  EX  MA  WB
+---
+> 	total CPI = CPI(perfect memory system) 
+> 			+ SCPI(data cache) + SCPI(instruction cache)
+1007,1008d936
+< This superscalar pipeline has twice the throughput of a pipeline
+< that issues a single instruction at one time.
+1010c938
+< 
+---
+> Time per cycle (cycle time, clock time)
+1011a940,941
+>         Organization and hardware
+>         (very hard to study in the abstract)
+1013,1014c943,944
+< Amdahl's Law
+< ------------
+---
+>         Often a rate
+> 	   1 GHz == 1 ns = 10^(-9) s
+1015a946,948
+> 	   five times faster clock:
+> 	   1*5 GHz == 1/5 ns
+> 	   5 GHz == 0.2 ns = 200 ps
+1017d949
+< We define the performance metric speedup:
+1019c951,953
+< speedup = new rate / old rate 
+---
+> Compare w/ Mhz only if
+>         instrns/program same (same instrn set)
+>         and CPI same (same implementation e.g., 386)
+1021c955,957
+<         = old execution time / new execution time
+---
+> MIPS
+>         (instrns/10^6)/time
+>         ignores instrns/program
+1023,1026c959,960
+< This metric compares the execution times of a specific program,
+< given specific input, before and after the code has been modified.
+< The modification makes the program better:  meaning the program
+< executes in less time after modification.
+---
+> MFLOPS (fp-ops/10^6)/time
+>         similar to MIPS for scientific programs
+1028,1030c962,963
+< We enhance a portion of our program.
+<   Before modification, the fraction of total execution time spent in
+<   the portion of the program to be modified is f.
+---
+> Compare with MIPS only if
+>         same ISA
+1032c965,966
+<   The speedup of the modified part of the code is S.
+---
+> SPECmarks -- time/program for several benchmarks
+>         Much better!
+1034c968,972
+<   ( Let an enhancement speedup f fraction of the time by speedup S)
+---
+> E.g.                    SPECmarks       MIPS    MHz
+> ----                    ---------       ----    ---
+> Itanium vs PentiumIV        x
+> PentiumIV vs PentiumIII     x            x
+> PentiumIV-2GHz vs PII-1GHz  x            x       x
+1036,1039d973
+<               [(1-f)+f]*old time
+< speedup = -----------------------------------
+<           (1-f) * old time + f/S * old time
+<   
+1041,1042c975,990
+< 	     1
+< 	= ---------
+---
+> ^L
+> Amdahl's Law
+> ------------
+> 
+> (Or why the common case matters most)
+> 
+> speedup = new rate / old rate = old time / new time
+> 
+> 
+> Let an enhancement speedup f fraction of the time by
+> speedup S
+> 
+> speedup = [(1-f)+f]*old time / (1-f) * old time + f/S * old time
+> 
+> 	= 1
+> 	  ---------
+1050c998
+< 	    5%	   10		1.047
+---
+> 	    5%	  10		1.047
+1053,1054d1000
+< An infinite speedup would mean that some portion of the
+< code was removed from the program.
+1056,1058c1002,1004
+< lim		   1                 1
+< 		---------	=  -----
+< S --> inf	1-f + f/S          1 - f
+---
+> lim		1
+> 		---------	=  1/ 1-f
+> S --> inf	1-f + f/S
+1069,1070d1014
+< We must eliminate code that accounts for half the execution
+< time of the program in order to get a speedup of 2.
+1072,1073c1016
+< This says that we should concentrate on the common case!
+< Work on the code where it can do the most good.
+---
+> Concentrate on the common case!
+1074a1018
+> 
+1076,1080c1020,1021
+< </pre>
+< <HTML>
+< <HEAD>
+< <TITLE>CS/ECE 354 Spring 2000 (Section 2)</TITLE>
+< </HEAD>
+---
+> Parallel Processors 
+> ===============================
+1082,1083c1023
+< <BODY> 
+< <pre>
+---
+> Want to get even faster than 50%/year
+1084a1025
+> Use N processors
+1086,1087c1027
+< A Bit more on Performance
+< ---------------------------
+---
+> But unlike pipelining, parallelism visible to software
+1089c1029
+< To measure program performance, for a program that is executed:
+---
+> How organize?
+1091,1093c1031,1035
+<  time         instrns     cycles     time
+< --------  =  --------- * -------- * -------
+< program       program     instrn     cycle
+---
+> SMP (Symmetric Multiprocessor)
+> ------------------------------
+> For small-medium machines (<=64 processors)
+> 	HW: shared memory w/ bus
+> 	SW: mostly run indep jobs w/ OS sharing
+1094a1037,1041
+>             P      P      ...  P      
+>             |      |           |
+>         +==========================+
+>           |    |     |         |
+>           M    M     M         M
+1096,1099c1043
+< Instructions per program (path length)
+<       - number of instructions executed when the program runs
+<       - it depends on the architecture (instruction set) and the
+<         compiler used to produce the assembly language code
+---
+> Too much bus traffic and memory latency too long==> add caches
+1101c1045,1052
+< Cycles per instruction (CPI) = cycles / instrn
+---
+>             P      P      ...  P      
+>             |      |           |
+>             $      $      ...  $      
+>             |      |           |
+>         +==========================+
+>           |    |     |         |
+>           M    M     M         M
+>                              100: 4
+1103,1104c1054
+<       -	it depends on the architecture and organization (like whether
+<         or not the implementation has a cache)
+---
+> Let address 100 have the value 4
+1106,1107c1056,1059
+< 	SCPI = Stall Cycles Per Instruction
+< 	(Useful for identifying impact of one component, such as cache misses)
+---
+>         P0 reads
+> 	P1 reads
+>         P0 writes 5
+>         P1 reads <-- must get "5", not the copy of "4" in his cache
+1109,1110c1061
+< 	For data cache:
+< 		SCPI = %load_store instr * %data_miss * stall_cycles_per_miss
+---
+>         This is the "cache coherence" problem
+1112,1113c1063,1065
+< 	For instruction cache:
+< 		SCPI = %instr_miss * stall_cycles_per_miss
+---
+> General solutions
+> 	1) Invalidate copies of old data	<=== Normal solution
+> 	2) Update out-of-date copies
+1115,1116c1067,1072
+< 	total CPI = CPI for perfect memory system 
+< 			+ SCPI for data cache + SCPI for instruction cache
+---
+> Specific solutions (NOT ON EXAM)
+> 	1) Eavesdrop on all other transactions, invalidate if cache 
+> 	block is written
+> 	2) Add a level of indirection; before updating a block, check 
+> 	with central "directory" to see who else has copies that should
+> 	be invalidated
+1117a1074,1075
+> Commonly used in
+> 	servers and high-end workstations today
+1119c1077
+< Time per cycle (cycle time, clock time)
+---
+> 
+1121,1122c1079,1082
+<         Organization and hardware
+<         (very hard to study in the abstract)
+---
+> Large Machines -- Blue Sky (NOT ON EXAM)
+> ----------------------------------------
+> >100 processors
+> 	HW: workstation nodes + interconnect
+1124,1125c1084,1088
+<         Often a rate
+< 	   100 MHz == 10 ns
+---
+>           P-+-M  P-+-M  ...  P-+-M  
+>             |      |           |
+>         +===+======+===========+===+
+>         |       interconnect       |
+>         +==========================+
+1127,1129c1090,1092
+< 	   five times faster clock:
+< 	   100*5 MHz == 10/5 ns
+< 	   500 MHz == 2 ns
+---
+> 	SW: need to do parallel processing 
+> 		How communicate?
+> 		How coordinate (synchronize)?
+1130a1094,1096
+> Private Memory
+> 	"multicomputer"
+> 	send/receive messages -- like email
+1132,1134c1098,1103
+< Compare w/ Mhz only if
+<         instrns/program same (same instrn set)
+<         and CPI same (same implementation e.g., 386)
+---
+> Shared Memory
+> 	"multprocessor"
+> 	implicit communication --
+> 		read of location last written by other processor
+> 
+> Large machines still experimental
+1136,1137c1105,1111
+< </pre>
+< <HR> <!-- ------------------------------------------------ -->
+---
+> The big problem is SOFTWARE
+> 		can't have Amdahl's Law bottleneck
+> 		can't waste too much time communicating
+> 			(100-1000s times slower than FP op)
+> 		can't waste too much time synchronizing
+> 			overhead of synch
+> 			work imbalance
+1139,1140c1113
+< </BODY>
+< </HTML>
+---
+> We'll see what the future brings...
+1141a1115
+> <!--#include virtual="style4.html" -->

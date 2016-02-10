@@ -1,0 +1,205 @@
+<!--#include virtual="style1.html" -->
+
+Chapter 12 -- Exception Handler (Kernel) GIST <!-- EDIT CHAPTER INFO -->
+
+<!--#include virtual="style2.html" -->
+
+<!--#echo var="LAST_MODIFIED" -->
+
+<!--#include virtual="style3.html" -->
+<b>
+
+
+
+
+KERNEL starts on the next page....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###############################################################################
+# Master start point for all exceptions
+###############################################################################
+		.ktext
+# Begin {
+# Save registers that exception handler may use
+# Determine what exception cause and jump to the appropriate handler.
+# } End of master startup
+
+
+###############################################################################
+# Master end point for all exceptions
+###############################################################################
+_k_Return:	
+# Begin {
+#   Restore all of the registers and return
+# } End of master end point
+
+
+###############################################################################
+# Procedure:	_k_HandleInt
+# Description:	All interrupts are processed through this routine.
+###############################################################################
+_k_HandleInt:
+# Begin {
+# Call display handler _k_DP_handler
+# Call keyboard handler _k_KB_handler
+# Clear clock interrupt ...
+		j	_k_Return
+# } End of _k_HandleInt
+
+
+###############################################################################
+# Procedure:	_k_HandleSys
+# Description:	All system calls are handled through this routine.
+###############################################################################
+_k_HandleSys:
+# Begin {
+# Get the syscall number in $v0 and branch to the appropriate subhandler:
+#  _k_Putc, _k_Puts, _k_Getc, _k_Done
+# } End of _k_HandleSys
+
+
+###############################################################################
+# Done syscall subhandler -- First, empty the output buffer.  Then, halt.
+###############################################################################
+_k_Done:
+# Begin {
+# } End of _k_Done
+
+###############################################################################
+# Putc syscall subhandler -- enqueue the character and return
+###############################################################################
+_k_Putc:
+# Begin {
+		jal	_k_DPenQ
+		j	_k_Return
+# } End of _k_Putc
+
+###############################################################################
+# Puts syscall subhandler -- enqueue the characters associated with the string
+# and then return
+###############################################################################
+_k_Puts:
+# Begin {
+#   Get the address of string
+#   Get the next character to enqueue; if it's a null, then return
+#   Enqueue the character
+#   Advance the pointer to the next character and loop
+# } End of _k_Puts
+
+###############################################################################
+# Getc syscall subhandler -- dequeue a character and return it
+###############################################################################
+_k_Getc:
+# Begin {
+		jal	_k_KBdeQ
+		j	_k_Return
+# } End of _k_Getc:
+
+###############################################################################
+# Procedure:	_k_DPenQ
+# Description:	enqueue a character on the queue of characters to be displayed
+###############################################################################
+_k_DPenQ:
+# Begin {
+#
+# Get the head and tail pointers for the queue
+# Attempt to allocate space in the queue
+#   If the queue is full, keep trying to print until we make room, then
+#   try to allocate space again
+		jal	_k_DP_handler
+# Add the character to the queue, saving the new tail pointer
+# Turn on the display and interrupt
+# As long as we're in the kernel, attempt to display the next character on
+# the queue before we return
+		jal	_k_DP_handler
+		jr	$ra
+# } End of _k_DPenQ
+
+###############################################################################
+# Procedure:	_k_DP_handler
+# Description:  Display interrupt handler: write if there is one & display ready
+###############################################################################
+_k_DP_handler:
+# Begin {
+# See if the display is ready; if not, return
+# Get the head and tail pointers for the put queue, return if the queue
+# is empty
+# Update the head pointer while removing the next character from queue;
+# print the character
+# Return the status of the queue (0 = empty, non-zero = contains data)
+		jr	$ra
+# } End of _k_DP_handler
+
+
+###############################################################################
+# Procedure:	_k_KBdeQ
+# Description:  dequeue a character from the keyboard queue
+###############################################################################
+_k_KBdeQ:
+# Begin {
+# Turn the keyboard interrupt back on
+# Get the head and tail pointer for the queue
+# If no characters are enqueued, wait for one to arrive; in the mean time,
+# make sure the display is updated
+		bne	$t0, $t1, _k_KBdeQ_l2
+		...
+		jal	_k_DP_handler
+		jal	_k_KB_handler
+		...
+_k_KBdeQ_l2:
+
+# Get the next character from the queue, advance the head pointer, & return
+# the character
+		
+		jr	$ra
+# } End of _k_KBdeQ
+
+
+###############################################################################
+# Procedure:	_k_KB_handler
+#
+# Description:	Keyboard interrupt handler puts char in queue if room.
+###############################################################################
+_k_KB_handler:
+# Begin {
+# Get the status of the keyboard; if no characters are found, then return
+# Get the head and tail pointers for the queue; allocate space for the new
+# character; if no space is available, then shutoff interrupt and return
+# Put the character in the queue and update the tail pointer
+# Display the character that was input
+	...
+	jal	_k_DPenQ
+
+_k_KB_ret:
+	jr	$ra
+# } End of _k_KB_handler
+
+
+###############################################################################
+# Error stuff and print routines deleted.
+###############################################################################
+
+</b>
+<!--#include virtual="style4.html" -->

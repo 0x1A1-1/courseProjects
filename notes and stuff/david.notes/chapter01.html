@@ -1,0 +1,617 @@
+<HTML>
+<HEAD>
+<TITLE>CS/ECE 354 Spring 2000 (Section 2)</TITLE>
+</HEAD>
+
+<BODY> 
+
+<!--  { BEGIN COMMENT
+	I will comment this way.
+END COMMENT } -->
+ 
+<HR> <!-- ------------------------------------------------ -->
+<IMG align=middle width=152 height=62 border=0 ALIGN=TOP SRC="/pics/logo.small.gif" ALT="University of Wisconsin - Madison"></A>
+<H1>CS/ECE 354: Machine Organization and Programming</H1>
+<H2>Spring 2000</H2>
+<H2>David A. Wood's Section 2 </H2>
+<H2>Return to <a href="http://www.cs.wisc.edu/~cs354-1/cs354.html">CS/ECE 354 Home Page</a></H2>
+<HR> <!-- ------------------------------------------------ -->
+<H2>Approximate Lecture Notes for
+Chapter 1 -- Introduction</H2>
+<P>
+Purpose: I provide these notes to students to:
+<UL>
+<LI> Allow better concentration in lecture by reducing note-taking pressure.
+<LI> Provide a study-aid after lecture.
+</UL>
+<P>
+Disclaimers:
+<UL>
+<LI> I may change these after you have printed them out.
+<LI> I will not follow these notes exactly in class.
+<LI> Students are responsible for what I say in class.
+<LI> Reading these notes is not a substitute for attending lecture.
+<LI> These notes probably contain errors.
+</UL>
+<P>
+Acknowledgement:
+<UL>
+<LI> These notes are derived from the notes of Karen Miller and
+Mark Hill, sometimes with substantial and sometimes with trivial changes.
+</UL>
+<HR> <!-- ------------------------------------------------ -->
+<pre>
+
+ADMINISTRATIVE STUFF:
+
+introduce self
+  name on board
+
+pass out:  web page & 2 x cheating form
+
+introduce course
+  students work hard for the 4 credits
+  starts fast -- 7 homeworks
+
+
+goals for course:
+	use applications 	ride in car
+	HLL programming		drive car
+	this course		a look under hood
+
+	why?			less vulnerable when HLL breaks
+				write compiler or system SW
+				build computers
+
+Example 1:
+
+	int a, b, csquared;
+	...
+	a = 30000;
+	b = 40000;
+	csquared = a*a + b*b;
+	c = sqrt(csquared);
+
+Results should be 50000.
+
+But get:  "Error: sqrt called with negative number."
+
+Insert: printf("%d\n", csquared);
+
+Prints: -1794967296
+
+Q: Why not 50000*50000 = 2,500,000,000?
+
+A: Max integer on most current machines is 2,147,483,647 = 2^31 - 1
+   2,500,000,000 > 2,147,483,647
+
+Q: Why -1,794,967,296?
+
+A: 2,500,000,000 - 2^32 = -1,794,967,296
+   By the end of this class this will make sense!!!
+
+	We start with HLL like Pascal
+	and move down toward machines
+
+	Can be bizarre until you "get it"
+
+
+Example 2: Y2K Problem
+
+In many computer programs year 1999 + 1 = 1900 not 2000.
+
+Why? Many old programs only store the last two decimal digits: 99 and 00.
+
+Why is this a problem? Is your younger sister born in 1985 eligible to
+get a drivers licence in 2001:
+
+	if (currentyear - birthyear >= 16 ) { /* get license */
+
+With Y2K, this could evaluate to 01 - 85 = -84 < 16 ==> no license
+
+Q: But why is it so hard to find these cases?
+
+A: It depends on data and instruction representation that this course teaches.
+
+   This course will teach you about it.
+
+
+
+
+
+
+GO OVER HANDOUTS IN DETAIL.
+
+
+Some introductory material
+--------------------------
+
+basic concept within computer science and engineering:
+     Levels of Abstraction -- simplify -- e.g., map or computer memory
+     models -- add new ideas to understand -- route or linked list
+     hierarchy -- models on models
+
+     used (for our purposes) to design programs, computers
+
+     when a problem is large, it needs to be broken down --
+       we "divide and conquer"
+       one way is by introducing a hierarchy (level), and solving
+       the problem at each level
+     example: design of a computer
+       1. transistors available
+       2. gates, flip flops
+       3. components, like registers and adders
+       4. CPU, memory system, I/O devices
+       5. computer system
+	  
+
+			computer system
+
+
+
+	  CPU            memory           I/O stuff
+
+
+
+
+                        components
+
+
+
+
+   	                gates
+
+
+
+   	                transistors
+
+
+     discuss TOP-DOWN vs. BOTTOM-UP design
+
+
+
+
+     another example:  software levels of abstraction
+       writing a large program -- >10,000 lines of code
+       TOP-DOWN:
+       divide into modules, design each module separately.
+       define procedures (functions) that accomplish a task.
+       specify interfaces (parameters) for the procedures.
+
+KEY CONCEPT:
+       the implementation of a function is independent of
+       its interface specification!  it is a different level
+       in the abstraction of program design.
+
+
+    the "big picture" -- a computer with software running on it.
+
+
+
+      HLL                                               computer
+      Pascal, C, Fortran                                hardware
+      C++, Java
+
+
+    how do we get from one to the other?
+		   wanted:  write in nice abstract HLL.
+		   have:  stupid computer that only knows how to
+			  execute machine language
+
+
+    Example provided by Prof. James Larus (you don't have to understand
+    this now)
+
+
+-------------------------------------------
+sum.c
+-------------------------------------------
+
+#include <stdio.h>
+
+int
+main (int argc, char *argv[])
+{
+  int i;
+  int sum = 0;
+
+  for (i = 0; i <= 100; i++) sum += i * i;
+  printf ("The sum from 0 .. 100 is %d\n", sum);
+}
+
+
+-------------------------------------------
+sum.s
+-------------------------------------------
+	.text
+	.align	2
+	.globl	main
+	.ent	main 2
+main:
+	subu	$sp, 32
+	sw	$31, 20($sp)
+	sd	$4, 32($sp)
+	sw	$0, 24($sp)
+	sw	$0, 28($sp)
+loop:
+	lw	$14, 28($sp)
+	mul	$15, $14, $14
+	lw	$24, 24($sp)
+	addu	$25, $24, $15
+	sw	$25, 24($sp)
+	addu	$8, $14, 1
+	sw	$8, 28($sp)
+	ble	$8, 100, loop
+	la	$4, str
+	lw	$5, 24($sp)
+	jal	printf
+	move	$2, $0
+	lw	$31, 20($sp)
+	addu	$sp, 32
+	j	$31
+	.end	main
+
+	.data
+	.align	0
+str:
+	.asciiz	"The sum from 0 .. 100 is %d\n"
+
+
+-------------------------------------------
+sum.nolabels
+-------------------------------------------
+
+addiu	sp,sp,-32
+sw	ra,20(sp)
+sw	a0,32(sp)
+sw	a1,36(sp)
+sw	zero,24(sp)
+sw	zero,28(sp)
+lw	t6,28(sp)
+lw	t8,24(sp)
+multu	t6,t6
+addiu	t0,t6,1
+slti	at,t0,101
+sw	t0,28(sp)
+mflo	t7
+addu	t9,t8,t7
+bne	at,zero,-9
+sw	t9,24(sp)
+lui	a0,4096
+lw	a1,24(sp)
+jal	1048812
+addiu	a0,a0,1072
+lw	ra,20(sp)
+addiu	sp,sp,32
+jr	ra
+move	v0,zero
+
+-------------------------------------------
+sum.machine_lang
+-------------------------------------------
+
+00100111101111011111111111100000
+10101111101111110000000000010100
+10101111101001000000000000100000
+10101111101001010000000000100100
+10101111101000000000000000011000
+10101111101000000000000000011100
+10001111101011100000000000011100
+10001111101110000000000000011000
+00000001110011100000000000011001
+00100101110010000000000000000001
+00101001000000010000000001100101
+10101111101010000000000000011100
+00000000000000000111100000010010
+00000011000011111100100000100001
+00010100001000001111111111110111
+10101111101110010000000000011000
+00111100000001000001000000000000
+10001111101001010000000000011000
+00001100000100000000000011101100
+00100100100001000000010000110000
+10001111101111110000000000010100
+00100111101111010000000000100000
+00000011111000000000000000001000
+00000000000000000001000000100001
+
+
+    complete picture:
+
+
+
+    HLL        compiler      assembly       assembler     machine
+			     language                     language
+
+    width*length             mult f1, f2, f3             0101001...
+
+
+    compiler - translates HLL in assembly language (CS 536)
+
+    assembly language
+	give operation first with MNEUMONIC
+	   * operation (e.g., *)
+	   * operand types (e.g., integers)
+
+	give operand locations
+	   * often output/result operand first
+	   * often two input operands last
+
+    assembler - translates assembly language to machine language
+      * all 0' and 1's.
+      * for both instructions and data
+
+
+
+
+
+
+this course deals with the software aspects of assembly language,
+   assemblers and machine language.  It also deals with the
+   hardware aspects of what the computer does to execute programs.
+
+   It is an introduction to study of COMPUTER ARCHITECTURE:
+   the interface between hardware and software.
+
+
+
+about COMPUTER ARCHITECTURE
+   the relation between hardware (stuff you can touch)
+		   and  software (programs)
+
+
+   I can design a computer that has hardware which executes
+   programs in any programming language.
+     For example,  a computer that directly executes Pascal.
+
+
+   So, why don't we do just that?
+   1.  From experience (in the engineering community), we know
+   that the hardware that executes HLL programs directly
+   are slower than those that execute a more simple, basic
+   set of instructions.
+
+   2.  Usability of the machine.  Not everyone wants a Pascal
+   machine.  ANY high level language can be translated into
+   assembly language.
+
+
+
+What is the difference between a comptuer architecture and a
+particular machine?
+Machines:
+	A Dell PC with an Intel Pentium III
+	A Gateway PC with a Intel Pentium microprocessor
+	New PC with AMD K7 processor
+
+Architecure: IA-32 or x86 -- all run the same software
+	(Some special instructions for graphics are different)
+
+Architecture we will use is
+	MIPS R2000 (Kane, MIPS RISC Architecture book, on reserve)
+	representative of RISC architectures
+	popular, simpler than many architectures (e.g., x86).
+
+	Very similar to Alpha, the architecture of the fastest
+	microprocessors.  Also similar to Sparc and PowerPC.
+
+In this class, in whatever language you are writing programs,
+it will look like you have a machine that executes
+those programs directly.
+
+What we will do:
+
+
+
+   HLL ------> SAL ------> MAL ------> TAL
+
+
+we assume that you know a HLL.  From that, we can give you
+SAL.  Later in the semester, you will learn MAL and TAL.
+
+
+HLL, SAL, and MAL are each abstractions.
+Each defines a computer architecture.
+TAL happens to be a real (manufactured) architecture.
+
+
+
+basic computer operation
+------------------------
+
+simplified diagram of a computer system (hardware!)
+
+     
+
+     CPU -------+------- memory
+                |
+                |
+	       I/O
+
+
+CPU -- controls the running of programs
+       executes instructions
+       makes requests of the memory
+memory -- where programs and program variables are stored
+	  handles requests from the CPU
+
+
+interaction between CPU and memory.
+    to execute an instruction, the CPU must be able to
+    request 3 things from memory:
+
+    1. instruction                     FETCH
+    2. operand (variable) load         LOAD
+    3. operand (variable) store        STORE
+
+
+    the memory really only needs to be able to do 2 operations
+
+    1. read   (fetch or load)
+    2. write  (store)
+
+
+    where?       a label specifies a unique place in memory.
+		 a label is often identified as an address.
+
+
+    read:   CPU specifies an address and a read operation
+	    memory responds with the contents of the address
+
+    write:  CPU specifies an address, data to be stored, and
+	    a write operation
+	    memory responds by overwriting the data at the
+	    address specified
+
+
+Ancient Chinese Philosopher:  A journey of a 1000 miles begins
+			      with a single step
+
+For computers
+	journey -- execute program
+	step -- instruction
+		   make some progress
+		   specific next step--next instruction
+
+
+     discussion by a generic assembly language instruction example:
+	    mult   a, b, c
+
+
+     instructions and operands are stored in memory.
+     before they can be used by the CPU, they must
+     be fetched/loaded
+
+     CPU steps involved:
+       1. fetch the instruction
+	  questions for later: which instruction, what address
+       2. figure out what the instruction is -- DECODE
+	  IT IS A MULT INSTRUCTION
+	  this also reveals how many operands there are, since
+	  the number of operands is fixed for any given instruction
+	  THERE ARE 3 OPERANDS
+       3. load operand(s)
+          OPERANDS ARE b AND c
+       4. do the operation specified by the instruction
+	  MULTIPLY b AND c TOGETHER
+       5. store result(s) (if any)
+	  RESULT GOES INTO VARIABLE a
+
+     next step:
+     suppose we want to execute multiple instructions, like
+     a program
+
+     except for branch instructions, execute instructions sequentially
+
+     the CPU must keep track of which instruction is to be
+     executed
+
+     it does this by the use of an extra variable contained within
+     and maintained by the CPU, called a PROGRAM COUNTER, or PC
+     the contents of the variable is the address of the next
+     instruction to be executed.
+
+
+     modify the above CPU steps:
+       1.  fetch the instruction at the address given by the PC
+
+       added step.  modify the PC such that it contains the address of
+	       the next instruction to execute
+
+       2-5. the same as above
+
+
+  The added step could come at any time after step 1.  It is convenient
+  to think of it as step 2.
+
+  This set of steps works fine for all instructions EXCEPT
+  branch instructions.  
+
+
+
+
+  branch instructions:
+       example:   beq x, y, label
+
+
+  1. fetch instruction -- address given by PC
+  2. update PC
+  3. decode
+     (its a BEQ instruction)
+  4. fetch operands (x and y)
+  5. compare operands (for equality)
+  6. if equal, overwrite PC with address implied by 3rd operand (label)
+
+
+
+The CPU steps involved:
+     1. fetch the instruction
+     2. update PC
+     3. decode
+     4. load operand(s)
+     5. do the operation specified by the instruction
+     6. store result(s) (if any)
+
+
+notice that this series of steps gets repeated constantly --
+to make the computer useful, all that is needed is a way
+to give the PC an initial value (the first instruction of a program),
+and to have a way of knowing when the program is done, and the
+PC can be given the starting address of another program.
+
+
+the cycle of steps is very important -- it forms the basis for
+understanding how a computer operates.  The cycle of steps
+is termed the INSTRUCTION FETCH/EXECUTE CYCLE.
+
+
+Put it all Together: The Cardboard Computer
+
+	PC: I1
+
+	I1: add x1, x1, x2
+	I2: sub x3, x3, x4
+	I3: add x5, x5, x1
+	I4: bne x1, x3, I1
+	I5: HALT
+
+	X1:  0
+	X2: 10
+	X3: 30
+	X4:  5
+	X5:  0
+
+Master Control Loop:
+
+top:
+	Fetch Instr
+	Increment PC
+	Decode Instr
+	Fetch Operands
+	Execute Operation
+	Store Results
+	goto top
+
+
+
+Key concepts from chapter:
+
+Abstraction -- hides details
+   ML --> (TAL --> MAL --> SAL) --> HLL
+
+Computer architecture vs. implementation
+	x86 vs. 486
+
+Computer parts
+	CPU, Memory, I/O
+
+Instructions
+	one step at a time
+	stored in memory
+	operand in memory
+	must specify next instruction
+</pre>
+<HR> <!-- ------------------------------------------------ -->
+
+</BODY>
+</HTML>

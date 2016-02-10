@@ -1,0 +1,496 @@
+<HTML>
+<HEAD>
+<TITLE>CS/ECE 354 Spring 2000 (Section 2)</TITLE>
+</HEAD>
+
+<BODY> 
+
+<!--  { BEGIN COMMENT
+	I will comment this way.
+END COMMENT } -->
+ 
+<HR> <!-- ------------------------------------------------ -->
+<IMG align=middle width=152 height=62 border=0 ALIGN=TOP SRC="/pics/logo.small.gif" ALT="University of Wisconsin - Madison"></A>
+<H1>CS/ECE 354: Machine Organization and Programming</H1>
+<H2>Spring 2000</H2>
+<H2>David A. Wood's Section 2 </H2>
+<H2>Return to <a href="http://www.cs.wisc.edu/~cs354-1/cs354.html">CS/ECE 354 Home Page</a></H2>
+<HR> <!-- ------------------------------------------------ -->
+<H2>Approximate Lecture Notes for
+Chapter 6 -- Floating Point Arithmetic</H2>
+<P>
+Purpose: I provide these notes to students to:
+<UL>
+<LI> Allow better concentration in lecture by reducing note-taking pressure.
+<LI> Provide a study-aid after lecture.
+</UL>
+<P>
+Disclaimers:
+<UL>
+<LI> I will not follow these notes exactly in class.
+<LI> Students are responsible for what I say in class.
+<LI> Reading these notes is not a substitute for attending lecture.
+<LI> These notes probably contain errors.
+</UL>
+<P>
+Acknowledgement:
+<UL>
+<LI> These notes are derived from the notes of Karen Miller,
+sometimes with substantial and sometimes with trivial changes.
+</UL>
+<HR> <!-- ------------------------------------------------ -->
+<pre>
+
+arithmetic operations on floating point numbers consist of
+ addition, subtraction, multiplication and division
+
+the operations are done with algorithms similar to those used
+  on sign magnitude integers (because of the similarity of
+  representation) -- example, only add numbers of the same
+  sign.  If the numbers are of opposite sign, must do subtraction.
+
+
+ADDITION
+
+ example on decimal value given in scientific notation:
+
+       9.997 x 10 ** 2
+     + 4.631 x 10 ** -1
+     -----------------
+
+     first step:  align decimal points
+     second step:  add
+
+      
+       9.997    x 10 ** 2
+     + 0.004631 x 10 ** 2
+     --------------------
+      10.001631 x 10 ** 2
+
+     third step:  normalize the result
+
+	often already normalized
+	otherwise move only one digit
+
+     1.0001631 x 10 ** 3
+	
+    Example presumes infinite precision; with FP must round.
+
+
+ example on fl pt. value given in binary:
+
+ .25 =   0 01111101 00000000000000000000000
+
+ 100 =   0 10000101 10010000000000000000000
+
+ explicitly add hidden bit:
+		    |
+		    V
+ .25 =   0 01111101 1 00000000000000000000000
+
+ 100 =   0 10000101 1 10010000000000000000000
+
+
+    to add these fl. pt. representations,
+    step 1:  align radix points
+
+
+
+	 shifting the mantissa LEFT by 1 bit DECREASES THE EXPONENT by 1
+
+	 shifting the mantissa RIGHT by 1 bit INCREASES THE EXPONENT by 1
+
+	 we want to shift the mantissa right, because the bits that
+	 fall off the end should come from the least significant end
+	 of the mantissa
+
+       -> choose to shift the .25, since we want to increase it's exponent.
+	 01111101 - 127 = 125 - 127 = -2
+	 10000101 - 127 = (128 + 5) - (128 - 1) = 6
+
+	 shift smaller by 6 - (-2) = 8 places
+
+       -> note: can do subtraction directly since biases cancel
+       
+		    10000101
+		   -01111101
+		   ---------
+		    00001000   (8) places.
+
+            0 01111101 1 00000000000000000000000 (original value)
+            0 01111110 0 10000000000000000000000 (shifted 1 place)
+		       (note that hidden bit is shifted into msb of mantissa)
+            0 01111111 0 01000000000000000000000 (shifted 2 places)
+            0 10000000 0 00100000000000000000000 (shifted 3 places)
+            0 10000001 0 00010000000000000000000 (shifted 4 places)
+            0 10000010 0 00001000000000000000000 (shifted 5 places)
+            0 10000011 0 00000100000000000000000 (shifted 6 places)
+            0 10000100 0 00000010000000000000000 (shifted 7 places)
+            0 10000101 0 00000001000000000000000 (shifted 8 places)
+
+
+    step 2: add (don't forget the hidden bit for the 100)
+
+         0 10000101 1 10010000000000000000000  (100)
+      +  0 10000101 0 00000001000000000000000  (.25)
+      ---------------------------------------
+	 0 10000101 1 10010001000000000000000
+
+
+
+    step 3:  normalize the result (get the "hidden bit" to be a 1)
+
+	     it already is for this example.
+
+   result is
+	 0 10000101 10010001000000000000000
+
+
+Example with post-normalization:
+
+	s exp  h frtn
+	- ---  - ----
+	0 011  1 1100
+      + 0 011  1 1011
+	------------
+	0 011 11 0111
+	0 100  1 1011   1--> discarded
+
+
+
+
+SUBTRACTION
+
+     Like addition, but watch out when the numbers are close:
+
+       1.23456  x 10 ** 2
+     - 1.23455  x 10 ** 2
+     -----------------
+       0.00001  x 10 ** 2
+
+       1.00000  x 10 ** -3
+
+     A many-digit normalization is possible!
+
+     first step:  align decimal points
+
+     like addition as far as alignment of radix points
+
+     then the algorithm for subtraction of sign mag. numbers takes over.
+
+
+     before subtracting,
+       compare magnitudes (don't forget the hidden bit!)
+       change sign bit if order of operands is changed.
+
+     don't forget to normalize number afterward.
+
+	s exp  h frtn
+	- ---  - ----
+        0 011  1 1011	smaller
+      -	0 011  1 1101	bigger
+	------------
+	switch and match differecne negative
+
+	0 011  1 1101   bigger
+      - 0 011  1 1011	smaller
+	------------
+	1 011  0 0010
+	1 000  1 0000
+
+
+
+MULTIPLICATION
+
+ example on decimal values given in scientific notation:
+
+       3.0 x 10 ** 1
+     * 5.0 x 10 ** 2
+     -----------------
+
+     algorithm:  multiply mantissas
+		 add exponents
+		 normalize
+
+       3.0 x 10 ** 1
+     * 5.0 x 10 ** 2
+     -----------------
+      15.00 x 10 ** 3
+
+      1.50 x 10 ** 4	
+
+
+ example in binary:    use a mantissa that is only 4 bits so that
+		       I don't spend all day just doing the multiplication
+		       part.
+
+
+     0 10000100 0100
+   x 1 00111100 1100
+   -----------------
+
+
+   mantissa multiplication:           1.0100
+    (don't forget hidden bit)	    x 1.1100
+				    ------
+				     00000
+				    00000
+				   10100
+				  10100
+				 10100
+				 ---------
+				1000110000
+                      becomes   10.00110000
+
+
+
+    add exponents:       always add true exponents
+			 (otherwise the bias gets added in twice)
+
+     biased:
+     10000100
+   + 00111100
+   ----------
+
+
+   10000100         01111111  (switch the order of the subtraction,
+ - 01111111       - 00111100   so that we can get a negative value)
+ ----------       ----------
+   00000101         01000011
+   true exp         true exp
+     is 5.           is -67
+
+
+     add true exponents      5 + (-67) is -62.
+
+     re-bias exponent:     -62 + 127 is 65.
+	  unsigned representation for 65 is  01000001.
+
+
+
+     put the result back together (and add sign bit).
+
+
+     1 01000001  10.00110000
+
+
+     normalize the result:
+	 (moving the radix point one place to the left increases
+	  the exponent by 1.)
+
+     1 01000001  10.00110000
+       becomes
+     1 01000010  1.000110000
+
+
+     this is the value stored (not the hidden bit!):
+     1 01000010  000110000
+
+
+
+DIVISION
+
+   similar to multiplication.
+
+   true division:
+   do unsigned division on the mantissas (don't forget the hidden bit)
+   subtract TRUE exponents
+
+
+   The IEEE standard is very specific about how all this is done.
+   Unfortunately, the hardware to do all this is pretty slow.
+
+   Some comparisons of approximate times:
+       2's complement integer add      1 time unit
+       fl. pt add                      2 time units
+       fl. pt multiply                 2 time units
+       fl. pt. divide                  8 time units
+
+   There is a faster way to do division.  Its called 
+   division by reciprocal approximation.  It takes about the same
+   time as a fl. pt. multiply.  Unfortunately, the results are
+   not always the same as with true division.
+
+   Division by reciprocal approximation:
+
+
+      instead of doing     a / b
+
+      they do   a x  1/b.
+
+      figure out a reciprocal for b, and then use the fl. pt.
+      multiplication hardware.
+
+
+  example of a result that isn't the same as with true division.
+
+       true division:     3/3 = 1  (exactly)
+
+
+       reciprocal approx:   1/3 = .33333333
+	    
+			  3 x .33333333 =  .99999999, not 1
+
+    It is not always possible to get a perfectly accurate reciprocal.
+
+
+
+rounding
+--------
+arithmetic operations on fl. pt. values compute results that cannot
+be represented in the given amount of precision.  So, we must round
+results.
+
+There are MANY ways of rounding.  They each have "correct" uses, and
+exist for different reasons.  The goal in a computation is to have the
+computer round such that the end result is as "correct" as possible.
+There are even arguments as to what is really correct.
+
+lecture note:  a number line will help to get the message across.
+
+Round to Nearest (Even)
+-----------------------
+        6-9 up
+        5   to even to make unbiased
+        1-4 down
+        0   unchanged
+
+E.g.,
+     example:
+	 .7783      if 3 decimal places available, .778
+		    if 2 decimal places available, .78
+	1.5	    if 1			 , 2
+	2.5	    if 1			 , 2
+
+
+In binary
+        xxx.1....1...    up
+        xxx.100000000... to even
+        xxx.0....1...    down
+        xxx.000000000... unchanged
+
+Need infinite bits? No
+        guard -- One extra bit 
+		(the bit to the right of the radix point in example above)
+        sticky -- OR of all the bits to the right of the guard bit
+
+	Guard	Sticky	Round
+	-----	------	-----	
+	1	1	Up (add one in LSB position)
+	1	0	To even (Force LSB to zero)
+	0	1	Down (Truncate guard and sticky bits)
+	0	0	Unchanged
+
+Round to nearest is the default rounding method in IEEE Floating Point
+
+
+3 other methods of rounding:
+  round toward 0 --  also called truncation.
+     figure out how many bits (digits) are available.  Take that many
+     bits (digits) for the result and throw away the rest.
+     This has the effect of making the value represented closer
+     to 0.
+
+     example:
+	 .7783      if 3 decimal places available, .778
+		    if 2 decimal places available, .77
+
+  round toward + infinity --
+     regardless of the value, round towards +infinity.
+
+     example:
+	 1.23       if 2 decimal places, 1.3
+	-2.86       if 2 decimal places, -2.8
+
+  round toward - infinity --
+     regardless of the value, round towards -infinity.
+
+     example:
+	 1.23       if 2 decimal places, 1.2
+	-2.86       if 2 decimal places, -2.9
+
+Round to +/- infinity is sometimes used to check the robustness of the
+calculation.  It can also be used for a crude approximatation of interval 
+arithmetic, where one calculates error bars for results.
+
+
+
+overflow 
+----------------------
+Just as with integer arithmetic, floating point arithmetic operations
+can cause overflow.  Detection of overflow in fl. pt. comes by checking
+exponents before/during normalization.
+
+Once overflow has occurred, an infinity value can be represented and
+propagated through a calculation.
+
+1/0 = infinity
+
+infinity * x = infinity
+1/infinity = 0
+
+
+
+Underflow and Denormalized numbers
+--------------------
+
+Underflow occurs in fl. pt. representations when a number is
+too small (close to 0) to be represented.  (show number line!)
+
+if a fl. pt. value cannot be normalized
+    (getting a 1 just to the left of the radix point would cause
+     the exponent field to be all 0's)
+    then underflow occurs.
+
+IEEE Floating Point handles underflow with DENORMALIZED NUMBERS
+	i.e., The hidden bit to the left of the radix point is ZERO
+	This is indicated by E=0 and F<>0
+
+Denormalized value = (-1)^S * F/2^n * 2^(E-bias+1)
+                   = (-1)^S * F/2^23 * 2^-126
+
+Notice that the value of the true exponent is the same for the smallest
+normalized numbers as it is for denormalized numbers.
+
+ADVANCED TOPIC: Why denorms?
+Q: What is the maximum error in a number represented in the range 2^-125 to 2^-126?
+Q: With denorms, what is the maximum error in a number represented in the 
+   range 2^-126 to 0?
+Q: Without denorms, what is the maximum error in a number represented in the 
+   range 2^-126 to 0?
+
+Show number line: denormalized numbers equalize the error in the ranges 
+2^-125 to 2^-126 and 2^-126 to 0.  
+
+Without denorms, floating point FLUSHES TO ZERO, which results in loss of
+precision, and hence larger errors, near zero.
+
+With denorms, floating point provides GRADUAL UNDERFLOW
+
+Denormalized numbers are difficult to implement efficiently, and some systems
+trap to software to perform these operations.  
+
+NaNs
+------
+Recall NaNs represent Not A Number
+e.g., sqrt(-1) = NaN
+
+NaNs propagate through calculations
+NaN * x = NaN, including NaN * 0 = NaN
+1/NaN = NaN
+Any operation on a NaN produces a NaN.
+
+
+Final warning
+-------------
+
+Beware mixing small and large numbers in FP
+        (3.1415... + 6*10^22) - 6*10^22 != 3.1415... + (6*10^22 - 6*10^22)
+        Numerical analysis.
+
+</pre>
+<HR> <!-- ------------------------------------------------ -->
+
+</BODY>
+</HTML>
+

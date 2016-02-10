@@ -1,0 +1,881 @@
+<HTML>
+<HEAD>
+<TITLE>CS/ECE 354 Spring 2000 (Section 2)</TITLE>
+</HEAD>
+
+<BODY> 
+
+<!--  { BEGIN COMMENT
+	I will comment this way.
+END COMMENT } -->
+ 
+<HR> <!-- ------------------------------------------------ -->
+<IMG align=middle width=152 height=62 border=0 ALIGN=TOP SRC="/pics/logo.small.gif" ALT="University of Wisconsin - Madison"></A>
+<H1>CS/ECE 354: Machine Organization and Programming</H1>
+<H2>Spring 2000</H2>
+<H2>David A. Wood's Section 2 </H2>
+<H2>Return to <a href="http://www.cs.wisc.edu/~cs354-4/cs354.html">CS/ECE 354 Home Page</a></H2>
+<HR> <!-- ------------------------------------------------ -->
+<H2>Approximate Lecture Notes for
+Chapter 12 -- Interrupts and Exception Handling</H2>
+<P>
+Purpose: I provide these notes to students to:
+<UL>
+<LI> Allow better concentration in lecture by reducing note-taking pressure.
+<LI> Provide a study-aid after lecture.
+</UL>
+<P>
+Disclaimers:
+<UL>
+<LI> I will not follow these notes exactly in class.
+<LI> Students are responsible for what I say in class.
+<LI> Reading these notes is not a substitute for attending lecture.
+<LI> These notes probably contain errors.
+</UL>
+<P>
+Acknowledgement:
+<UL>
+<LI> These notes are derived from the notes of Karen Miller,
+sometimes with substantial and sometimes with trivial changes.
+</UL>
+<HR> <!-- ------------------------------------------------ -->
+<pre>
+
+
+For I/O
+	Why have SW repeatedly ask a device, "Are you ready?" (polling).
+	Instead have device tell SW, "I am ready!" (interrupt)
+
+
+Device needs HW wire into CPU.
+
+This wire must somehow influence SW.
+
+DRAW PICTURE -- SPEND CONSIDERABLE TIME MOTIVATING
+
+Interrupts
+----------
+Examples
+    I/O device
+	    change in status	<== we will concentrate on this
+	    error condition
+    processor problem
+	    thermal overide shutdown
+	    internal error detected
+    clock
+    ...
+
+Properties
+    they arrive asynchronously
+    can't communmicate with running program (no args or return values)
+    they are associated with various priorities
+
+Want to handle soon (interrupt latency)
+(Usually) want to resume program (may even be other user's I/O!)
+
+
+Traps
+-----
+Related to interrupts
+
+Examples
+    syscall	<== we will concentrate on this
+    illegal instruction
+    arithmetic overflow
+    lw from unaligned address
+    ...
+
+Properties
+    they arrive synchronously -- i.e. pertain to specific instruction
+    (get trap in same place if your re-run program)
+    they are associated with various priorities
+
+Must handle immediately
+(Usually) want to resume program
+
+
+Exception
+---------
+
+(People often incorrectly mix up the terms interrupt, trap and exception.)
+
+Mechanism used to handle both interrupts and traps
+	HW handles initial reaction
+	then invokes SW called an Exception Handler
+
+HW
+ 1. sets state giving cause of exception
+ 2. changes to kernel mode, saving the previous mode
+    in a hardware stack (3 levels deep) -- for dangerous work ahead
+ 3. disables further interrupts -- to prevent infinite loop
+ 4. saves current PC -- to able to resume previously-running program
+ 5. jumps to hardwired address 0x8000 0080.
+
+
+Exception Handler (.ktext beginning at 0x80000080)
+	Set flag to detect incorrect entry
+	(due to exception while in exception handler)
+	Saves some registers
+	Assertain exception type (MIPS: exception_code in Cause register)
+	(e.g., I/O interrupt or syscall)
+	Jump to specific exception handler
+
+	Handle specific exceptions
+
+	To resume program, jump to clean up routine
+	Restore registers
+	Reset flag (that detects incorrect entry)
+	Atomically
+		Restore previous mode
+		Reenable interrupts
+		Jump back to program (using EPC)
+
+
+Syscall handler (1 of 2 specfic exceptions we examine)
+
+	Change EPC to point to next instruction 
+	(to prevent infinite syscall loop)
+
+	Look at syscall number (MIPS: $2)
+	(e.g., putc is 11 and getc 12) 
+	Jump to specfic syscall handler
+
+
+putc handler (one of many syscall handlers)
+	Add char (from $4) to putqueue
+	Turn on display interrupts
+	Try to print a char	# note to me: DP_handler
+	Jump back to main exception handler
+
+getc handler
+	...
+
+
+
+External (I/O) interrupt handler (to me: HandleInt)
+	Which interrupt (interrupt field in Cause reg)
+	(for us: interrupt 0 is clock, 1 keyboard, 2 display)
+	Call specific interrupt handler (xxx, KB_handler, DP_handler)
+	Jump back to main exception handler
+
+DP_handler (print char if can)
+	(Re-)check display status (MIPS: memory-mapped)
+	If putqueue not empty, print char
+	Return to external interrupt handler
+
+Back to hardware...
+
+MIPS Exception Registers
+------------------------
+
+Show picture of CPU, CO, CI, Memory, I/O.
+
+Kernel Register 0
+	GPR $26 nicknamed $k0
+	Kernel can trash between any two user instructions
+
+Kernel Register 1
+	GPR $27 nicknamed $k1
+	Like $k0
+
+The rest are coprocessor 0 registers.
+
+To read  c0 reg $14 use:  mfc0 .., $14  (move from coprocessor 0)
+To write c0 reg $14 use:  mtc0 .., $14  (...  to   ...)
+
+
+Exception Program Counter (EPC)
+
+	Coprocessor 0 reg $14
+
+	PC of instruction causing exception 
+		loaded on an exception
+		"the return address"
+
+
+Cause Register
+
+	Coprocessor 0 reg $13
+
+	bits	size	field
+	----	----	-----
+	31..16  16	IGNORE
+	15..10	 6	interrupt
+	9..8	 2	software_interrupt
+	7..6	 2	ZERO
+	5..2	 4	exception_code
+	1..0	 2	ZERO
+
+	interrupt || software_interrupt give seven interrupt-pending bits
+
+	exception_codes
+	---------------
+	  0			external interrupt
+	  1-7			IGNORE
+	  8			syscall exception
+	  9-12			IGNORE
+	  13-15			RESERVED
+	       
+LSB HW interrupt is used for clock	interrupt[0] = cause[10]
+	then		     keyboard	interrupt[1] = cause[11]
+			     display	interrupt[2] = cause[12]
+
+Says what interrupts are pending.
+
+
+Status Register
+
+	Coprocessor 0 reg $12
+
+	bits	size	field
+	----	----	-----
+	31..16	16	IGNORE
+	15..10	 5	hw_interrupt_mask
+	9..8	 2	sw_interrupt_mask
+	7..6	 2	ZERO
+	5	 1	mode_old
+	4	 1	interrupt_enable_old
+	3	 1	mode_previous
+	2	 1	interrupt_enable_previous
+	1	 1	mode_current
+	0	 1	interrupt_enable_current
+
+
+Like w/ Cause:
+hw-interrupt is used for     clock	interrupt[0] = cause[10]
+	then		     keyboard	interrupt[1] = cause[11]
+			     display	interrupt[2] = cause[12]
+
+        ----ignore---- IIII IISS ZZEE EEZZ
+	mask    1 .. 1 1111 0111 1111 1111
+	0x        ffff	  f    7    f    f
+
+Want to disable keyboard interrupts (called "maskable interrupt")
+
+	mfc0	$5, $12
+	andi	$5, $5, 0xffffff7ff	# Turn off keyboard interrupts
+	mtc0	$5, $12
+
+See GetQueueFull
+
+
+Mode/interrupt_enable
+		mode_* = 0 ==> kernel
+		mode_* = 1 ==> user
+
+		interrupt_enable_* = 0 ==> interrupts disabled
+		interrupt_enable_* = 1 ==> interrupts ensabled
+
+	On exception (and in parallel):
+	   0 --> mode_current --> mode_previous --> mode_old
+	   0 --> interrupt_enable_current --> <similarly>
+
+	On instruction (return from exception) instruction:
+	   mode_current <-- mode_previous <-- mode_old <-- ??
+	   interrupt_enable_current <-- <similarly>
+
+	A three-level stack!
+
+
+Reference:
+
+%T MIPS R2000 RISC Architecture
+%A Gerry Kane
+%I Prentice-Hall
+%C Englewood Cliffs, NJ
+%D 1987
+
+See Chapter 5 
+pp. 1-12 (intro to exceptions), 
+p. 17 (external interrupts), and
+p. 21 (syscall)
+
+1987 edition is much cleaner than 1992 edition
+
+
+On Exception HW does:
+
+hardware does the following:
+ 1. sets state giving cause of exception
+    Cause register -- coprocessor C0, register 13
+
+      32 bit register, bits 6..2 (5 bits) specify the type
+      of the exception, called the ExcCode.
+
+      Page 316 gives the mapping of encodings to causes
+      examples:
+         00000  (0)  Interrupt
+         00100  (4)  load from an illegal address
+         01000  (8)  syscall instruction
+         01100  (12) arithmetic overflow
+
+ 2. changes to kernel mode, saving the previous mode -- for dangerous work ahead
+    in a hardware stack (3 levels deep)
+
+    The mode is saved in the Status register.
+    coprocessor C0, register 12
+
+    defined in the processor's architecture are 2 modes,
+       user -- the mode that user programs run under.
+               certain instructions are not available
+       kernel -- the operating system mode.  Allows the OS
+               to retain control over "vital" system aspects.
+               All instructions are available.
+
+ 3. disables further interrupts -- to prevent infinite loop
+ 4. saves current PC -- so able to resume previously-running program
+
+    coprocessor C0, register 14, called Exception Program counter.
+
+    Gives return address in user program. Where to return to
+    when done handling the exception.
+
+ 5. jumps to hardwired address 0x8000 0080.
+    This is where the exception handler code is.
+
+
+Before we do the exception hander...
+
+
+Jump Tables
+-----------
+
+A clever mechanism for doing something like a CASE statement.
+A jump to one of many locations.
+
+
+   keep a table of addresses (case1, case2, and case3):
+
+   JumpTable:  .word case0
+               .word case1
+               .word case2
+
+
+    sll  $8, $8, 2          # case number shifted left 2 bits
+                            # (need a word offset into table, not byte)
+    lw   $9, JumpTable($8)  # load address into $9
+    jr   $9                 # jump to address contained in $9
+
+    .
+    .
+    .
+
+ case0:   #code for case0 here
+    .
+    .
+    .
+ case1:   #code for case1 here
+    .
+    .
+    .
+ case2:   #code for case2 here
+
+
+  (Note that the cases don't have to go in any specific order.)
+
+
+
+Addressing mode:          label($rb)
+     Effective address is gotten by    label + ($rb)
+
+     label doesn't fit into 16 bit displacement field of load/store
+     instruction.
+
+    MAL->TAL synthesis of this must be something like:
+         la  $1, label
+         add $1, $1, $rb
+     then use 0($1) as addressing mode in load/store  instruction.
+
+
+
+
+GO OVER EXCEPTION HANDLERS LINE BY LINE
+
+Exception Handler from Goodman/Miller Chapter 12
+------------------------------------------------
+
+.\" From goodman@gouda.cs.wisc.edu Wed Apr 13 07:58:22 1994
+.\" Subject: Re:  chapter 12 exception handler
+.\" 
+.\" Sure.  Here's the code straight out of the book.  It's
+.\" troff, so there may be some minor errors -- extra backslashes --
+.\" in places.
+.\" 
+.sz -2
+.ft C
+.ls 1
+.nf
+# Assign addresses to labels
+        .eq    KeyboardData     0xbfff0000
+        .eq    KeyboardStatus   0xbfff0004
+        .eq    DisplayData      0xbfff0008
+        .eq    DisplayStatus    0xbfff000c
+        .eq    KeyboardData     20xbfff0010
+        .eq    KeyboardStatus   20xbfff0014
+        .eq    DisplayData      20xbfff0018
+        .eq    DisplayStatus    20xbfff001c
+        .eq    ClockStatus      0xbfff0020
+
+        .kdata
+flag:   .word    0      # flag is set to one if entering the kernel
+                        # has cause the loss of the user return address.
+                        # This flag will help to notice problems.
+                        # It will not prevent them.
+BadReentry:
+        .asciiz  "Bad re-entry into kernel\\nHalting\\n"
+
+tmpr1:  .word 0        # Temporary storage for register 1
+tmpr2:  .word 0        # Temporary storage for register 2
+tmpr4:  .word 0        # Temporary storage for register 4
+tmpr5:  .word 0        # Temporary storage for register 5
+tmpr6:  .word 0        # Temporary storage for register 6
+tmpr7:  .word 0        # Temporary storage for register 7
+tmpr31: .word 0        # Temporary storage for register 31
+
+
+        .ktext
+        .space  0x80    # Skip space so kernel starts at 0x80000080
+        add $k1, $1, $0 # Save register 1
+        lw $k0, flag    # Test for illegal re-entry.
+        beqz $k0, OK
+        la $4, BadReentry
+        j Panic
+
+OK:     li $k0, 1       # Set flag to (help) prevent illegal re-entry.
+        sw $k0, flag
+        sw $k1, tmpr1   # Save registers
+        sw $2, tmpr2
+        sw $4, tmpr4
+        sw $5, tmpr5
+        sw $6, tmpr6
+        sw $7, tmpr7
+        sw $31, tmpr31
+        mfc0 $k0, $13   # Get the Cause register
+        andi $k0, $k0, 0x3c  # Mask out the ExcCode bits in the from Cause
+        lw $k0, JumpTable($k0)  # Read address from jump table
+        jr $k0          # Jump to exception handler
+
+
+Return: lw $2, tmpr2    # Code to handle return to user
+        lw $4, tmpr4    # Restore registers
+        lw $5, tmpr5
+        lw $6, tmpr6
+        lw $7, tmpr7
+        lw $31, tmpr31
+        li $k1, 0       # Clear re-entry flag
+        sw $k1, flag
+        lw $k1, tmpr1   # Restore register 1
+        add $1, $k1, $0
+        mfc0 $k0, $14   # Get the EPC register
+        rfe             # Return from exception
+        jr $k0
+
+        .kdata
+PMess:  .asciiz "Panic:  "
+        .ktext          # Panic prints a message and quits
+
+Panic:  la $5, PMess
+PLoop1: lb $6, ($5)     # Read letter to print
+        beqz $6, PLoop3 # Done when we find a null
+PLoop2: lw $7, DisplayStatus
+        bgez $7, PLoop2 # loop until display is ready
+        sw $6, DisplayData   # output character
+        addi $5, $5, 1  # do next character
+        j PLoop1
+PLoop3: lb $6, ($4)     # Print message pointed to by $4
+        beqz $6, PCont  # Done when we find a null
+PLoop4: lw $7, DisplayStatus
+        bgez $7, PLoop4 # loop until display is ready
+        sw $6, DisplayData  # output character
+        addi $4, $4, 1  # do next character
+        j PLoop3
+PCont:  li $2, 0        # Clear re-entry warning
+        sw $2, flag
+        li $2, 13       # The quit_now syscall
+        syscall
+
+                        # This is a blocking busy wait print routine
+PrintString:            # It is used only to print errors.
+        lb $6, ($4)
+        beqz $6, PSCont
+PSLoop: lw $7, DisplayStatus
+        bgez $7, PSLoop
+        sw $6, DisplayData
+        addi $4, $4, 1
+        j PrintString
+PSCont: jr $31
+
+        .kdata
+        .align  2
+JumpTable:
+        .word HandleInt    # Interrupt
+        .word HandleMOD    # TLB modification exception
+        .word HandleTLBL   # TLB miss exception (load or fetch)
+        .word HandleTLBS   # TLB miss exception (store)
+        .word HandleAdEL   # Address error exception (load or fetch)
+        .word HandleAdES   # Address error exception (store)
+        .word HandleIBE    # Bus error exception (for a fetch)
+        .word HandleDBE    # Bus error exception (for a load or store)
+        .word HandleSys    # Syscall exception
+        .word HandleBp     # Breakpoint exception
+        .word HandleRI     # Reserved Instruction exception
+        .word HandleCpU    # Co-processor Unusable exception
+        .word HandleOvf    # Arithmetic overflow exception
+        .word HandleFPInexact  # Inexact floating point result
+        .word HandleDivideBy0  # Divide by 0
+        .word HandleFPOvf
+        .word HandleFPUnder
+        .word HandleReserved, HandleReserved, HandleReserved, HandleReserved
+        .word HandleReserved, HandleReserved, HandleReserved, HandleReserved
+        .word HandleReserved, HandleReserved, HandleReserved, HandleReserved
+        .word HandleReserved, HandleReserved, HandleReserved, HandleReserved
+
+        .kdata
+BadExp: .asciiz  "Unexpected exception (a bug in sim?)\\nHalting\\n"
+        .ktext
+HandleMOD:
+HandleTLBL:
+HandleTLBS:
+HandleBp:
+HandleReserved:
+        la $4, BadExp
+        j Panic
+
+        .kdata
+IntMess: .asciiz "Interrupt ignored\\n"
+        .ktext
+HandleInt:
+        jal DP_handler
+        jal KB_handler
+        lw $0, ClockStatus  #This line clears the clock interrupt.
+        j Return
+
+        .kdata
+AdEMess: .asciiz "Address error exception\\n"
+
+        .ktext
+HandleAdEL:
+HandleAdES:
+        la $4, AdEMess
+        jal PrintString
+        j Return
+
+        .kdata
+BEMess: .asciiz "Bus error exception\\n"
+        .ktext
+HandleDBE:
+HandleIBE:
+        la $4, BEMess
+        jal PrintString
+        j Return
+
+        .kdata
+SysMess: .asciiz "Illegal syscall number\\n"
+        .ktext
+HandleSys:
+        mfc0 $k1, $14    # Get the EPC register
+        addi $k1, $k1, 4 # Increment PC past syscall instruction
+        mtc0 $k1, $14    # Set the EPC register
+
+        lw $2, tmpr2     # Get the syscall number
+
+        li $4, 11        # Is it putc?
+        beq $2, $4, Putc
+
+        li $4, 4         # Is it puts?
+        beq $2, $4, Puts
+
+        li $4, 12        # Is it getc?
+        beq $2, $4, Getc
+
+        li $4, 10        # Is is exit?
+        beq $2, $4, Exit
+
+        la $4, SysMess   # Bad number, print message.
+        jal PrintString
+        j Return
+
+Exit:    jal DP_handler      # Empty the output queue
+         lw $5, hpqp
+         lw $6, tpqp
+         bne $5, $6, Exit
+
+         li $2, 0            # Clear re-entry warning
+         sw $2, flag
+
+         li $2, 13           # The call the quit_now syscall
+         syscall
+
+                             # PUTC
+        .kdata
+tmpc:   .word 0
+tmpr:   .word 0
+        .ktext
+Putc:   lw $4, tmpr4         # Load the character to print into $4
+        jal PutR4
+        j Return
+
+PutR4:  lw $6, hpqp          # Get head pointer for point queue
+        lw $5, tpqp          # Get tail pointer for point queue
+        addi $5, $5, 1       # Advance tail
+        andi $5, $5, 0xff
+        beq $5, $6, Full     # Check if full
+        sb $4, putqueue($5)  # Add to queue
+        sw $5, tpqp          # Save new tail pointer
+        mfc0 $5, $12         # Get the Status register
+        ori $5, 0x00005000   # Turn on display interrupts
+        mtc0 $5, $12         # Set the Status register
+        sw $31, tmpr         # Save return address
+        jal DP_handler       # Try to print
+        lw $31, tmpr         # Restore return address
+        jr $31
+
+Full:   sw $4, tmpc          # Save the character to print
+        sw $31, tmpr         # Save the return address
+        jal DP_handler       # Try to print
+        lw $4, tmpc          # Restore the character to print
+        lw $31, tmpr         # Restore the return address
+        j PutR4              # Cannot KB_handler!
+
+Puts:                        # PUTS
+        lw $7, tmpr4         # Get address of string
+PutsLoop:
+        lbu $4, ($7)         # Get a character
+        beq $4, $0, Return   # Check to see if we are done
+        jal PutR4            # Print that character
+        addi $7, $7, 1       # Move pointer
+        j PutsLoop           # Loop
+
+                             # GETC
+Getc:
+        mfc0 $5, $12         # Get the Status register
+        ori $5, 0x000000800  # Turn on keyboard interrupts
+        mtc0 $5, $12         # Set the Status register
+        lw $4, tgqp          # Get the tail get queue pointer
+        lw $5, hgqp          # Get the head get queue pointer
+        beq $4, $5, GotNone  # See if queue is empty
+        addi $5, $5, 1       # Advance the head pointer
+        andi $5, $5, 0xff
+        lb $2, getqueue($5)  # Get the character
+        sw $2, tmpr2
+        sw $5, hgqp
+        j Return
+GotNone:
+        jal DP_handler       # Keep output going.
+        jal KB_handler       # While waiting for next character
+        j Getc
+
+        .kdata
+RIMess: .asciiz "Reserved instruction exception\\n"
+        .ktext
+HandleRI:
+        la $4, RIMess
+        jal PrintString
+        j Return
+
+        .kdata
+CpUMess: .asciiz "Co-processor Unusable exception\\n"
+
+        .ktext
+HandleCpU:
+        la $4, CpUMess    # Print message about exception
+        jal PrintString
+        j Return
+
+        .kdata
+OvfMess: .asciiz "Integer Overflow exception\\n"
+
+        .ktext
+HandleOvf:
+        la $4, OvfMess     # Print message about exception
+        jal PrintString
+        j Return
+
+        .kdata
+FPIMess: .asciiz "Inexact floating point result exception\\n"
+        .ktext
+HandleFPInexact:
+        la $4, FPIMess     # Print message about exception
+        jal PrintString
+        j Return
+
+        .kdata
+DB0Mess: .asciiz "Divide by zero exception\\n"
+        .ktext
+HandleDivideBy0:
+        la $4, DB0Mess     # Print message about exception
+        jal PrintString
+        j Return
+
+        .kdata
+FPOvfMess: .asciiz "Floating point overflow exception\\n"
+        .ktext
+HandleFPOvf:
+        la $4, FPOvfMess   # Print message about exception
+        jal PrintString
+        j Return
+
+        .kdata
+FPUnderMess: .asciiz "Floating point underflow exception\\n"
+        .ktext
+HandleFPUnder:
+        la $4, FPUnderMess  # Print message about exception
+        jal PrintString
+        j Return
+
+
+        .kdata
+putqueue: .space 256
+        .align 2
+tpqp:   .word 0
+hpqp:   .word 0
+        .ktext
+DP_handler:
+        lw $4, DisplayStatus  # Get display status word
+        bgez $4, PutRet       # Return if not ready
+        lw $4, hpqp           # Get head put queue pointer
+        lw $5, tpqp           # Get tail put queue pointer
+        beq $4, $5, PutRet    # Is empty
+        addi $4, $4, 1        # Remove character from queue
+        andi $4, $4, 0xff
+        sw $4, hpqp           # Update the head pointer
+        lb $4, putqueue($4)   # Get the character to output
+        sw $4, DisplayData    # Output the character
+PutRet: jr $31                # Return to caller
+
+        .kdata
+getqueue: .space 256
+tgqp:   .word 0
+hgqp:   .word 0
+        .ktext
+KB_handler:
+        lw $4, KeyboardStatus    # Get keyboard status word
+        bgez $4, GetRet          # Return if not ready
+        lw $4, tgqp              # Get tail get queue pointer
+        lw $5, hgqp              # Get head get queue pointer
+        addi $4, $4, 1           # Increment tail
+        andi $4, $4, 0xff
+        beq $4, $5, GetQueueFull # Branch if queue is full
+        sw $4, tgqp              # Update tail pointer
+        lw $5, KeyboardData      # Get keyboard data
+        sb $5, getqueue($4)      # Store it in the queue
+        move $4, $5              # Move to $4 so it can be printed
+        j PutR4                  # PutR4 will do a "jr $31"
+GetRet: jr $31                   # Return to caller
+
+GetQueueFull:                    # Can't really do anything.
+                                 # Characters may be lost.
+        mfc0 $5, $12
+        andi $5, $5, 0xffffff7ff # Turn off keyboard interrupts
+        mtc0 $5, $12
+        jr $31
+
+        .text
+        .globl __start
+__start:
+        sw $0, flag             # Clear check for bad kernel re-entry
+        mfc0 $5, $12
+        ori $5, 0x00001c01      # Turn on keyboard interrupts
+        mtc0 $5, $12
+
+.fi
+.sp
+.ft P
+.ft B
+.sz +2
+Figure 12.4
+
+
+Different architectures do exception differently,
+but it is a variation on a common theme
+-------------------------------------------------
+
+	E.g., instead of jumping to specific address
+	jump to address specified in a special register
+	jump to address specified at a specific address (memory indirect)
+	let address by modified by a few bits of the cause
+	(hardware "vectors" interrupts)
+
+
+Multiple interrupts
+-------------------
+
+So far
+	run user program
+	interrupt
+	generation exception
+	exception handler deals with interrupt
+	resume user program
+
+Q: What happens if multiple interrupt (and traps) arrive simultaneously?
+
+A: Have priorities in HW / SW
+	Handle highest-priority interrupt first
+	("equal" priority interupts must be handled is some order)
+	Give higher priority
+		more serious (e.g., power failing)
+		can't wait long (e.g., rotating disk)
+
+Q: What happens if an interrupt arrives while an interrupt is being serviced?
+
+Poor A: Make it wait until done with first interrupt
+
+	But how do you prevent it from causing an exception?
+
+	May be a bad idea for higher priority interrupts
+
+Better A: Make (most of) exception handler re-entrant
+	Allow higher-priority exceptions
+
+Basic Idea
+	Initial exception disables all interrupts
+	Exception handler (EH) determines exception's priority
+	EH then saves important state that could be clobbered
+	if higher priority interrupt occurs (most important: EPC)
+	EH re-enables higher-priority interrupts
+	Higher-priority interrupts may or may not cause an exceptions
+	This EH eventually finishes
+
+For MIPS
+	Status register's interrupt_enable bit is reset by exception
+	(with current and previous moved to previous and old)
+	A "master circuit breaker"
+	Status register's 7b interrupt_mask field allows five levels
+	of HW and two SW to be masked (ignored)
+
+
+Processes and Multiprogramming
+------------------------------
+
+OS often has one exception handler called the "kernel"
+
+A program running is called a "process" (or task)
+
+A process's state is
+	its memory (include stack)
+	its regular registers (GPRs and FPRs)
+	its PC and other control registers
+	some OS memory (e.g., info and buffer for open files)
+
+On an exception, the CPU jumps into the kernel
+
+The kernel will eventually resume the user process
+
+If the user process ask of an I/O (disk read), the kernel schedules it,
+and then both often have nothing to for a long time (20 ms = 2M instructions)
+
+Why not run another user program?
+	Called multiprogramming or multitasking
+		
+To create the illusion of running processes concurrently,
+	Also (context) switch after a time quantum (e.g., 2 ms or
+	200K instructions)
+	Check on clock interrupts
+
+Multiprogramming on uniprocessor != multiprocessing on multiprocessor.
+</pre>
+<HR> <!-- ------------------------------------------------ -->
+
+</BODY>
+</HTML>
+

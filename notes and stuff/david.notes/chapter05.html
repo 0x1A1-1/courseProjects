@@ -1,0 +1,589 @@
+<HTML>
+<HEAD>
+<TITLE>CS/ECE 354 Spring 2000 (Section 2)</TITLE>
+</HEAD>
+
+<BODY> 
+
+<!--  { BEGIN COMMENT
+	I will comment this way.
+END COMMENT } -->
+ 
+<HR> <!-- ------------------------------------------------ -->
+<IMG align=middle width=152 height=62 border=0 ALIGN=TOP SRC="/pics/logo.small.gif" ALT="University of Wisconsin - Madison"></A>
+<H1>CS/ECE 354: Machine Organization and Programming</H1>
+<H2>Spring 2000</H2>
+<H2>David A. Wood's Section 2 </H2>
+<H2>Return to <a href="http://www.cs.wisc.edu/~cs354-1/cs354.html">CS/ECE 354 Home Page</a></H2>
+<HR> <!-- ------------------------------------------------ -->
+<H2>Approximate Lecture Notes for
+Chapter 5 -- Arithmetic and Logical Operations</H2>
+<P>
+Purpose: I provide these notes to students to:
+<UL>
+<LI> Allow better concentration in lecture by reducing note-taking pressure.
+<LI> Provide a study-aid after lecture.
+</UL>
+<P>
+Disclaimers:
+<UL>
+<LI> I will not follow these notes exactly in class.
+<LI> Students are responsible for what I say in class.
+<LI> Reading these notes is not a substitute for attending lecture.
+<LI> These notes probably contain errors.
+</UL>
+<P>
+Acknowledgement:
+<UL>
+<LI> These notes are derived from the notes of Karen Miller and
+Mark Hill, sometimes with substantial and sometimes with trivial changes.
+</UL>
+<HR> <!-- ------------------------------------------------ -->
+<pre>
+
+
+Operations we'll get to know (and love):
+
+    addition
+    subtraction
+    multiplication
+    division
+    logical ops
+    shifting
+
+--------
+ADDITION
+--------
+
+
+A LITTLE BIT ON ADDING
+----------------------
+  an overview.
+
+
+       a      0011
+      +b     +0001
+      --     -----
+     sum      0100
+
+
+  its really just like we do for decimal!
+    0 + 0 = 0
+    1 + 0 = 1
+    1 + 1 = 2  which is 10 in binary, sum is 1 and carry the 1.
+    1 + 1 + 1 = 3  sum is 0, and carry a 1.
+
+	carry in  a  b   sum  carry out
+	   0      0  0    0    0
+	   0      0  1    1    0
+	   0      1  0    1    0
+	   0      1  1    0    1
+	   1      0  0    1    0
+	   1      0  1    0    1
+	   1      1  0    0    1
+	   1      1  1    1    1
+
+
+Ignore overflow for now.
+
+Addition w/ unsigned
+--------------------
+
+  just like the simple addition given.
+
+  examples:
+
+      100001           00001010 (10)
+     +011101          +00001110 (14)
+     -------          ---------
+      111110           00011000 (24)
+
+      (ignoring overflow)
+
+
+
+Addition w/ 2SC
+---------------
+
+For non-negatives (0 and positives) ==> just like unsigned add
+
+
+Assume 5-bit and observe:
+
+
+    00011 (3)         101000  (-24)        111111 (-1)
+  + 11100 (-4)      + 010000  (16)       + 001000 (8)
+  ------------      --------             --------
+    11111 (-1)        111000  (-8)        1 000111 (7)
+
+    Ignore carry-outs (and overflow)
+
+
+Add w/ sign magnitude:
+---------------------
+
+  rules:
+    - add magnitudes only (do not carry into the sign bit)
+    - throw away any carry out of the msb of the magnitude
+    - add only integers of like sign ( + to +    or    - to -)
+    - sign of result is same as sign of the addends
+
+  examples:
+
+    0  0101 (5)        1  1010 (-10)
+  + 0  0011 (3)      + 1  0011 (-3)
+  ---------          ---------
+    0  1000 (8)        1  1101 (-13)
+
+
+    0  01011 (11)
+  + 1  01110 (-14)
+  ----------------
+  don't add! must do subtraction!
+
+Add w/ one's complement:
+-----------------------
+
+   by example
+
+
+    00111 (7)         111110 (-1)            11110 (-1)
+  + 00101 (5)       + 000010 (2)           + 11100 (-3)
+  -----------       ------------           ------------
+    01100 (12)      1 000000 (0) wrong!    1 11010 (-5) wrong
+			+  1                  +  1
+		      ----------             ----------
+		      000001 (1)             11011 (-4)
+
+
+   so it seems that if there is a carry out of the msb, then
+   the result will be off by 1, so add 1 again to get the correct
+   result.
+
+
+
+
+-----------
+SUBTRACTION
+-----------
+
+  general rules:
+    1 - 1 = 0
+    0 - 0 = 0
+    1 - 0 = 1
+   10 - 1 = 1
+    0 - 1 = borrow!
+
+But often we can do a - b as a + (-b)
+	i.e., replace substraction with additive inverse & addition
+
+
+Subtraction w/ 2SC
+------------------
+
+Don't bother use addition:
+
+       a - b  becomes   a + (-b)
+
+  - so, get the additive inverse of b, and do addition.
+
+    examples
+
+   10110 (-10)
+ - 00011 (3)    -->       00011
+ ------------               |
+			   \|/
+			  11100
+			+     1
+			-------
+			  11101 (-3)
+
+Apply to otherwise unused LSB carry in:
+
+     10110 (-10)
+   + 11101 (-3)
+   ------------
+  1  10011  (-13)
+  (throw away carry out)
+
+Actually use 1SC and apply 1 to otherwise unused LSB carry in:
+
+	 1 <------+
+     10110 (-10)  |
+   + 11100 <------+--- (-3)
+   ------------
+  1  10011  (-13)
+  (throw away carry out)
+
+
+Why use 2SC?  Can do a+b and a-b, with a positive or negative
+and b positive or negative with adders and inverters.
+
+
+
+Subtraction w/ unsigned
+-----------------------
+
+For n-bits use above 2SC method and overflow if negative
+
+      11100 (+28)
+    - 10110 (+22)
+    -------------
+
+==>
+
+	  1
+      11100 (+28)
+    + 01001 (-22 w/ carry above)
+    -------------
+      00110 (+6)
+
+
+
+Subtraction w/ sign magnitude
+-----------------------------
+
+
+sign magnitude:
+
+  - if the signs are the same, then  do subtraction
+  - if signs are different, then change the problem to addition
+  - compare magnitudes, then subtract smaller from larger
+  - if the order is switched, then switch the sign too.
+
+  - when the integers are of the opposite sign, then do
+	a - b    becomes   a + (-b)
+	a + b    becomes   a - (-b)
+
+
+     examples
+
+   0 00111 (7)             1 11000 (-24)
+ - 0 11000 (24)          - 1 00010 (-2)
+ --------------          --------------
+                           1 10110 (-22)
+do 0 11000 (24)
+ - 0 00111 (7)
+ --------------
+   1 10001 (-17)
+   (switch sign since the order of the subtraction was reversed)
+
+
+
+one's complement:
+
+     figure it out on your own
+
+
+
+
+
+
+
+
+more on integer arithmetic
+-------------------------
+
+
+OVERFLOW DETECTION IN ADDITION
+
+  unsigned -- when there is a carry out of the msb
+
+	   1000 (8)
+	  +1001 (9)
+	  -----
+	 1 0001 (1)
+
+  sign magnitude -- when there is a carry out of the msb of the magnitude
+
+	 1 1000 (-8)
+       + 1 1001 (-9)
+	  -----
+	 1 0001 (-1)  (carry out of msb of magnitude)
+
+  2's complement -- when the signs of the addends are the same, and the
+		    sign of the result is different
+
+
+	  0011 (3)
+	+ 0110 (6)
+	----------
+	  1001 (-7)   (note that a correct answer would be 9, but
+		       9 cannot be represented in 4 bit 2's complement)
+
+  a detail -- you will never get overflow when adding 2 numbers of
+	      opposite signs
+
+
+OVERFLOW DETECTION IN SUBTRACTION
+
+   unsigned -- if negative
+   sign magnitude -- never happen when doing subtraction
+   2's complement -- we never do subtraction, so use the addition rule
+      on the addition operation done.
+
+
+
+
+MULTIPLICATION of integers (non-negative)
+
+	  multiplicand
+	x   multiplier
+	--------------
+	       product
+
+	       0011 (+3)
+	     x 0110 (+6)
+	       ----
+	       0000
+	      0011
+	     0011
+	    0000
+	    -------
+	    0010010 (+18)
+
+     
+     0 x 0 = 0
+     0 x 1 = 0
+     1 x 0 = 0
+     1 x 1 = 1
+
+     -- longhand, it looks just like decimal
+
+     -- the result can require 2x as many bits as the larger multiplicand
+
+     For 2SC:
+
+     If negative multiplicand, just sign-extend it.
+
+     If negative multiplier, take 2SC of both multiplicand and multiplier
+     (-7 * -3 = 7 * 3;  7 * -3 = -7 * 3)
+
+     Easier than book's method.
+	2x as many bits (as the larger).  Then take the correct number
+	of result bits from the least significant portion of the result.
+
+
+
+	A simpler approach:  If multiplier negative, take 2SC of both
+
+ 
+    2's complement example:
+	
+	  0011 (3)
+	* 1011 (-5)
+	-----------
+	
+	            1101 (-3)
+	          * 0101 (+5)
+	        -------------
+	     11111111101
+	     0000000000
+	     111111101
+	  +  00000000
+	  -------------------
+	     11111110001 (-18)
+
+
+
+DIVISION of integers
+--------------------
+     unsigned only!
+
+     do example of 15 / 3         1111 / 011
+
+
+Logical operations
+------------------
+Operate on raw bits 
+	1 == true
+	0 == false
+
+
+	in1 in2		and  or	 nand   nor xor xnor (equal)
+	  0 0		 0   0    1	 1   0   1
+	  0 1		 0   1    1	 0   1   0
+	  1 0		 0   1    1	 0   1   0
+	  1 1		 1   1	  0      0   0   1
+
+    In Computer, done bitwise (in parallel for corresponding bits)
+
+
+                     X =  0011
+                     Y =  1010
+
+       X  AND  Y is       0010
+       X   OR  Y is       1011
+       X  NOR  Y is       0100
+       X  XOR  Y is       1001
+                etc.
+
+
+SAL LOGICAL INSTRUCTIONS
+
+
+   operate bitwise on 32 .words
+
+	not   x, y         x <-  NOT (y)
+	and   x, y, z      x <-  (y) AND (z)
+	or    x, y, z      x <-  (y) OR (z)
+	nor   x, y, z      x <-  (y) NOR (z)
+	nand  x, y, z      x <-  (y) NAND (z)
+	xor   x, y, z      x <-  (y) XOR (z)
+	xnor  x, y, z      x <-  (y) XNOR (z)
+
+
+
+Example:
+
+   a:	.word 0x00000003	# 0...0 0011
+   b:	.word 0x0000000a	# 0...0 1010
+   c:   .word
+   d:   .word
+
+   .text
+   and c,a,b			# 0...0 0010
+   or c,a,b			# 0...0 1011
+
+
+
+Example:
+
+   abcd:  .word	0x61626364
+   mask: .word	0x000000ff
+   tmp:	  .word 
+
+   .text
+   and tmp,abcd,mask
+   beq tmp,'d',found_d
+   ...
+
+Add:
+   mask2:  .word 0x0000ff00
+   ...
+   and tmp,abcd,mask
+   beq tmp,'c',found_c WRONG!  Need shift
+
+
+
+Shifts and Rotates
+------------------
+
+USE PICUTRES FROM pp.118-120
+
+	   
+  logical right - move bits to the right, same order
+	       - throw away the bit that pops off the lsb
+	       - introduce a 0 into the msb
+
+	       00110101
+
+	       00011010
+
+  logical left - move bits to the left, same order
+	       - throw away the bit that pops off the msb
+	       - introduce a 0 into the lsb
+
+
+	       00110101
+
+	       01101010
+
+
+  arithmetic right - move bits to the right, same order
+	       - throw away the bit that pops off the lsb
+	       - reproduce the original msb into the new msb 
+	       - another way of thinking about it:  shift the
+		 bits, and then do sign extension
+
+	       00110101        1100
+
+	       00011010        1110
+
+
+  arithmetic left - move bits to the left, same order
+	       - throw away the bit that pops off the msb
+	       - introduce a 0 into the lsb
+	       - SAME AS LOGICAL LEFT SHIFT!
+
+
+  rotate left - move bits to the left, same order
+	      - put the bit that pops off the msb into the lsb,
+		so no bits are thrown away or lost.
+
+	       00110101        1100
+
+	       01101010        1001
+
+
+  rotate right - move bits to the right, same order
+	      - put the bit that pops off the lsb into the msb,
+		so no bits are thrown away or lost.
+
+	       00110101        1100
+	       10011010        0110
+
+
+SAL SHIFT AND ROTATE INSTRUCTIONS
+
+	sll   x, y, value     x <- (y), logically left shifted by value bits
+	srl   x, y, value     x <- (y), logically right shifted by value bits
+	sra   x, y, value     x <- (y), arithmetically right shifted by
+					value bits
+	rol   x, y, value     x <- (y), rotated left by value bits
+	ror   x, y, value     x <- (y), rotated right by value bits
+
+the rules for doing the arithmetic operations vary depending
+on what representation is implied.
+
+
+Example:
+
+   abcd:  .word	0x61626364
+   mask2:  .word 0x0000ff00
+   tmp:	  .word 
+
+   .text
+   and tmp,abcd,mask2
+   srl tmp,tmp,8
+   beq tmp,'c',found_c
+
+
+
+
+
+Software / Hardware Trade Off
+-----------------------------
+
+Two implementations of integer multiply:
+
+	SW: Loop of add, masks, shifts (Figure 5.8 p. 132)
+
+	HW: Muliply hardware that does things directly
+
+SW
+	+ no extra hardware
+	- slow: once around loop per multiplier bit
+		(ok if multiply uncommon)
+
+HW	+ special logic -- may have opportunity cost
+	- fast (was 10 simple instrn times; now 2-4)
+
+Today
+	enough extra chip area may HW worthwhile
+
+
+
+Review
+-------
+    addition
+    subtraction
+    multiplication
+    division
+    logical ops
+    shifting
+</pre>
+<HR> <!-- ------------------------------------------------ -->
+
+</BODY>
+</HTML>

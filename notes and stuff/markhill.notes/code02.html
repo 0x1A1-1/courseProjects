@@ -1,0 +1,156 @@
+<!--#include virtual="style1.html" -->
+
+Code Examples from
+Chapter 2 -- SAL <!-- EDIT CHAPTER INFO -->
+
+<!--#include virtual="style2.html" -->
+
+Wednesday, August 29, 2001 <!-- EDIT LAST UPDATE DATE -->
+
+<!--#include virtual="style3.html" --><font face=Courier fixed" size=5><strong>
+
+PROGRAM EXAMPLE:
+----------------
+
+# this simple program adds up 2 integers and prints their sum and products.
+
+   .data
+
+ prompt1:  .asciiz "Enter an integer: "
+ prompt2:  .asciiz "Enter a second integer: "
+ linefeed: .byte '\n'
+ msg1:     .asciiz "The sum of "
+ msg2:     .asciiz " and "
+ msg3:     .asciiz " is "
+ msg4:     .asciiz "The product of "
+ int1:     .word  0
+ int2:     .word  0
+ sum:      .word
+ product:  .word
+
+
+
+
+   .text
+
+      # get the 2 integers from user
+           puts prompt1
+           get int1
+           put linefeed
+           puts prompt2
+           get int2
+           put linefeed
+
+      # calculate the sum and products
+           add sum, int1, int2
+           mul product, int1, int2
+	
+      # print out the sum and products
+           puts msg1
+           put int1
+           puts msg2
+           put int2
+           puts msg3
+           put sum
+           put linefeed
+
+           puts msg4
+           put int1
+           puts msg2
+           put int2
+           puts msg3
+           put product
+           put linefeed
+           done
+
+
+
+
+
+
+
+
+
+
+
+
+
+Another simple SAL example program (optional)
+----------------------------------
+
+# A SAL program to print out a multiplication table
+
+ .data
+start:    .word 0  # entered by user
+finish:   .word 0  # entered by user
+ii:       .word    # loop induction variable
+jj:       .word    # loop induction variable
+product:  .word
+prompt1:  .asciiz "Enter starting value: "
+prompt2:  .asciiz "Enter ending value: "
+newline:  .byte '\n'
+x_symbol: .byte 'X'
+equals:   .byte '='
+space:    .byte ' '
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ .text
+
+__start:    puts prompt1                # get user input
+            get  start
+            puts prompt2
+            get  finish
+
+
+            move ii, start
+for:        bgt  ii, finish, all_done   # nested for loop to print out
+            move jj, start              # the table
+nested:     bgt  jj, finish, next_iter
+            mul  product, ii, jj
+
+            # print one line of table
+            put  ii
+            put  space
+            put  x_symbol
+            put  space
+            put  jj
+            put  space
+            put  equals
+            put  space
+            put  product
+            put  newline
+
+            add  jj, jj, 1
+            b    nested
+next_iter:  add ii, ii, 1
+            put  newline
+            b    for
+
+all_done:   done
+
+
+<!--#include virtual="style4.html" -->

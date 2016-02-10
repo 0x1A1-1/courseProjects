@@ -1,0 +1,277 @@
+<!--#include virtual="style1.html" -->
+
+Code Examples from
+Chapter 8 -- Registers and MAL <!-- EDIT CHAPTER INFO -->
+
+<!--#include virtual="style2.html" -->
+
+Wednesday, August 29, 2001 <!-- EDIT LAST UPDATE DATE -->
+
+<!--#include virtual="style3.html" --> <font face=Courier fixed" size=5><strong>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Here's a sample MAL program.
+
+
+#  this simple MAL program reads in 2 characters, figures
+#  out which one is alphabetically first, and prints it out.
+
+
+#  register assignments
+#    8 --  the first character typed by the user
+#    9 --  the second character typed by the user
+#   10 --  temporary
+#   11 --  holds the value of the larger character
+#   13 --  the address of the newline character constant
+#   14 --  newline character (a constant)
+
+
+  .data
+newline:  .byte  '\n'
+
+  .text
+__start:      getc $8                       # get 2 characters
+              getc $9
+
+              la   $13, newline             # print out newline
+              lb   $14, ($13)
+              putc $14
+
+              sub  $10, $9, $8              # figure out which is larger
+              bgez $10, secondlarger
+              add  $11, $9, $0
+              b    printresult
+
+secondlarger: add  $11, $8, $0
+
+printresult:  putc $11
+end:
+              done
+
+
+
+
+
+
+
+
+Another MAL programming example  (SIMULATED)
+-------------------------------
+
+# a MAL program to print out the ? of a user-entered integer.
+
+ .data
+# prompts
+str1:       .asciiz   "Enter an integer: "
+str2:       .asciiz   "The result is  "
+str_error:  .asciiz   "\nInput error detected. Quitting.\n"
+newline:    .byte     '\n'
+
+# variables
+int_array:  .word 0:20     # array to hold integer for printing
+
+ .text
+
+__start:   la   $8, str1           # print prompt
+           puts $8
+
+           lb   $10, newline       # read characters and calculate
+           li   $11, 57            #   the integer represented
+           li   $12, 48
+           getc $9
+get_chars: beq  $9, $10, got_int   # newline char terminates loop
+           bgt  $9, $11, int_error
+           blt  $9, $12, int_error
+           sub  $13, $9, 48        # convert char to digit
+           mul  $14, $14, 10       # int = int * 10 + digit
+           add  $14, $14, $13
+           getc $9
+           b    get_chars
+
+int_error: la   $8, str_error
+           puts $8
+           j    end_program
+
+
+
+
+
+
+
+
+
+
+got_int:
+
+#  $14 -- the integer to be printed
+#  $15 -- base address of array holding the integer
+#  $16 -- running address of array element 
+#  $17 -- single digit of the integer
+#  $18 -- single character of the integer
+print_int: la $8, str2
+           puts $8
+
+           la   $15, int_array
+           move $16, $15
+more_digits: rem $17, $14, 10
+           sw  $17, ($16)
+	   add $16, $16, 4
+           div $14, $14, 10
+           bgtz $14, more_digits
+
+           sub $16, $16, 4
+           bge  $16, $15 more_chars   # test for result = 0
+           putc '0'
+           putc $10                   # print newline
+
+more_chars: lw  $18, ($16)
+           add  $18, $18, 48
+           putc $18
+           sub $16, $16, 4
+           bge  $16, $15, more_chars
+
+end_program: putc $10
+           done
+
+
+
+
+
+
+
+
+
+
+
+Extra MAL code examples
+-----------------------
+
+
+Problem:
+Write a MAL code fragment to initialize an array of
+100 integers.  Make each element -1.
+
+
+
+Solution:
+
+
+.data
+int_array:  .word  0:100
+
+.text
+
+        la   $8, int_array   # $8 is address of elements in array
+        li   $9, 1           # $9 is a counter
+        li   $10, 100        # $10 is the number of times to go thru loop
+        li   $11, -1         # $11 is the initial value to place in array
+
+loop:   bgt  $9, $10, done_loop
+        sw   $11, ($8)
+        add  $8, $8, 4
+        add  $9, $9, 1
+        b    loop
+
+done_loop:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Problem:
+Write a MAL code fragment to print out each character of
+a null terminated string.  Note that this is equivalent
+to the MAL code fragment
+   puts  string
+but does not use the puts instruction.
+
+
+
+Solution:
+
+.data
+string:   .asciiz  "hello, world.\n"
+
+.text
+
+       la   $8, string    # $8 is location of byte to be printed
+       lbu  $9, ($8)      # $9 contains character to be printed
+loop_top:
+       beq  $9, $0, string_done
+       putc $9
+       add  $8, $8, 1
+       lbu  $9, ($8)
+       b    loop_top
+
+string_done:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Problem:
+Write a MAL code fragment to add 1 to each element of
+an array of integers.
+
+
+Solution:
+
+# MAL code fragment
+.data
+arr:  .word  0:50  # 50 element array of integers
+
+.text
+
+       la  $10, arr    # $10 is address of an array element
+       li  $8, 0       # $8 is a loop counter (or array index)
+       li  $9, 50      # $9 is the ending value for loop counter
+loop:  beq $8, $9, done_loop
+       lw  $11, ($10)  # get an array element
+       add $11, $11, 1 
+       sw  $11, ($10)  # put element back
+       add $10, $10, 4 # update address
+       add $8, $8, 1   # update loop counter
+       b   loop
+done_loop:    # more code will go here
+
+<!--#include virtual="style4.html" -->

@@ -1,0 +1,708 @@
+2,5c2
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 3 - Number Systems</title>
+< </head>
+---
+> <!--#include virtual="style1.html" -->
+7,8c4,5
+< <BODY>
+< <h1> Chapter 3 -- Number Systems</h1>
+---
+> Lecture Notes for
+> Chapter 3 -- Number Systems <!-- EDIT CHAPTER INFO -->
+10c7
+< <pre>
+---
+> <!--#include virtual="style2.html" -->
+12,13c9
+< about number systems.
+< ---------------------
+---
+> Monday, September 17, 2001 <!-- EDIT LAST UPDATE DATE -->
+14a11
+> <!--#include virtual="style3.html" -->
+16,19c13,73
+< here's the decimal number system as an example:
+<      digits (or symbols) allowed: 0-9
+<      base (or radix):  10
+<      the order of the digits is significant
+---
+> </PRE><b>NOT YET UPDATED FOR FALL 2003</b><PRE>
+> 
+> 
+> Intro
+> -----
+> 
+> (Applies to Chapter 4 as well.)
+> 
+> In the beginning people represented numbers with: /
+> 	///////  is seven
+> 	/////// + ///// = ////////////
+> 
+> Later:
+> 	////\ // + ////\ = ////\ ////\ //
+> 	VII + V = VVII = XII
+> 
+> We use:
+> 	7 + 5 = 12 = 1*10 + 2 -- base ten -- because we have ten fingers
+> 
+> 
+> 
+> BIG CONCEPT (ignored in life but important for computers): 
+> 
+> Number representation vs. Number
+> 
+> There are many ways to "represent" a number (e.g., above)
+> 
+> Representation does not affect the result of an operation
+> 
+> 	XII + XXXIII = XLV
+> 	12 + 33 = 45
+> 
+> But representation affects difficulty
+> of computing result:
+> 
+> 	XXXIII
+>        *   XII
+>         ------
+> 	XXXIII
+>        XXXIII
+>       CCCXXX
+>       --------
+>       CCCXXXXXXXXXIIIIII
+>       CCCLXXXXVI
+>       CCCXCVI = 396
+> 
+> For computer we need to chose a representations that allows us
+> to build fast electronic circuits for computer (e.g., adding)
+> 
+> Since computer don't have fingers, they don't use base ten number
+> 
+> This chapter is a review of number systems
+> 
+> The next chapter applies the ideas to computers.
+> 
+> 
+> 
+> Representing positive integers: 1, 2, 3, ...
+> 
+> Big advance of humankind:  arabic numerals
+> "weighted position notation with base ten"
+25c79
+<         5 is the least significant symbol (it carries the least weight)
+---
+>      5 is the least significant symbol (it carries the least weight)
+26a81,82
+>      digits (or symbols) allowed: 0-9
+>      base (or radix):  10
+29,31c85
+< here's a binary number system:
+<      digits (symbols) allowed: 0, 1
+<      base (radix):  2
+---
+> A table (to be filled in as number systems introduced:
+33c87,93
+<      each binary digit is called a BIT
+---
+>   Base     Name         Digits                    Example
+>   ----     ----         ------                    -------
+>   ten      decimal      0 1 2 3 4 5 6 7 8 9       19
+>   two      binary       0 1                       10011
+>   eight    octal        0 1 2 3 4 5 6 7           23
+>   sixteen  hexadecimal  0 ... 9 a b c d e f       13
+>   B        base B       0 ... B-1
+35d94
+<      the order of the digits is significant
+37,40c96
+<      numbering of the digits
+< 	    msb           lsb
+< 	    n-1            0
+< 	where n is the number of digits in the number
+---
+> For computer binary number work great -- why? two-state devices
+42,43c98,100
+< 	  msb stands for most significant bit
+< 	  lsb stands for least significant bit
+---
+> here's a binary number system:
+>      digits (symbols) allowed: 0, 1
+>      base (radix):  2
+54,55c111,123
+<   Of interest:  most assembly languages have no way to represent
+<    binary values!
+---
+> 
+> 			21st C
+> 	system	e.g.	humans	computers
+> 	------	----	------	---------
+> 	roman	XVIII	bad	bad
+> 	arabic	18	good	bad
+> 	binary	100010	bad	good
+> 
+> Humans might multiply romans numerals by converting to arabic, multiplying
+> and converting back
+> 
+> Computer usually multiply arabic numerals by converting to binary, multiplying
+> and converting back
+57a126,127
+> Humans use octal or hex to read binary number (we'll see why when
+> we learn how to convert bases).
+80,84c150,152
+<      the order of the digits is significant
+< 
+<      hex   decimal   binary
+<      0       0        0000
+<      1       1        0001
+---
+>      hex   decimal
+>      0       0
+>      1       1
+88,94c156,169
+<      9       9        1001
+<      a       10       1010
+<      b       11       1011
+<      c       12       1100
+<      d       13       1101
+<      e       14       1110
+<      f       15       1111
+---
+>      9       9
+>      a       10
+>      b       11
+>      c       12
+>      d       13
+>      e       14
+>      f       15
+> 
+>      Why a-f?  Need six more symbols
+>      Could use heart, club, diamond, spade, square and triangle
+>      But a-f are on keyboard and it's easy to remember c is one bigger then b
+> 
+>      Note: English has a special symbol for twelve (not ten-ee-two)
+> 	   like twenty-three
+99c174
+< 	      163 (base 10)
+---
+> 	   163 (base 10)
+100a176,186
+>       3e8 (base 16) is really
+> 	   3 x 16**2 + e x 16**1  + 8 x 16**0
+> 	   3 x 256   + 14 x 16    + 8 x 1
+> 	    768      +   224      +   8
+> 	   1000 (base 10)
+> 
+>       100 (base 16) is really
+> 	   1 x 16**2 + 0 x 16**1  + 0 x 16**0
+> 	   1 x 256   + 0 x 16     + 0 x 1
+> 	    256      +   0        + 0
+> 	   256 (base 10)
+102,115d187
+< A common syntax used to represent hexadecimal values (in code)
+< is to place the symbols "0x" as a prefix to the value.
+< SAL and MAL do this.
+<   Example:   0x8d    is the hexadecimal value 8d (10001101 binary)
+< 
+< A second common syntax is to place a suffix of 'h' onto a value,
+< indicating that it is hexadecimal.
+<   Example:   8dh  (as above)
+<   Note that h is not a symbol used in hexadecimal, so it can indicate
+<   the representation used.  The Intel architectures do this in their
+<   assembly languages.  This representation is actually more time
+<   consuming (meaning the execution time of the code) to interpret,
+<   since the entire number must be read before it can be decided
+<   what number system is being used.
+119c191
+< Given all these examples, here's a set of formulas for the
+---
+> given all these examples, here's a set of formulas for the
+122c194
+<   Given an n-digit number (in weighted positional notation):
+---
+>   here's a number (in weighted positional notation):
+127,128c199
+<   the subscript gives us a numbering of the digits
+< 
+---
+>   given a base B, this is the decimal value
+130d200
+<   given a base b, this is the decimal value
+132,133c202
+< 
+< 	  the summation (from i=0 to i=n-1) of S  *  b^i
+---
+> 	  the summation (from i=0 to i=n-1) of S  x  B**i
+135c204
+< 
+---
+> 
+142,148c211
+<     just use the definition (summation) given above.
+< 
+<     134 (base 5)
+<     1 x 5**2  +  3 x 5**1  +  4 x 5**0
+<       25      +    15      +    4
+< 	         44 (base 10)
+< 
+---
+>     just use the definition give above.
+151,154c214
+< decimal --> another base
+<     one algorithm that works:
+<     Divide decimal value by the base until the quotient is 0.
+<     The remainders give the digits of the value.
+---
+> decimal --> binary
+156,157c216,218
+<     Note:  this algorithm works for decimal to ANY base.  Just
+<            change the base.
+---
+> Two ways:
+>    (1) divide decimal value by 2 until the value is 0 (see book)
+>    (2) know your powers of two and subtract
+159,166c220,222
+<     examples:
+< 	36 (base 10)    to base 2 (binary)
+< 	36/2 = 18  r=0  <-- lsb
+< 	18/2 =  9  r=0
+< 	 9/2 =  4  r=1
+< 	 4/2 =  2  r=0
+< 	 2/2 =  1  r=0
+< 	 1/2 =  0  r=1  <-- msb
+---
+> Method (2):
+> 	... 256	128  64	 32  16   8   4   2   1
+> 	      d   d   d   d   d   d   d   d   d
+168c224,226
+< 	 36 (base 10) == 100100 (base 2)
+---
+> E.g., 42
+> 	What is the biggest power of two that fits? 32
+> 	42-32 = 10
+169a228,229
+> 	What fits? 8
+> 	10-8 = 2
+171,175c231,232
+< 	14 (base 10)    to base 2 (binary)
+< 	14/2 =  7  r=0  <-- lsb
+< 	 7/2 =  3  r=1
+< 	 3/2 =  1  r=1
+< 	 1/2 =  0  r=1  <-- msb
+---
+> 	What fits? 2
+> 	2-2 = 0 done!
+177c234,237
+< 	 14 (base 10) == 1110 (base 2)
+---
+> 	one 32, one 8, one 2
+> 	one 32, zero 16, one 8, zero 4, one 2, zero 1
+> 	 1       0        1       0       1     0
+> 	 101010
+179,194d238
+< 
+< 	38 (base 10)    to base 3
+< 	38/3 = 12  r=2  <-- ls digit
+< 	12/3 =  4  r=0
+< 	 4/3 =  1  r=1
+< 	 1/3 =  0  r=1  <-- ms digit
+< 
+< 	 38 (base 10) == 1102 (base 3)
+< 
+< 
+<         100 (base 10)   to base 5
+<         100/5 = 20  r=0
+<          20/5 =  4  r=0
+<           4/5 =  0  r=4
+<        
+<           100 (base 10) = 400 (base 5)
+244d287
+<      example:
+246,247c289,290
+<       5   0   1
+<      101 000 001
+---
+> hex --> octal
+>      do it in 2 steps,       hex --> binary --> octal
+248a292,293
+> decimal --> hex
+>      do it in 2 steps,       decimal --> binary --> hex
+250,252c295,296
+< hex --> octal
+<      do it in 2 steps,       1. hex --> binary 
+<                              2. binary --> octal
+---
+> Explain why humans (make that computer scientists) use hex (or octal)
+> to read binary
+254c298,300
+< 
+---
+> 	10110010  !=  10010010
+> 	1011 0010     1001 0010
+> 	   b 2           9 2
+256,257c302
+< Where the bases are powers of a common value, this transformation
+< is easy (like binary, base 4, octal, hexadecimal)
+---
+> How many 1 bits in 178?   How in b2?  b has 3 + 2 has 1 = 4.
+259d303
+< Examples:
+261c305
+<   base 3 to base 9
+---
+> 
+263c307,308
+<      2100122 (base 3)
+---
+> On zero and negative integers
+> -----------------------------
+265,266c310
+<      One base 9 digit is substituted for each 2 base 3 digits.
+<      Why 2?  Answer: 3^2=9
+---
+> In any base b, zero is
+268,279c312,313
+<      base
+<       3   9
+<      -------
+<      00   0
+<      01   1
+<      02   2
+<      10   3
+<      11   4
+<      12   5
+<      20   6
+<      21   7
+<      22   8
+---
+>       ...  + 0 x b**3  + 0 x b**2  + 0 x b**1  + 0 x b**0
+> 		 0     +    0      +     0     +    0
+280a315
+> 		 0  (by convention only one zero)
+282c317
+<      2 10 01 22 (base 3)
+---
+> Negative integers
+284,285c319,320
+<      2  3  1  8 (base 9)   
+< 
+---
+> 	Most humans precede number with "-" (e.g., -2000)
+> 	(Accountant, however, use parentheses:  (2000)
+286a322
+> 	Called signed-magnitude
+288,289c324
+< on representing nonintegers
+< ---------------------------
+---
+>         e.g., -1000 into hex?
+291,295c326
+< what range of values is needed for calculations
+<      very large:     Avogadro's number 6.022 x 10 ** 23 atoms/mole
+< 		     mass of the earth 5.98 x 10 ** 24 kilograms
+< 		     speed of light    3.0 x 10 ** 8 meters/sec
+<      very small:     charge on an electron -1.60 x 10 ** (-19)
+---
+> 	1000  = 3 x 16**2 + e x 16**1  + 8 x 16**0
+296a328
+> 	==> -3e8
+297a330,331
+> 	Computers, well see in Chapter 4, want to do it
+> 	with just 0 and 1's, and not other symbols -,(,).
+299,301d332
+< scientific notation
+<     a way of representing rational numbers using integers
+<     (used commonly to represent nonintegers in computers)
+303,304c334,335
+<                                      exponent
+< 	    number =  mantissa x base
+---
+> On "decimals"
+> -------------
+305a337
+> 	What is 3.14159?
+307,310c339
+< 	mantissa == fraction == significand
+< 	base == radix
+< 	point is really called a radix point, for a number with
+< 	 a decimal base, its called a decimal point.
+---
+> 	3 x 10**0 + 1 x 10**-1 + 4 x 10**-2 + 1 x 10**-3 + 5 x 10**-4 + 9 x 10**-5
+312c341
+< 	all the constants given above are in scientific notation
+---
+> 	or
+313a343
+> 	3 x 10**0 + 1/10**1 + 4/10**2 + 1/10**3 + 5/10**4 + 9/10**5
+314a345,346
+> 	... +3 +2 +1 0 . -1 -2 -3 -4 -5 
+> 		     3 .  1  4  1  5  9
+316,319d347
+< normalization
+<   to keep a unique form for every representable noninteger, they
+<   are kept in NORMALIZED form.  A normalized number will follow the
+<   following rule:
+321c349,350
+< 	   1 <=  mantissa  <  base
+---
+>         S    S    S     .    S     S     S
+>          2    1    0	      -1    -2    -3
+323,324d351
+<   In this form, the radix point is always placed one place to
+<   the right of the first significant symbol (as above).
+326c353,354
+< 
+---
+> 	  the summation (i) of S  x  10**i
+>                                 i
+327a356
+> 	In base ten, called "decimal"
+329c358
+< on precision, accuracy, and significant digits
+---
+> 	Can do in any base
+331,332c360,361
+<    These terms are often used incorrectly or ignored.  They are
+<    important!
+---
+> 	  the summation (i) of S  x  b**i
+>                                 i
+334,347c363
+<    A measurement (in a scientific experiment) implies a certain
+<    amount of error, depending on equipment used.  Significant
+<    digits tell about that error.
+<    For example, a number given as
+<     3.6  really implies that this number is in the range of
+< 	 3.6 +- .05,   which is 3.55 to 3.65
+< 	 This is 2 significant digits.
+<     3.60 really implies that this number is in the range of
+< 	 3.6 +- .005,   which is 3.595 to 3.605
+< 	 This is 3 significant digits.
+<     
+<    So, the number of significant digits given in a number tells
+<    about how accurately the number is known. The larger the number
+<    of significant digits, the better the accuracy.
+---
+> 	E.g.,  3e.8f in hex is
+349,362c365,366
+<    Computers (or calculators, a more familiar machine) have a fixed
+<    precision.  No matter what accuracy of a number is known, they
+<    give lots of digits in a number.  They ignore how many significant
+<    digits are involved.
+<    For example, if you do the operation 1.2  x  2.2. given that
+<       each number has 2 significant digits, a correct answer is
+< 		  
+< 		  1.2
+< 		x 2.2
+< 		-----
+< 		   24
+< 		+ 24
+< 		-----
+< 		  264 --> 2.64  -->   2.6   or 2.6 +- .05
+---
+> 	3 * 16**1 + 14 * 16**0 + 8 * 16**-1 + 15*16**-2
+> 	  3*16    +    14      +    8/16    +  15/256 
+364,367c368,370
+<       a calculator will most likely give an answer of 2.640000000,
+<       which implies an accuracy much higher than possible.  The
+<       result given is just the highest precision that the calculator
+<       has.  It has no knowledge of accuracy -- only precision.
+---
+>                143
+> 	= 62 & ---
+> 	       256
+369c372,376
+< 
+---
+> 	E.g., binary 10.101
+> 
+> 	1 * 2**1 + 0 * 2**0 + 1 * 2**-1 + 0*2**-2 + 1*2**-3
+> 	2 + 0 + 1/2 + 0/4 + 1/8
+> 	2 5/8
+434,435c441,442
+<   examples:
+<           101.001 (octal) to decimal
+---
+>   example:
+>           101.001 (octal)
+440c447
+<           13.a6 (hexadecimal) to decimal
+---
+>           13.a6 (hexadecimal)
+446d452
+< EXAMPLE:  give 102.3 (base 5) in base 3
+448,477c454,597
+<   102 (base 5) to decimal:
+<     1 * 5^2 + 0 * 5^1 + 2 * 5^0
+<       25    +    0    +   2
+<       27 (base 10) = 102 (base 5)
+< 
+<    .3 (base 5) to decimal:
+<       .3 * 5^(-1)
+<        3/5, or .6 (decimal)
+<        .6 (base 10) = .3 (base 5)
+< 
+<     So, 102.3 (base 5) is 27.6 (decimal)
+< 
+<     27 (decimal)  to base 3
+<     27/3 = 9  r=0 <-- ls digit
+<      9/3 = 3    0
+<      3/3 = 1    0
+<      1/3 = 0    1              27 (base 10) = 1000 (base 3)
+< 
+<     .6 x 3 = 1.8    1 (ms fractional digit)
+<     .8 x 3 = 2.4    2
+<     .4 x 3 = 1.2    1
+<     .2 x 3 = 0.6    0
+<     .6 x 3  this repeats the 4 digits
+<                                ____
+<               .6 (base 10) =  .1210
+< 	      A bar over the top of the digits that repeat is a commonly
+< 	      used notation.
+<                              ____
+<      102.3 (base 5)  =  1000.1210 (base 3)
+< </pre>
+---
+> on representing nonintegers
+> ---------------------------
+> 
+> what range of values is needed for calculations
+>      very large:     Avogadro's number 6.022 x 10 ** 23 atoms/mole
+> 		     mass of the earth 5.98 x 10 ** 24 kilograms
+> 		     speed of light    3.0 x 10 ** 8 meters/sec
+>      very small:     charge on an electron -1.60 x 10 ** (-19)
+> 
+> 
+> 
+> scientific notation
+>     a way of representing rational numbers using integers
+>     (used commonly to represent nonintegers in computers)
+> 
+>                                      exponent
+> 	    number =  mantissa x base
+> 	
+> 
+> 	mantissa == fraction == significand
+> 	base == radix
+> 	point is really called a radix point, for a number with
+> 	 a decimal base, its called a decimal point.
+> 
+> 	all the constants given above are in scientific notation
+> 
+> 
+> 
+> normalization
+>   to keep a unique form for every representable noninteger, they
+>   are kept in NORMAL form.  A number in normal form will follow the
+>   following rule:
+> 
+> 	   1 <=  mantissa  <  base
+>   
+>   In the normal form the radix point is always placed one place to
+>   the right of the first significant symbol (as above).
+> 
+> 
+> 
+> On accuracy, significant digits and precision
+> ---------------------------------------------
+> 
+>    These terms are often used incorrectly or ignored.  They are
+>    important!
+> 
+>    Accuracy:
+> 
+>    A measurement (in a scientific experiment) implies a certain
+>    amount of error, depending on equipment used.  
+> 
+>    If measure the distance between two building with
+> 
+>    advanced instrument:	106.1345 meters +/- 0.003 (3 mm)
+>    by walking:		 98 meters +/- 15 meters
+> 
+>    "accuracy" is the difference between your measurement and
+>    the true, usually unknown, value.
+> 
+>    the +/- says you expect the true value to be within the interval
+> 
+>    98 meters +/- 15 meters ==> [83, 113] meters
+> 
+>    say you also measured the distance from the 1st building to
+>    the sidewalk of the 2nd:  72 +/- 8 = [64, 80]
+> 
+>    say you want the distance from the sidewalk to the 2nd building
+> 
+>    subtracting yields: [83, 113] - [64, 80] = [83-80, 113-64]
+> 		= [3, 49] = 26 +/- 23  bogus!!!
+> 
+>    need to measure distance from sidewalk to 2nd bldg directly!!
+> 
+>    would be okay with advanced instrument
+> 
+>    
+>    
+>    Significant Digits:
+>    
+>    they tell about accuracy by approx interval.
+> 
+>    For example, a number given as
+>     3.6  really implies that this number is in the range of
+> 	 3.6 +- 0.05,   which is 3.55 to 3.65
+> 	 This is 2 significant digits.
+>     3.60 really implies that this number is in the range of
+> 	 3.6 +- 0.005,   which is 3.595 to 3.605
+> 	 This is 3 significant digits.
+> 
+>     What is the intervale for 3.?
+>     
+>    So, the number of significant digits given in a number tells
+>    about how accurately the number is known. The larger the number
+>    of significant digits, the better the accuracy.
+> 
+> 
+> 
+>    Precision:
+> 
+>    Computers (or calculators, a more familiar machine) have a fixed
+>    precision.  No matter what accuracy of a number is known, they
+>    give lots of digits in an number.  They ignore how many significant
+>    digits are involved.
+>    For example, if you do the operation 1.2  x  2.2. given that
+>       each number has 2 significant digits, a correct answer is
+> 		  
+> 		  1.2
+> 		x 2.2
+> 		-----
+> 		   24
+> 		+ 24
+> 		-----
+> 		  264 --> 2.64  -->   2.6   or 2.6 +- .05
+> 
+>       a calculator will most likely give an answer of 2.640000000,
+>       which implies an accuracy much higher than possible.  The
+>       result given is just the highest precision that the calculator
+>       has.  It has no knowledge of accuracy -- only precision.
+> 
+>       Area of a circle is pi x radius**2
+>       pi = 3.14159265...
+>       radius = 8.3 meters
+> 
+>       Area = 81.91771634183238675...  WRONG!
+>       Area = 82 meters 
+> 
+> 
+>    Recall building and sidewalk example
+> 
+>    Computers make the problem even worse, because they can do millions
+>    of calculations, where
+> 
+>    (1) they can do millions of calculations and you don't look at or
+>    think about each calculation
+> 
+>    (2) the computers can print results with many digits -- but precision
+>    does not imply accuracy
+> 
+>    (3) you believe a computer's result too much -- they don't make
+>    mistakes, right?
+> 
+>    A whole sub-field of CS:  Numerical analysis.
+> 
+> <!--#include virtual="style4.html" -->

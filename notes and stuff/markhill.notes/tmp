@@ -1,0 +1,74 @@
+Software/Cache Performance
+--------------------------
+
+In many future cases, the performance of your program will be 
+dominated by cache misses.  Thus, if you you can cut the
+number of misses in half, even if you do more of other
+operations, you can go about twice as fast.
+
+Consider a very large two-dimensional array A[1K,100K] stored in 
+row-major order:  
+
+   A[1,1]
+   A[1,2]
+   A[1,3]
+   ...,
+   A[1,100K]
+   A[2,1]
+   A[2,2]
+   A[2,3]
+   ...,
+   A[2,100K]
+   ...
+   A[1K,1]
+   A[1K,2]
+   A[1K,3]
+   ...
+   A[1K,100K]
+
+   Total Array Size = 1K * 100K * 4 bytes = 400Mbytes > larger than most caches
+   Column Size = 100K * 4 bytes = 400Kbytes
+
+Consider two programs where the variables that start with the letter "r" 
+are allocated to registers:
+
+
+ROW-WISE:
+
+  rsum = 0.0
+
+     do rj = 1 to 100K {
+
+	    do ri = 1 to 1K {
+
+			rsum = rsum + A[ri,rj]
+  }}
+
+
+COLUMN-WISE:
+
+  rsum = 0.0
+
+     do ri = 1 to 1K {
+
+	    do rj = 1 to 100K {
+
+			rsum = rsum + A[ri,rj]
+  }}
+
+About how many misses in a 2Mbyte cache of 64byte blocks (lines)?
+
+ROW-WISE:
+    Reference 1st word in block for each of 100K blocks (6400K bytes)
+    Reference 2nd word in block for each of 100K blocks
+    ...
+    Every reference misses!
+    #Misses = 100K * 1K = 100M!!!!
+
+
+COLUMN-WISE:  
+
+    Miss on first word of block and hit on next 15
+    #Misses = 100K * 1K / 16 = 6 M !!!
+
+Cache behavior matters!

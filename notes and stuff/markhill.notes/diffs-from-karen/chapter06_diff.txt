@@ -1,0 +1,704 @@
+1,4c1
+< <html>
+< <head>
+< <title> Lecture notes - Chapter 6 - Floating Point Arithmetic</title>
+< </head>
+---
+> <!--#include virtual="style1.html" -->
+6,7c3,4
+< <BODY>
+< <h1> Chapter 6 -- floating point arithmetic</h1>
+---
+> Lecture Notes for
+> Chapter 6 -- Floating Point Arithmetic <!-- EDIT CHAPTER INFO -->
+9c6
+< <pre>
+---
+> <!--#include virtual="style2.html" -->
+10a8
+> <!--#echo var="LAST_MODIFIED" -->
+11a10
+> <!--#include virtual="style3.html" -->
+13,14c12,108
+< about FLOATING POINT ARITHMETIC
+< -------------------------------
+---
+> </PRE><b>NOT YET UPDATED FOR FALL 2003</b><PRE>
+> 
+> 
+> REVIEW OF FLOATING POINT NUMBERS (From Chapter 4)
+> --------------------------------
+> 
+> 
+> Scientific Notation
+> 
+>      -1234.567
+>                    3
+>      -1.234567 * 10
+> 
+> 
+> Binary
+> 
+>      64.2
+>      1000000.0011001100110011. . .
+>                               6
+>      1.00000000110011. . . x 2	
+>                                110
+>      1.00000000110011. . . x 10
+> 
+>          s        e
+>      (-1)  x f x 2
+> 
+>      s = 0
+>      f = 1.00000000110011. . .
+>      e = 110
+> 
+> 
+> IEEE Single-Precision (32 bits)
+> 
+> 	 -------------------
+> 	 | S |   E   |  F  |
+> 	 -------------------
+> 
+>     S is one bit representing the sign of the number
+>     E is an 8 bit biased integer representing the exponent
+>     F is an unsigned integer
+> 
+> 
+>     S = s
+>     E = e + 127
+>                  23
+>     F = (f-1) x 2
+> 
+>     S = 0
+>     E = 6 + 127 = 133 = 10000101
+>                                        23
+>     F = (1.00000000110011. . . - 1) x 2
+> 
+>                                   23
+>     F =  0.00000000110011. . . x 2
+>     F =    00000000110011001100110
+> 
+>     S     E               F
+>     0  10000101  00000000110011001100110
+> 
+>     the values are often given in hex, so here it is
+> 
+>     0100 0010 1000 0000 0110 0110 0110 0110
+> 
+>   0x   4    2    8    0    6    6    6    6
+> 
+>     0x42806666
+> 
+> 
+> From IEEE Single-Precision back to a number
+> 
+>     S     E               F
+>     0  10000101  00000000110011001100110
+> 
+>     s = S
+>     e = E - 127
+>     f = F/2  + 1
+> 
+>     s = 0
+>     e = 133 - 127 = 6 = 110
+> 
+> 				          23
+>     f =  (00000000110011001100110 + 1) / 2
+> 
+>                                      -23
+>     f =  100000000110011001100110 x 2
+> 
+>     f = 1.00000000110011001100110
+> 
+>         s        e
+>     (-1)  x f x 2
+>                                110
+>     1.00000000110011. . . x 10
+> 
+> 
+> 
+> And now onto Chapter 6 ...
+> --------------------------
+29,30c123,124
+<        3.25 x 10 ** 3
+<      + 2.63 x 10 ** -1
+---
+>        9.997 x 10 ** 2
+>      + 4.631 x 10 ** -1
+37,38c131,132
+<        3.25     x 10 ** 3
+<      + 0.000263 x 10 ** 3
+---
+>        9.997    x 10 ** 2
+>      + 0.004631 x 10 ** 2
+40,41c134
+<        3.250263 x 10 ** 3
+< 	(presumes use of infinite precision, without regard for accuracy)
+---
+>       10.001631 x 10 ** 2
+43,44c136,143
+<      third step:  normalize the result (already normalized!)
+< 
+---
+>      third step:  normalize the result
+> 
+> 	often already normalized
+> 	otherwise move only one digit
+> 
+>      1.0001631 x 10 ** 3
+> 	
+>     Example presumes infinite precision; with FP must round.
+49d147
+<          S    E       F
+53a152,158
+>  explicitly add hidden bit:
+> 		    |
+> 		    V
+>  .25 =   0 01111101 1 00000000000000000000000
+> 
+>  100 =   0 10000101 1 10010000000000000000000
+> 
+57a163
+> 
+68c174,181
+<        -> shift by  10000101
+---
+> 	 01111101 - 127 = 125 - 127 = -2
+> 	 10000101 - 127 = (128 + 5) - (128 - 1) = 6
+> 
+> 	 shift smaller by 6 - (-2) = 8 places
+> 
+>        -> note: can do subtraction directly since biases cancel
+>        
+> 		    10000101
+73,75c186,187
+<        with hidden bit and radix point shown, for clarity:
+<             0 01111101 1.00000000000000000000000 (original value)
+<             0 01111110 0.10000000000000000000000 (shifted 1 place)
+---
+>             0 01111101 1 00000000000000000000000 (original value)
+>             0 01111110 0 10000000000000000000000 (shifted 1 place)
+77,83c189,195
+<             0 01111111 0.01000000000000000000000 (shifted 2 places)
+<             0 10000000 0.00100000000000000000000 (shifted 3 places)
+<             0 10000001 0.00010000000000000000000 (shifted 4 places)
+<             0 10000010 0.00001000000000000000000 (shifted 5 places)
+<             0 10000011 0.00000100000000000000000 (shifted 6 places)
+<             0 10000100 0.00000010000000000000000 (shifted 7 places)
+<             0 10000101 0.00000001000000000000000 (shifted 8 places)
+---
+>             0 01111111 0 01000000000000000000000 (shifted 2 places)
+>             0 10000000 0 00100000000000000000000 (shifted 3 places)
+>             0 10000001 0 00010000000000000000000 (shifted 4 places)
+>             0 10000010 0 00001000000000000000000 (shifted 5 places)
+>             0 10000011 0 00000100000000000000000 (shifted 6 places)
+>             0 10000100 0 00000010000000000000000 (shifted 7 places)
+>             0 10000101 0 00000001000000000000000 (shifted 8 places)
+88,89c200,201
+<          0 10000101 1.10010000000000000000000  (100)
+<       +  0 10000101 0.00000001000000000000000  (.25)
+---
+>          0 10000101 1 10010000000000000000000  (100)
+>       +  0 10000101 0 00000001000000000000000  (.25)
+91c203
+< 	 0 10000101 1.10010001000000000000000
+---
+> 	 0 10000101 1 10010001000000000000000
+101d212
+< 
+103,106d213
+<    suppose that the result of an addition of aligned mantissas
+<    gives
+< 	 10.11110000000000000000000
+<    and the exponent to go with this is 10000000.
+107a215
+> Example with post-normalization:
+109c217,223
+<    We must put the mantissa back in the normalized form.
+---
+> 	s exp  h frtn
+> 	- ---  - ----
+> 	0 011  1 1100
+>       + 0 011  1 1011
+> 	------------
+> 	0 011 11 0111
+> 	0 100  1 1011   1--> discarded
+111,116d224
+<    Shift the mantissa to the right by one place, and increase the
+<    exponent by 1.
+< 
+<    The exponent and mantissa become
+<       10000001   1.01111000000000000000000    0 (1 bit is lost off the least
+<                                                 significant end)
+121a230,242
+>      Like addition, but watch out when the numbers are close:
+> 
+>        1.23456  x 10 ** 2
+>      - 1.23455  x 10 ** 2
+>      -----------------
+>        0.00001  x 10 ** 2
+> 
+>        1.00000  x 10 ** -3
+> 
+>      A many-digit normalization is possible!
+> 
+>      first step:  align decimal points
+> 
+133,163c254,265
+<      EXAMPLE:
+< 
+< 	 0 10000001 10010001000000000000000 (the representations)
+<        - 0 10000000 11100000000000000000000
+<       ---------------------------------------
+< 
+< 
+<     step 1:  align radix points
+<     
+<          0 10000000 11100000000000000000000
+< 	 becomes
+<          0 10000001 11110000000000000000000 (notice hidden bit shifted in)
+< 
+< 
+< 	 0 10000001 1.10010001000000000000000
+<        - 0 10000001 0.11110000000000000000000
+<       ---------------------------------------
+< 
+<     step 2:  subtract mantissa
+< 
+< 	  1.10010001000000000000000
+<        -  0.11110000000000000000000
+<       -------------------------------
+<           0.10100001000000000000000
+< 
+<     step 3:  put result in normalized form
+< 
+<         Shift mantissa left by 1 place, implying a subtraction of 1 from
+< 	the exponent.
+< 
+<          0 10000000 01000010000000000000000
+---
+> 	s exp  h frtn
+> 	- ---  - ----
+>         0 011  1 1011	smaller
+>       -	0 011  1 1101	bigger
+> 	------------
+> 	switch and match difference negative
+> 
+> 	0 011  1 1101   bigger
+>       - 0 011  1 1011	smaller
+> 	------------
+> 	1 011  0 0010
+> 	1 000  1 0000
+172c274
+<      + 0.5 x 10 ** 2
+---
+>      * 5.0 x 10 ** 2
+175c277
+<      algorithm:  multiply mantissas (use unsigned multiplication)
+---
+>      algorithm:  multiply mantissas
+176a279
+> 		 normalize
+179c282
+<      + 0.5 x 10 ** 2
+---
+>      * 5.0 x 10 ** 2
+181c284
+<       1.50 x 10 ** 3
+---
+>       15.00 x 10 ** 3
+182a286
+>       1.50 x 10 ** 4	
+184c288,291
+<  example in binary:    use a mantissa that is only 4 bits as an example
+---
+> 
+>  example in binary:    use a mantissa that is only 4 bits so that
+> 		       I don't spend all day just doing the multiplication
+> 		       part.
+192,195d298
+<    The multiplication is unsigned multiplication (NOT two's complement),
+<    so, make sure that all bits are included in the answer.  Do NOT
+<    do any sign extension!
+< 
+242,243c345
+< 	  the exponent by 1. Can also think of this as a logical
+< 	  right shift.)
+---
+> 	  the exponent by 1.)
+268,276c370,376
+<        2's complement integer add      1 time unit
+<        fl. pt add                      4 time units
+<        fl. pt multiply                 6 time units
+<        fl. pt. divide                 13 time units
+< 
+<    There is a faster way to do division.  Its called 
+<    division by reciprocal approximation.  It takes about the same
+<    time as a fl. pt. multiply.  Unfortunately, the results are
+<    not always correct.
+---
+>        2's complement integer add      1 cycle
+>        fl. pt add                      1-2 cycles
+>        fl. pt multiply                 1-2 cycles
+>        fl. pt. divide                  4-8 cycles?
+> 
+> 
+> Some machines (e.g., Cray-1) used to do reciprocal approximation.
+287a388
+>       fast, but not completely correct.
+289,299d389
+<   example of a result that isn't the same as with true division.
+< 
+<        true division:     3/3 = 1  (exactly)
+< 
+< 
+<        reciprocal approx:   1/3 = .33333333
+< 	    
+< 			  3 x .33333333 =  .99999999, not 1
+< 
+<     It is not always possible to get a perfectly accurate reciprocal.
+< 
+301,302c391
+< 
+< Current fastest (and correct) division algorithm is called SRT
+---
+> Current fastest (and correct) division algorithm is SRT (optional)
+325,341d413
+< 
+< 
+< 
+< ISSUES in floating point
+<   note: this discussion only touches the surface of some issues that
+<   people deal with.  Entire courses are taught on floating point
+<   arithmetic.
+< 
+< 
+< 
+< use of standards
+< ----------------
+< --> allows all machines following the standard to exchange data
+<     and to calculate the exact same results.
+< 
+< --> IEEE fl. pt. standard sets
+< 	parameters of data representation (# bits for mantissa vs. exponent)
+343,344c415,491
+< --> MIPS architecture follows the standard
+<     (All architectures follow the standard now.)
+---
+> Rounding
+> --------
+> arithmetic operations on fl. pt. values compute results that cannot
+> be represented in the given amount of precision.  So, we must round
+> results.
+> 
+> There are MANY ways of rounding.  They each have "correct" uses, and
+> exist for different reasons.  The goal in a computation is to have the
+> computer round such that the end result is as "correct" as possible.
+> There are even arguments as to what is really correct.
+> 
+> lecture note:  a number line will help to get the message across.
+> 
+> Round to Nearest (Even)
+> -----------------------
+>         6-9 up
+>         5   to even to make unbiased
+>         1-4 down
+>         0   unchanged
+> 
+> E.g.,
+>      example:
+> 	 .7783      if 3 decimal places available, .778
+> 		    if 2 decimal places available, .78
+> 	1.5	    if 1			 , 2
+> 	2.5	    if 1			 , 2
+> 
+> 
+> In binary
+>         xxx.1....1...    up
+>         xxx.100000000... to even
+>         xxx.0....1...    down
+>         xxx.000000000... unchanged
+> 
+> Need infinite bits? No
+>         guard -- One extra bit 
+> 		(the bit to the right of the radix point in example above)
+>         sticky -- OR of all the bits to the right of the guard bit
+> 
+> 	Guard	Sticky	Round
+> 	-----	------	-----	
+> 	1	1	Up (add one in LSB position)
+> 	1	0	To even (Force LSB to zero)
+> 	0	1	Down (Truncate guard and sticky bits)
+> 	0	0	Unchanged
+> 
+> Round to nearest is the default rounding method in IEEE Floating Point
+> 
+> 
+> 3 other methods of rounding:
+>   round toward 0 --  also called truncation.
+>      figure out how many bits (digits) are available.  Take that many
+>      bits (digits) for the result and throw away the rest.
+>      This has the effect of making the value represented closer
+>      to 0.
+> 
+>      example:
+> 	 .7783      if 3 decimal places available, .778
+> 		    if 2 decimal places available, .77
+> 
+>   round toward + infinity --
+>      regardless of the value, round towards +infinity.
+> 
+>      example:
+> 	 1.23       if 2 decimal places, 1.3
+> 	-2.86       if 2 decimal places, -2.8
+> 
+>   round toward - infinity --
+>      regardless of the value, round towards -infinity.
+> 
+>      example:
+> 	 1.23       if 2 decimal places, 1.2
+> 	-2.86       if 2 decimal places, -2.9
+> 
+> Round to +/- infinity is sometimes used to check the robustness of the
+> calculation.  It can also be used for a crude approximatation of interval 
+> arithmetic, where one calculates error bars for results.
+345a493
+> 
+347c495
+< overflow and underflow
+---
+> overflow 
+355a504,519
+> 1/0 = infinity
+> 
+> infinity * x = infinity
+> 1/infinity = 0
+> 
+> 
+> NaNs
+> ------
+> Recall NaNs represent Not A Number
+> e.g., sqrt(-1) = NaN
+> 
+> NaNs propagate through calculations
+> NaN * x = NaN, including NaN * 0 = NaN
+> 1/NaN = NaN
+> Any operation on a NaN produces a NaN.
+> 
+356a521,522
+> Underflow and Denormalized numbers
+> --------------------
+359c525
+< to small (close to 0) to be represented.  (show number line!)
+---
+> too small (close to 0) to be represented.  (show number line!)
+366,376c532,534
+< Underflow may result in the representation of denormalized values.
+< These are ones in which the hidden bit is a 0.  The exponent field
+< will also be all 0s in this case.  Note that there would be a
+< reduced precision for representing the mantissa (less than 23 bits
+< to the right of the radix point).
+< 
+< Defining the results of certain operations
+< ------------------------------------------
+< Many operations result in values that cannot be represented.
+< Other operations have undefined results.  Here is a list
+< of some operations and their results as defined in the standard.
+---
+> IEEE Floating Point handles underflow with DENORMALIZED NUMBERS
+> 	i.e., The hidden bit to the left of the radix point is ZERO
+> 	This is indicated by E=0 and F<>0
+378,382c536,656
+< 1/0 = infinity
+< any positive value / 0 = positive infinity
+< any negative value / 0 = negative infinity
+< infinity * x = infinity
+< 1/infinity = 0
+---
+> Denormalized value = (-1)^S * F/2^n * 2^(E-bias+1)
+>                    = (-1)^S * F/2^23 * 2^-126
+> 
+> Notice that the value of the true exponent is the same for the smallest
+> normalized numbers as it is for denormalized numbers.
+> 
+> ADVANCED TOPIC: Why denorms?
+> Q: What is the maximum error in a number represented in the range 2^-125 to 2^-126?
+> Q: With denorms, what is the maximum error in a number represented in the 
+>    range 2^-126 to 0?
+> Q: Without denorms, what is the maximum error in a number represented in the 
+>    range 2^-126 to 0?
+> 
+> Show number line: denormalized numbers equalize the error in the ranges 
+> 2^-125 to 2^-126 and 2^-126 to 0.  
+> 
+> Without denorms, floating point FLUSHES TO ZERO, which results in loss of
+> precision, and hence larger errors, near zero.
+> 
+> With denorms, floating point provides GRADUAL UNDERFLOW
+> 
+> Denormalized numbers are difficult to implement efficiently, and some systems
+> trap to software to perform these operations.  
+> 
+> 
+> How represent?
+> --------------
+> 
+> Approx way:
+> 
+>        S       E       F       number
+>       ---     ---     ---      ------
+>        S       0       F       (-1)^S x 1.F x 2^(-127)    # to be updated
+>        S       1       F       (-1)^S x 1.F x 2^(-126)
+>        S       2       F       (-1)^S x 1.F x 2^(-125)
+>        ...
+>        S      254      F       (-1)^S x 1.F x 2^(+127)
+>        S      255      F       (-1)^S x 1.F x 2^(+128)    # to be updated
+> 
+> 
+> Actual way:
+> 
+>        S       E       F       number
+>       ---     ---     ---      ------
+>        S       0       F       (-1)^S x 0.F x 2^(-126)    # denormalized
+>        S       1       F       (-1)^S x 1.F x 2^(-126)    # unchanged
+>        S       2       F       (-1)^S x 1.F x 2^(-125)    # unchanged
+>        ... 
+>        S      254      F       (-1)^S x 1.F x 2^(+127)    # unchanged
+>        S      255              (-1)^S x infinity          # infinities
+>        S      255    F!=0      NaN                        # not a number
+> 
+> 
+> "Numerical analysis" Warning
+> ----------------------------
+> 
+> Beware mixing small and large numbers in FP
+>         (3.1415... + 6*10^23) - 6*10^23 != 3.1415... + (6*10^23 - 6*10^23)
+>         Numerical analysis.
+> 
+> 
+> 
+> MIPS floating point hardware (CHAPTER 8)
+> ----------------------------------------
+> 
+> Floating point arithmetic could be done by hardware, or by software.
+> Hardware is fast, and takes up chip real estate.
+> Software is slow, but takes up no space (memory for the software --
+>   an insignificant amount)
+> 
+> The MIPS specifies and offers a HW approach.
+> 
+> FP is done in "Coprocessor 1" (but this is not important)
+> 
+> 
+>         --------       --------
+> 	|      |       |      |
+> 	| C0   |       | C1   |
+> 	|      |       |      |
+>         --------       --------
+> 	   |              |
+> 	   |--------------|
+>            |
+>         --------
+> 	|      |
+> 	| MEM  |
+> 	|      |
+>         --------
+> 
+> 
+> Just as there are registers meant for integers, there are registers
+> meant for floating pt. values.
+> 
+>   MIPS has 32, 32 bit FP registers.
+> 
+>   Integer instructions have no access to these registers, just as
+>     fl. pt. instructions have no access to the integer registers.
+> 
+>   Single precision FP numbers (32b) must use even FP registers.
+> 
+>   Double precision FP numbers (64b) must use even-odd pair of registers
+> 
+>   Thus, there are really only 16 FP registers: 0, 2, 4, ..., 30.
+> 
+> 
+>     bit   31 . . .   0
+> 	 --------------
+>      f0  |            |
+> 	 +------------+
+>      f1  |            |
+> 	 +------------+
+>              .
+> 	     .
+> 	     .
+> 	 +------------+
+>     f29  |            |
+> 	 +------------+
+>     f30  |            |
+> 	 +------------+
+>     f31  |            |
+> 	 --------------
+384,398d657
+< 0/0 = NaN
+< 0 * infinity = NaN
+< infinity * infinity = NaN
+< infinity - infinity = NaN
+< infinity/infinity = NaN
+< 
+< x + NaN = NaN
+< NaN + x = NaN
+< x - NaN = NaN
+< NaN - x = NaN
+< sqrt(negative value) = NaN
+< NaN * x = NaN
+< NaN * 0 = NaN
+< 1/NaN = NaN
+<                     (Any operation on a NaN produces a NaN.)
+400a660,665
+> FP Instuctions
+> 
+>  (1) fl. pt. operations
+>       add, subtract, multiply, divide -- each specifies 3 fl. pt. registers.
+> 
+>       add.s ft, fr, fs (where .s means single precision)
+402,405c667
+< HW vs. SW computing
+< -------------------
+< floating point operations can be done by hardware (circuitry)
+< or by software (program code).
+---
+>       add.s $5, $6, $7
+407,408d668
+< -> a programmer won't know which is occuring, without prior knowledge
+<    of the HW.
+410c670
+< -> SW is much slower than HW.  by approx. 1000 times.
+---
+>  (2) fp load/store instructions
+412,414c672,674
+< A difficult (but good) exercize for students would be to design
+< a SW algorithm for doing fl. pt. addition using only integer
+< operations.
+---
+>      l.s  ft, x(rb)
+> 	  Address of data is    x + (rb)  -- note that rb is an integer register
+> 	  Read the data, and place it into fl. pt. register ft.
+416,419c676,680
+< SW to do fl. pt. operations is tedious.  It takes lots of shifting
+< and masking to get the data in the right form to use integer arithmetic
+< operations to get a result -- and then more shifting and masking to put
+< the number back into fl. pt. format.
+---
+> 	  Address calculation is the same.  Where the data goes is different.
+>      
+>      s.s -- store
+>      
+>      l.s $5, 120($6)   # $5 is an FP regsiter while $6 is a regular register
+421,422c682
+< A common thing for manufacturers to do is to offer 2 versions of the
+< same architecture, one with HW, and the other with SW fl. pt. ops.
+---
+>  (3) convert, moves, etc. -- idiosycratic and not covered
+424c684
+< </pre>
+---
+> <!--#include virtual="style4.html" -->

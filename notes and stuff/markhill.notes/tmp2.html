@@ -1,0 +1,277 @@
+More on nested called and $s/$t registers
+
+An example that shows a problem:
+
+
+  A calls B
+  B calls C
+  C calls D
+
+  the code for A is in a separate file from B, C, D
+  the code for B is in a separate file from C, D, A
+  the code for C is in a separate file from D, A, B
+
+  Code in A gets compiled separately from that of B, C, D
+  Code in B gets compiled separately from that of C, D, A
+  Code in C gets compiled separately from that of D, A, B
+
+
+  Suppose the code in A implements the statement
+      X = Y + Z
+  The compiler must assign variables X, Y, and Z (assumed to
+  be local variables for this example) to reside in registers.
+  Which registers does it choose?
+
+  The compiler will have a list of registers that are currently
+  unused, and choose the first 3 that it finds in the list.
+  For this example, use $8, $9, $10.
+
+  Some of the code for A looks something like:
+
+     A:   
+
+         add  $8, $9, $10
+
+
+	 jal  B
+
+         # assume more code here that needs the current values
+	 # in registers $8, $9, and $10
+
+	 jr   $ra
+
+
+
+
+  the example continues:
+
+  Suppose the code in B implements the statement
+      I = J * K
+  The compiler must assign variables I, J, and K (assumed to
+  be local variables for this example) to reside in registers.
+  Again, which registers does it choose?
+
+  Remembering that this code is compiled separately, the compiler
+  has no knowledge of the code generated for A.
+
+  So, some of the code for B looks something like:
+
+     B:   
+
+         mul  $8, $9, $10
+
+	 jal  C
+  
+	 jr   $ra
+
+
+   Notice that the compiler had chosen registers that overlap.
+   This code cannot work correctly due to the overlap.
+
+
+There are 2 standard solutions to this problem.  Both utilize
+space in an activation record to save/restore registers.
+
+
+One solution:  CALLER (parent) saves registers.
+
+the activation record for A:
+
+                     (smaller addresses at top of this diagram)
+
+       |           | <-- $sp
+       -------------
+       | $a0       | ------
+       -------------      |
+       | $a1       |      |
+       -------------      |
+       | $a2       |      |
+       -------------      |-- space allocated by A
+       | $a3       |      |
+       -------------      |
+       |   $10     |      |
+       -------------      |
+       |   $9      |      |
+       -------------      |
+       |   $8      |      |
+       -------------      |
+       |   $ra     | ------
+       -------------
+
+
+     # a code fragment of parts of A
+     A:  sub  $sp, $sp, 32 
+         sw   $ra, 32($sp)
+
+         add  $8, $9, $10
+
+	 # A is the caller of B
+	 # A saves $8, $9, and $10 so B can overwrite the values,
+	 #   should it choose to do so.
+	 sw   $8, 28($sp)
+	 sw   $9, 24($sp)
+	 sw   $10, 20($sp)
+
+	 jal  B
+
+         # Since there is more code here that needs the saved values
+	 # in registers $8, $9, and $10, restore them
+	 lw   $8, 28($sp)
+	 lw   $9, 24($sp)
+	 lw   $10, 20($sp)
+	 # now the values in $8, $9, and $10 can be used
+
+         add  $sp, $sp, 32 
+         lw   $ra, 32($sp)
+	 jr   $ra
+
+The other solution:  CALLEE (child) saves registers.
+
+Alternatively, it could be set up that the callee (child)
+saves/restores the values, so as to not mess up its caller's (parent's)
+register values:
+
+                     (smaller addresses at top of this diagram)
+
+       |           |
+       -------------
+       |           | <-- $sp
+       -------------
+       | $a0       | ------
+       -------------      |
+       | $a1       |      |
+       -------------      |
+       | $a2       |      |
+       -------------      |-- space allocated by B
+       | $a3       |      |
+       -------------      |
+       |   $10     |      |
+       -------------      |
+       |   $9      |      |
+       -------------      |
+       |   $8      |      |
+       -------------      |
+       |   $ra     | ------
+       -------------
+       | $a0       | ------
+       -------------      |
+       | $a1       |      |
+       -------------      |-- space allocated by A
+       | $a2       |      |
+       -------------      |
+       | $a3       |      |
+       -------------      |
+       |   $ra     | ------
+       -------------
+       |           |
+
+
+     # a code fragment of parts of B
+     B:  sub  $sp, $sp, 32 
+         sw   $ra, 32($sp)
+	 # B saves $8, $9, and $10 so it cannot possibly mess up
+	 # A's use of these registers.
+	 sw   $8, 28($sp)
+	 sw   $9, 24($sp)
+	 sw   $10, 20($sp)
+
+         mul  $8, $9, $10
+
+         jal  C
+  
+	 lw   $8, 28($sp)  # restore the registers
+	 lw   $9, 24($sp)
+	 lw   $10, 20($sp)
+         lw   $ra, 32($sp)
+	 add  $sp, $sp, 32
+	 jr   $ra
+
+
+Each of these solutions does solve the problem.  An implementation
+would need to make sure that the compiler always used just
+one method (for all time).
+
+Note:  for either of these methods, it is possible that the
+saves/restores are done unnecessarily.  Since the code is separately
+compiled, the compiler has no knowledge of which other procedures use
+which registers.
+
+
+The MIPS way
+------------
+
+Since either method (CALLER saved or CALLEE saved) potentially wastes
+time saving/restoring values that may not be overwritten, the MIPS
+solution utilizes some registers in its register file to be used
+as CALLER saved, and others are used as CALLEE saved.
+   
+   $8-$15, $24-$25 are CALLER saved
+   aliases are $t0 - $t9
+   It is presumed that any child can overwrite these registers in any
+   way it wants to.  The 't' in $t stands for temporary.
+
+
+   $16-$23, $30 are CALLEE saved
+   aliases are $s0 - $s8
+   A parent (caller) presumes that no child (callee) will modify
+   values in these registers.
+   But, any child (callee) that uses one of these registers MUST
+   save/restore it value for its parent (caller).
+
+This leaves the question for the programmer writing code:  which
+register should be chosen for a variable, $s or $t?
+
+   Here is my advice:
+
+   In a leaf procedure (which is a child, never a parent), use
+   $t registers for everything possible.  The $t registers do NOT
+   need to be saved/restored by a child.
+
+   In a non-leaf procedure (which is both a parent and a child!)
+   the choice between $s and $t registers is not as clear.
+   For a variable that is live across a call, it is often best to
+   use a $s register.  For those variables that are not live,
+   it is often best to use a $t register.  Note that the choice
+   of a $s register implies that there WILL be a save/restore
+   pair.
+
+
+
+The choice for using a $s or $t register may still not be obvious.
+Consider the following abstract code choices.
+
+within A:
+
+   loop:  use  $t
+          sw   $t, __($sp)  # save $t because it is live across a call
+          jal  B
+          lw   $t, __($sp)  # restore the $t
+          use  $t
+          b    loop
+
+	  jr   $ra
+
+This shows correct usage of the $t register.
+
+
+
+Alternatively, here is this same example, with the value in an $s
+register, instead of in a $t register.
+within A:
+          sw   $s, __($sp)  # save $s once by convention
+
+   loop:  use  $s
+          jal  B            # B is guaranteed (by convention) not to change $s
+	  use  $s
+	  b    loop
+
+          lw   $s, __($sp)  # restore the $s
+	  jr   $ra
+
+This also shows correct usage of an $s register.
+
+In this case, using an $s register is more efficient.  The save
+restore pairs using the $t register are inside the loop, so there
+are memory access instructions (2 of them) for every iteration of
+the loop.  Using the $s register still requires a save/restore
+pair, but it happens just once.

@@ -1,0 +1,16 @@
+Name:Xiaojun He
+Section:1
+Partner's Name:
+Partner's Section:
+
+Question - demo.c shows us that if a program is stuck in an infinite loop, it cannot go forward. Our program for a simple alarm (intdate.c) also has an infinite while loop. Yet, we see the print statements like below when we execute it -
+
+% intdate
+Date will be printed every 3 seconds.
+Enter ^C to end the program:
+current time is Tue Sep  4 13:15:21 2015
+current time is Tue Sep  4 13:15:24 2015
+current time is Tue Sep  4 13:15:27 2015
+^C
+
+How does the main function of intdate.c come out of the infinite while loop to print these statement?
