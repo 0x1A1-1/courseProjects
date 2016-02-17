@@ -1,0 +1,147 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/Users/Sean/Google Drive/Spring 15-16/551/EXE3
+vadder_4b
+Z0 DXx6 sv_std 3 std 0 22 WmjPaeP=7F5?QFXzJ>D[Q2
+Z1 !s110 1455669154
+!i10b 1
+!s100 G6;Izz4V4_ij]o;`VV[W=3
+I^?TdQeUfOY_`H8NJGSlbg1
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+!s105 adder_sv_unit
+S1
+Z3 dD:/CsCourse/ECE551/HW2
+w1455575934
+8D:/CsCourse/ECE551/HW2/adder.sv
+FD:/CsCourse/ECE551/HW2/adder.sv
+L0 1
+Z4 OP;L;10.4a;61
+r1
+!s85 0
+31
+!s108 1455669153.000000
+!s107 D:/CsCourse/ECE551/HW2/adder.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW2/adder.sv|
+!s101 -O0
+!i113 1
+Z5 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact -O0
+vadder_4b_tb
+R1
+!i10b 1
+!s100 Wnh[Q9oF?<74?fdHY_<g93
+INN1eT>X_?ZMB8l=ULc>io1
+R2
+R3
+w1455587337
+8D:/CsCourse/ECE551/HW2/adder_tb.v
+FD:/CsCourse/ECE551/HW2/adder_tb.v
+L0 1
+R4
+r1
+!s85 0
+31
+Z6 !s108 1455669154.000000
+!s107 D:/CsCourse/ECE551/HW2/adder_tb.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/CsCourse/ECE551/HW2/adder_tb.v|
+!s101 -O0
+!i113 1
+Z7 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact -O0
+vdata_comp
+R0
+R1
+!i10b 1
+!s100 mo6CB:31ilbKa8JUho5U;0
+Ie2b6I5ZS<T2G7cR`0n44S3
+R2
+!s105 data_comp_sv_unit
+S1
+R3
+w1455666541
+8D:/CsCourse/ECE551/HW2/data_comp.sv
+FD:/CsCourse/ECE551/HW2/data_comp.sv
+L0 1
+R4
+r1
+!s85 0
+31
+R6
+!s107 D:/CsCourse/ECE551/HW2/data_comp.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW2/data_comp.sv|
+!s101 -O0
+!i113 1
+R5
+vdata_comp_tb
+R1
+!i10b 1
+!s100 ?e=_Y;gDn1Vm:AYVUDEdI1
+I@WIdCmQZj86aJbl6GUIQ_1
+R2
+R3
+w1455587509
+8D:/CsCourse/ECE551/HW2/data_comp_tb.v
+FD:/CsCourse/ECE551/HW2/data_comp_tb.v
+L0 1
+R4
+r1
+!s85 0
+31
+R6
+!s107 D:/CsCourse/ECE551/HW2/data_comp_tb.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/CsCourse/ECE551/HW2/data_comp_tb.v|
+!s101 -O0
+!i113 1
+R7
+vRAMqueue
+R0
+Z8 !s110 1455669155
+!i10b 1
+!s100 bDze_^8o6GnO>_>E_8z]>1
+Ibi>@1CMW3lTb9M1d@Y`IU3
+R2
+!s105 RAMqueue_sv_unit
+S1
+R3
+w1455669107
+8D:/CsCourse/ECE551/HW2/RAMqueue.sv
+FD:/CsCourse/ECE551/HW2/RAMqueue.sv
+L0 1
+R4
+r1
+!s85 0
+31
+Z9 !s108 1455669155.000000
+!s107 D:/CsCourse/ECE551/HW2/RAMqueue.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW2/RAMqueue.sv|
+!s101 -O0
+!i113 1
+R5
+n@r@a@mqueue
+vRAMqueue_tb
+R8
+!i10b 1
+!s100 <35=Oo@^E[X@MDRH5?Rcc3
+IFmmP2]W9Fo<I`ic:Uk]5B1
+R2
+R3
+w1455668748
+8D:/CsCourse/ECE551/HW2/RAMqueue_tb.v
+FD:/CsCourse/ECE551/HW2/RAMqueue_tb.v
+L0 1
+R4
+r1
+!s85 0
+31
+R9
+!s107 D:/CsCourse/ECE551/HW2/RAMqueue_tb.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/CsCourse/ECE551/HW2/RAMqueue_tb.v|
+!s101 -O0
+!i113 1
+R7
+n@r@a@mqueue_tb

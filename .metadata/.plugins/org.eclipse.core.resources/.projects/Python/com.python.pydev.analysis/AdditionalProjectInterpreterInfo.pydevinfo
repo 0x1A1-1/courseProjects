@@ -1,0 +1,46 @@
+-- VERSION_4
+-- START DISKCACHE_2
+D:\CsCourse\.metadata\.plugins\org.eclipse.core.resources\.projects\Python\com.python.pydev.analysis\v2_indexcache
+Vacation|1454682797512748000|D:\pro\Python Practice\Vacation.py
+studnetTeacher_func|1454685411119263000|D:\pro\Python Practice\studnetTeacher_func.py
+PygLatin|1454682312598873000|D:\pro\Python Practice\PygLatin.py
+battleShip|1454802145165005000|D:\pro\Python Practice\battleShip.py
+Market|1454684122446124000|D:\pro\Python Practice\Market.py
+-- END DISKCACHE
+-- START DICTIONARY
+5
+5=Vacation
+1=studnetTeacher_func
+4=PygLatin
+2=battleShip
+3=Market
+-- END DICTIONARY
+-- START TREE 1
+23
+ali|1|alice!11@
+ave|1|average!10@
+boa|1|board!19@
+cla|1|class_avg!11@
+com|1|compute_bill!26@
+fir|1|first!35@
+get|3|get_average!10@get_letter_grade!10@get_class_average!10@
+gue|2|guess_col!19@guess_row!19@
+hot|1|hotel_cost!42@
+llo|1|lloyd!11@
+new|1|new_word!35@
+ori|1|original!35@
+pla|1|plane_ride_cost!42@
+pri|2|prices!27@print_board!18@
+pyg|1|pyg!35@
+ran|2|random_col!18@random_row!18@
+ren|1|rental_car_cost!42@
+shi|2|ship_col!19@ship_row!19@
+sho|1|shopping_list!27@
+sto|1|stock!27@
+tri|1|trip_cost!42@
+tyl|1|tyler!11@
+wor|1|word!35@
+-- END TREE
+-- START TREE 2
+0
+-- END TREE

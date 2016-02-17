@@ -1,19 +1,52 @@
-module b_mon_4bia_mondder();
+module adder_4b_tb();
 
-reg [3:0] a_mon,b_mon; 
-reg cin_mon; //initialise test vector
-wire [3:0] sum_mon; 
-wire cout_mon;
+reg [4:0] A, B;
+reg [1:0]cin;
+reg [4:0] sum_gold;
+reg cout_gold;
+wire cout;
+wire [3:0] sum;
+reg fail; // fail bit
 
-adder ad4(.sum(sum_mon), .cout(cout_mon),.a(a_mon), .b(b_mon), .cin(cin_mon));
-initial
+
+adder_4b iDUT(.cout(cout), .sum(sum), .A(A), .B(B), .cin(cin));
+always@(*)
+	{cout_gold, sum_gold} = A + B + cin; // behavior
+
+
+initial // behavioral
 begin
-#0 a_mon=4¡¯b0000; b_mon=4¡¯b0000; cin_mon=1¡¯b0;
-#10 a_mon=4¡¯b0100; b_mon=4¡¯b0011; cin_mon=1¡¯b1;
-#20 a_mon=4¡¯b0011; b_mon=4¡¯b0111; cin_mon=1¡¯b1;
-#30 a_mon=4¡¯b1000; b_mon=4¡¯b0100; cin_mon=1¡¯b0;
-#40 a_mon=4¡¯b0101; b_mon=4¡¯b0101; cin_mon=1¡¯b1;
-end
+	A = 4'b0000;
+	B = 4'b0000;
+	cin = 1'b1;
+	fail = 1'b0;
+	#10;
 
-endmodule
- 
+	for (cin = 0; cin < 2; cin=cin+1)
+	begin
+		for (A = 0; A < 16; A=A+1)
+		begin
+			for (B = 0; B < 16; B=B+1)
+			begin
+				if (cout_gold == cout && sum_gold == sum)
+					#1 $display ("Passed");
+				else
+				begin
+					if (sum_gold == 16 )
+					begin
+						$display("all passed");
+						$stop;
+					end
+					fail = 1'b1; // fail bit set to 1
+					$display ("Err");
+					$display ("cout_gold = %b & cout = %b", cout_gold, cout);		
+					$display ("sum_gold = %b & sum = %b", sum_gold, sum);
+					$stop;	
+				end
+			end
+		end
+	end
+	$display("all passed");
+	$stop;
+end
+endmodule 

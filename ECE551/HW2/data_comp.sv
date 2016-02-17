@@ -4,24 +4,12 @@ input [7:0] serial_data, mask, match;
 input serial_vld;
 output prot_trig;
 
-wire SPItrig, UARTtrig;
+wire [7:0]  match_mask;
+wire match_check;
 
-	module SPI_RX(clk, rst_n, SS_n, SCLK, MOSI, edg, len8_16, mask, match, SPItrig);
-		input [15:0] mask, match;
-		input clk, rst_n, SS_n, SCLK, MOSI, edg, len8_16;
-		output SPItrig;
-		
-	endmodule
-
-	module UART_RX(clk, rst_n, RX, baud_cnt, match, mask, UARTtrig);
-		input [15:0] baud_cnt;
-		input [7:0] mask, match;
-		input clk, rst_n, RX;
-		output UARTtrip;
-		
-	endmodule
-
-assign prot_trig = ( SPItrig | disable ) & ( UARTtrig | disable );
+assign match_mask = (( match) ~^ (serial_data )) | mask;
+assign match_check = (match_mask==8'hff)? 1'b1:1'b0;
+assign prot_trig = (serial_vld == 1) ? match_check : 1'bz ;
 
 endmodule
 
