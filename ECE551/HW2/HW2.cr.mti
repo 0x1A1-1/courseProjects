@@ -1,9 +1,5 @@
 D:/CsCourse/ECE551/HW2/RAMqueue_tb.v {1 {vlog -work work -stats=none D:/CsCourse/ECE551/HW2/RAMqueue_tb.v
 Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
--- Compiling module RAMqueue_tb
-
-Top level modules:
-	RAMqueue_tb
 
 } {} {}} D:/CsCourse/ECE551/HW2/data_comp.sv {1 {vlog -work work -sv -stats=none D:/CsCourse/ECE551/HW2/data_comp.sv
 Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
@@ -21,10 +17,13 @@ Top level modules:
 
 } {} {}} D:/CsCourse/ECE551/HW2/RAMqueue.sv {1 {vlog -work work -sv -stats=none D:/CsCourse/ECE551/HW2/RAMqueue.sv
 Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
--- Compiling module RAMqueue
+
+} {} {}} D:/CsCourse/ECE551/HW2/data_comp_tb.v {1 {vlog -work work -stats=none D:/CsCourse/ECE551/HW2/data_comp_tb.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module data_comp_tb
 
 Top level modules:
-	RAMqueue
+	data_comp_tb
 
 } {} {}} D:/CsCourse/ECE551/HW2/adder_tb.v {1 {vlog -work work -stats=none D:/CsCourse/ECE551/HW2/adder_tb.v
 Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
@@ -32,42 +31,5 @@ Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 
 
 Top level modules:
 	adder_4b_tb
-
-} {} {}} D:/CsCourse/ECE551/HW2/data_comp_tb.v {2 {vlog -work work -stats=none D:/CsCourse/ECE551/HW2/data_comp_tb.v
-Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
--- Compiling module data_comp_tb
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(12): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(13): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(14): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(17): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(18): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(19): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(22): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(23): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(24): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(27): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(28): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(29): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(32): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(33): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-** Warning: D:/CsCourse/ECE551/HW2/data_comp_tb.v(34): (vlog-2600) [RDGN] - Redundant digits in numeric literal.
-
-
-Top level modules:
-	data_comp_tb
 
 } {} {}}

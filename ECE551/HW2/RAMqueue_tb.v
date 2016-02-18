@@ -10,55 +10,25 @@ wire [7:0] rdata;
 RAMqueue iDUT(.clk(clk), .we(we),  .waddr(waddr),
                   .raddr(raddr),.wdata(wdata), .rdata(rdata));
 
-
 initial 
 
 begin
     clk = 0;
     we = 0; //start turned off
-    waddr = 9'b 0_0000_0000;
-	raddr = 9'b 0_0000_0000;
-   	 #5;
-	waddr = 0'h123;
-	#10;
-	waddr = 0'h124;
-	#20;
-	waddr = 0'h125;
-	#10;
-	waddr = 0'h126;
-end
-    
-initial
-	begin
-	#5;
+    waddr = 9'h002;
+	raddr = 9'h000;
+	wdata = 8'h01;
+   	#20;
 	we=1;
-	raddr = 0'h123;
-	#20;
-	we=0;
-	raddr = 0'h124;
-	#10;
-	we=1;
-	#10;
-	we=0;
-	waddr = 0'h125;
-	end
+end 
 
-initial
-	begin
-	#5;
-	wdata = 0'hXX;
-	#10;
-	wdata = 0'hAB;
-	#10;
-	wdata = 0'hCD;
-	#10;
-	wdata = 0'hEF;
-	#10;
-	wdata = 0'hXX;
-	end
-	
-always
+always 
+begin
    #10 clk = ~clk;
-   
+   #20;
+     waddr<=waddr+1'h1;
+     raddr<=raddr+1'h1;
+	wdata<=wdata+1'h1;
+end
    
 endmodule
