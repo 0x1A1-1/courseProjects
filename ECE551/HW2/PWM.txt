@@ -1,1 +1,2 @@
-Pulse-width modulation (PWM) is a modulation technique used to encode a message into a pulsing signal.
+Pulse-width modulation (PWM) is a technique for getting analog results with digital means. From the research,
+it can be  used for the dimming of LEDs, driving a DC motor, audio effects and amplification and telecommunications.

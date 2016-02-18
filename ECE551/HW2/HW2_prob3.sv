@@ -48,28 +48,24 @@ always @(posedge clk, negedge reset)
 endmodule
 
 //
-module JK_flip_flop ( j ,k ,clk , reset ,q , qb);
+module JK_flip_flop ( j ,k ,clk , reset ,q);
 
-output q, qb ;
+output q;
 input j, k, clk, reset ;
-
 
 always @ (posedge (clk)) begin
  if (reset) begin
   q <= 0;
-  qb <= 1;
  end
  else 
  begin
   if (j!=k) 
   begin
    q <= j;
-   qb <= k;
   end
   else if (j==1 && k==1)
   begin
    q <= ~q;
-   qb <= ~qb;
   end
  end
 end
