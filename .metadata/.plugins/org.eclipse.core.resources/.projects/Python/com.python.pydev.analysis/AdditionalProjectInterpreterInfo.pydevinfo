@@ -1,46 +1,129 @@
 -- VERSION_4
 -- START DISKCACHE_2
-D:\CsCourse\.metadata\.plugins\org.eclipse.core.resources\.projects\Python\com.python.pydev.analysis\v2_indexcache
-Vacation|1454682797512748000|D:\pro\Python Practice\Vacation.py
-studnetTeacher_func|1454685411119263000|D:\pro\Python Practice\studnetTeacher_func.py
-PygLatin|1454682312598873000|D:\pro\Python Practice\PygLatin.py
-battleShip|1454802145165005000|D:\pro\Python Practice\battleShip.py
-Market|1454684122446124000|D:\pro\Python Practice\Market.py
+D:\CsCourse\.metadata\.plugins\org.eclipse.core.resources\.projects\python\com.python.pydev.analysis\v2_indexcache
+mergeList|1456548156560088000|D:\pro\Python Practice\mergeList.py
+functional|1455860003766138000|D:\pro\Python Practice\functional.py
+zigzagConvert|1456592489278749000|D:\pro\Python Practice\zigzagConvert.py
+Vacation|1455860003742765000|D:\pro\Python Practice\Vacation.py
+longestPalindrome|1456587951691450000|D:\pro\Python Practice\longestPalindrome.py
+mostWater|1456601653450959000|D:\pro\Python Practice\mostWater.py
+threeSumCloest|1456698265429633000|D:\pro\Python Practice\threeSumCloest.py
+generator|1455865678360292000|D:\pro\Python Practice\generator.py
+learning|1455865424832356000|D:\pro\Python Practice\learning.py
+Market|1455860003739242000|D:\pro\Python Practice\Market.py
+twoSum|1456546808558079000|D:\pro\Python Practice\twoSum.py
+findMedianSortedArrays|1456547456394807000|D:\pro\Python Practice\findMedianSortedArrays.py
+reverseInt|1456592401494273000|D:\pro\Python Practice\reverseInt.py
+Exception|1455860003737739000|D:\pro\Python Practice\Exception.py
+intToRoman|1456605148915276000|D:\pro\Python Practice\intToRoman.py
+maxPoint|1456635109939703000|D:\pro\Python Practice\maxPoint.py
+studnetTeacher_func|1455860003769664000|D:\pro\Python Practice\studnetTeacher_func.py
+PygLatin|1455860003740241000|D:\pro\Python Practice\PygLatin.py
+sortList|1456684971200702000|D:\pro\Python Practice\sortList.py
+addTwoNumbers|1456546926911835000|D:\pro\Python Practice\addTwoNumbers.py
+threeSum|1456692646650907000|D:\pro\Python Practice\threeSum.py
+intIsPalindrome|1456593136467717000|D:\pro\Python Practice\intIsPalindrome.py
+battleShip|1455860003763634000|D:\pro\Python Practice\battleShip.py
+lengthOfLongestSubstring|1456546795358552000|D:\pro\Python Practice\lengthOfLongestSubstring.py
 -- END DISKCACHE
 -- START DICTIONARY
-5
-5=Vacation
-1=studnetTeacher_func
-4=PygLatin
-2=battleShip
-3=Market
+29
+18=mergeList
+1=functional
+15=zigzagConvert
+21=mostWater
+2=generator
+4=learning
+12=reverseInt
+28=ListNode.__init__
+7=PygLatin
+23=sortList
+22=threeSum
+24=intIsPalindrome
+27=Solution
+8=Vacation
+19=longestPalindrome
+17=threeSumCloest
+26=Point
+25=ListNode
+6=Market
+14=findMedianSortedArrays
+16=twoSum
+11=Exception
+20=intToRoman
+10=maxPoint
+29=Point.__init__
+3=studnetTeacher_func
+9=addTwoNumbers
+5=battleShip
+13=lengthOfLongestSubstring
 -- END DICTIONARY
 -- START TREE 1
-23
-ali|1|alice!11@
-ave|1|average!10@
-boa|1|board!19@
-cla|1|class_avg!11@
-com|1|compute_bill!26@
-fir|1|first!35@
-get|3|get_average!10@get_letter_grade!10@get_class_average!10@
-gue|2|guess_col!19@guess_row!19@
-hot|1|hotel_cost!42@
-llo|1|lloyd!11@
-new|1|new_word!35@
-ori|1|original!35@
-pla|1|plane_ride_cost!42@
-pri|2|prices!27@print_board!18@
-pyg|1|pyg!35@
-ran|2|random_col!18@random_row!18@
-ren|1|rental_car_cost!42@
-shi|2|ship_col!19@ship_row!19@
-sho|1|shopping_list!27@
-sto|1|stock!27@
-tri|1|trip_cost!42@
-tyl|1|tyler!11@
-wor|1|word!35@
+44
+L|1|L!11@
+L1|1|L1!19@
+L2|1|L2!19@
+ali|1|alice!27@
+app|1|application!34@
+ave|1|average!26@
+boa|1|board!43@
+che|1|check_version!34@
+cla|1|class_avg!27@
+com|1|compute_bill!50@
+dec|1|decode!34@
+exe|1|EXEC!35@
+f|1|f!10@
+fir|1|first!59@
+get|4|get_name!34@get_letter_grade!26@get_average!26@get_class_average!26@
+gue|2|guess_col!43@guess_row!43@
+hos|1|HOST!35@
+hot|1|hotel_cost!66@
+ind|1|INDEX!35@
+is_|1|is_odd!10@
+lis|1|ListNode!73@
+llo|1|lloyd!27@
+mai|1|main!34@
+new|1|new_word!59@
+not|1|not_empty!10@
+ori|1|original!59@
+pla|1|plane_ride_cost!66@
+poi|1|Point!81@
+por|1|PORT!35@
+pri|2|prices!51@print_board!42@
+pyg|1|pyg!59@
+r|1|r!91@
+ran|2|random_row!42@random_col!42@
+ren|1|rental_car_cost!66@
+rev|1|reverse!98@
+shi|2|ship_col!43@ship_row!43@
+sho|1|shopping_list!51@
+sol|15|Solution!105@Solution!113@Solution!121@Solution!129@Solution!137@Solution!81@Solution!145@Solution!97@Solution!153@Solution!161@Solution!169@Solution!177@Solution!73@Solution!185@Solution!193@
+sto|1|stock!51@
+tem|1|TEMP!35@
+tri|1|trip_cost!66@
+tyl|1|tyler!27@
+wor|1|word!59@
+wri|1|write_py!34@
 -- END TREE
 -- START TREE 2
-0
+19
+__i|2|__init__!25&74@__init__!26&82@
+add|1|addTwoNumbers!27&74@
+con|1|convert!27&122@
+fin|1|findMedianSortedArrays!27&114@
+int|1|intToRoman!27&162@
+isp|1|isPalindrome!27&194@
+len|2|lengthOfLongestSubstring!27&106@lengthOfLongestSubstring_better!27&106@
+lon|1|longestPalindrome!27&154@
+ls|1|ls!27&83@
+max|2|maxArea!27&170@maxPoints!27&82@
+mer|1|merge!27&146@
+nex|1|next!28&75@
+rev|2|reverse!27&98@rev!27&99@
+sor|1|sortList!27&186@
+thr|2|threeSum!27&178@threeSumClosest!27&138@
+two|1|twoSum!27&130@
+val|1|val!28&75@
+x|1|x!29&83@
+y|1|y!29&83@
 -- END TREE

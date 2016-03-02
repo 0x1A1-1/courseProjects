@@ -1,0 +1,13 @@
+'''
+Created on Feb 26, 2016
+
+@author: Cigarent
+'''
+class Solution(object):
+    def ispalindrome(self, s):
+        print(s[0:3])
+        print(s[0:3:-1])
+        if (s[0:3]==s[0:3:-1]):
+            print("yes")
+     
+    ispalindrome(object,"abab")      

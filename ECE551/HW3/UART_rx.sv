@@ -13,10 +13,10 @@ rx_state state, next_state;
 
 		
 //bit counter
-always @(posedge clk, posedge bit_rst) begin
+always @(posedge clk) begin
 	if (bit_rst)
-		bit_counter <= 4'b1000;
-	if (shift)
+		bit_counter <= 4'b0000;
+	else if (shift)
 		bit_counter <= bit_counter+1;
 	else
 		bit_counter <= bit_counter;
@@ -32,15 +32,21 @@ always @(posedge clk) begin
 
 //trigger block
 always @(negedge RX)begin
-	trigger <= 1'b1;
+	if (state==IDLE)
+		trigger <= 1'b1;
+	else
+		trigger <= 1'b0;
 end
 
 //shift block
-always @(posedge shift)begin
-	cmd <= {cmd[6:0],RX};
+always @(posedge clk)begin
+	if (shift)
+		cmd <= {cmd[6:0],RX};
+	else
+		cmd <= cmd;
 end
 	
-assign rdy = data_rdy & !clr_rdy;
+assign rdy = data_rdy?(clr_rdy? 0: 1):0;
 
 //state machine
 always @(posedge clk, negedge rst_n)
@@ -51,24 +57,27 @@ always @(posedge clk, negedge rst_n)
 		
 always_comb begin
 	shift = 1'b0;
-	bit_rst = 1'b0;
 	case(state)
-	IDLE:
+	IDLE:	begin
+		bit_rst = 1'b1;
+		baud_rst = 1'b1;
 		if (!rst_n) begin
 			next_state = IDLE;
 		end
 		else if (trigger) begin
+			bit_rst = 1'b0;
+			baud_rst = 1'b0;
 			data_rdy = 1'b0;
 			next_state = LOAD;
 		end
 		else
 			next_state = IDLE;
+	end
 		
 	LOAD:
 		if (bit_counter==4'b1000) begin
 			next_state = IDLE;
 			data_rdy = 1'b1;	
-			bit_rst = 1'b1;
 		end
 		else if (baud_cnt==7'b1101101) begin
 			baud_rst = 1'b1;
@@ -76,6 +85,7 @@ always_comb begin
 			next_state =LOAD;
 		end
 		else begin
+			baud_rst = 1'b0;
 			next_state= LOAD;
 		end
 	endcase

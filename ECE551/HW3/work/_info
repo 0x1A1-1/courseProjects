@@ -264,6 +264,31 @@ r1
 !i113 1
 R6
 n@u@a@r@t_rx
+vUART_rx_tb
+R1
+!s110 1456880241
+!i10b 1
+!s100 SkYB@j^1A=[J4BK0SH^FI1
+IKf2XfBG`JZ;3e9XMjNj5]2
+R3
+!s105 UART_rx_tb_sv_unit
+S1
+R0
+w1456880232
+8D:/CsCourse/ECE551/HW3/UART_rx_tb.sv
+FD:/CsCourse/ECE551/HW3/UART_rx_tb.sv
+L0 1
+R5
+r1
+!s85 0
+31
+!s108 1456880241.000000
+!s107 D:/CsCourse/ECE551/HW3/UART_rx_tb.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW3/UART_rx_tb.sv|
+!s101 -O0
+!i113 1
+R6
+n@u@a@r@t_rx_tb
 vUART_tx
 R1
 Z15 !s110 1456877822

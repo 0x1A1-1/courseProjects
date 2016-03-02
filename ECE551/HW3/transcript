@@ -1,37 +1,29 @@
-# Compile of UART_rx.sv failed with 1 errors.
-# Compile of UART_tx.sv was successful.
-# 2 compiles, 1 failed with 1 error.
-# Error opening D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv
-# Path name 'D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv' doesn't exist.
-# Error opening D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv
-# Path name 'D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv' doesn't exist.
-# Error opening D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv
-# Path name 'D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv' doesn't exist.
-# Compile of UART_rx.sv failed with 1 errors.
-# Compile of UART_tx_tb.sv was successful.
-# 2 compiles, 1 failed with 1 error.
-# Compile of dual_PWM.sv was successful.
-# Compile of dual_PWM_tb.sv was successful.
-# Compile of dual_PWM_tb.v was successful.
-# Compile of pwm8.sv was successful.
-# Compile of pwm8_tb.sv was successful.
-# Compile of pwm8_tb.v was successful.
-# Compile of ss_A2D.v was successful.
-# Compile of ss_A2D_datapath.v was successful.
-# Compile of ss_A2D_SM.sv was successful.
-# Compile of ss_A2D_tb.v was successful.
-# Compile of trigger_logic.sv was successful.
-# Compile of trigger_logic_tb.sv was successful.
-# Compile of UART_rx.sv failed with 2 errors.
-# Compile of UART_tx.sv was successful.
-# Compile of UART_tx_tb.sv was successful.
-# 15 compiles, 1 failed with 2 errors.
-# Error opening D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv
-# Path name 'D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv' doesn't exist.
-# Compile of UART_rx.sv failed with 2 errors.
-# Compile of UART_rx.sv failed with 2 errors.
-# Compile of UART_rx.sv failed with 2 errors.
-# Compile of UART_rx.sv failed with 1 errors.
-# Compile of UART_rx.sv failed with 1 errors.
-# Compile of UART_rx.sv failed with 1 errors.
-# Compile of UART_rx.sv was successful.
+# Reading C:/Modeltech_pe_edu_10.4a/tcl/vsim/pref.tcl
+# OpenFile D:/CsCourse/ECE551/HW3/HW3.mpf
+# Loading project HW3
+vsim -gui work.UART_rx_tb
+# //  ModelSim PE Student Edition 10.4a Apr  7 2015 
+# //
+# //  Copyright 1991-2015 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION
+# //  WHICH IS THE PROPERTY OF MENTOR GRAPHICS CORPORATION OR ITS
+# //  LICENSORS AND IS SUBJECT TO LICENSE TERMS.
+# //  THIS DOCUMENT CONTAINS TRADE SECRETS AND COMMERCIAL OR FINANCIAL
+# //  INFORMATION THAT ARE PRIVILEGED, CONFIDENTIAL, AND EXEMPT FROM
+# //  DISCLOSURE UNDER THE FREEDOM OF INFORMATION ACT, 5 U.S.C. SECTION 552.
+# //  FURTHERMORE, THIS INFORMATION IS PROHIBITED FROM DISCLOSURE UNDER
+# //  THE TRADE SECRETS ACT, 18 U.S.C. SECTION 1905.
+# //
+# // NOT FOR CORPORATE OR PRODUCTION USE.
+# // THE ModelSim PE Student Edition IS NOT A SUPPORTED PRODUCT.
+# // FOR HIGHER EDUCATION PURPOSES ONLY
+# //
+# vsim -gui D:\CsCourse\ECE551\HW3\HW3.mpf 
+# Start time: 19:00:08 on Mar 01,2016
+# Loading sv_std.std
+# Loading work.UART_rx_tb
+# Loading work.UART_rx
+# End time: 19:06:26 on Mar 01,2016, Elapsed time: 0:06:18
+# Errors: 0, Warnings: 0

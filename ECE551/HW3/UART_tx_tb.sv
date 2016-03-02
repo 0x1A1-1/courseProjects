@@ -18,7 +18,7 @@ initial
 		trmt=1'b1;
 		repeat(2) @(posedge clk);
 		trmt = 1'b0;
-		#12000
+		#4000
 		rst_n=1'b0;
 		@(posedge clk);
 		rst_n=1'b1;
@@ -29,6 +29,6 @@ initial
 		trmt = 1'b0;
 	end
 
-always #5 clk=~clk;
+always #1 clk=~clk;
 	
 endmodule

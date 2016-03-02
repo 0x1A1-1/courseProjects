@@ -1,0 +1,28 @@
+'''
+Created on Feb 26, 2016
+
+@author: Sean
+'''
+class Solution(object):
+   
+    def lengthOfLongestSubstring(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        maxLen = 0 
+        curr = ""
+        for j in range (0, len(s)):
+            if s[j] in curr:
+                if (len(curr)>maxLen):
+                    maxLen=len(curr)
+                curr = curr[curr.index(s[j])+1:]+s[j]
+                
+            else:
+                curr+=s[j]
+                print(curr)
+            
+        return maxLen
+    
+    print(lengthOfLongestSubstring(object,"abcdabcdefax"))
+    

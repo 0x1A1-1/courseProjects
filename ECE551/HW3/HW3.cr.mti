@@ -82,12 +82,19 @@ Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
 Top level modules:
 	ss_A2D_datapath
 
-} {} {}} I:/551/HW3/trigger_logic.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/HW3/trigger_logic.sv
-Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
--- Compiling module trigger_logic
+} {} {}} D:/CsCourse/ECE551/HW3/UART_rx_tb.sv {1 {vlog -work work -sv -stats=none D:/CsCourse/ECE551/HW3/UART_rx_tb.sv
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module UART_rx_tb
 
 Top level modules:
-	trigger_logic
+	UART_rx_tb
+
+} {} {}} I:/551/HW3/dual_PWM.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/HW3/dual_PWM.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module dual_PWM
+
+Top level modules:
+	dual_PWM
 
 } {} {}} I:/551/HW3/ss_A2D.v {1 {vlog -work work -vopt -stats=none I:/551/HW3/ss_A2D.v
 Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
@@ -96,12 +103,26 @@ Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
 Top level modules:
 	ss_A2D
 
-} {} {}} I:/551/HW3/dual_PWM.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/HW3/dual_PWM.sv
+} {} {}} I:/551/HW3/trigger_logic.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/HW3/trigger_logic.sv
 Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
--- Compiling module dual_PWM
+-- Compiling module trigger_logic
 
 Top level modules:
-	dual_PWM
+	trigger_logic
+
+} {} {}} D:/CsCourse/ECE551/HW3/UART_tx_tb.sv {1 {vlog -work work -sv -stats=none D:/CsCourse/ECE551/HW3/UART_tx_tb.sv
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module UART_tx_tb
+
+Top level modules:
+	UART_tx_tb
+
+} {} {}} D:/CsCourse/ECE551/HW3/UART_rx.sv {1 {vlog -work work -sv -stats=none D:/CsCourse/ECE551/HW3/UART_rx.sv
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module UART_rx
+
+Top level modules:
+	UART_rx
 
 } {} {}} D:/CsCourse/ECE551/HW3/pwm8_tb.v {1 {vlog -work work -stats=none D:/CsCourse/ECE551/HW3/pwm8_tb.v
 Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
@@ -113,19 +134,19 @@ Top level modules:
 } {} {}} I:/551/HW3/UART_rx.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/HW3/UART_rx.sv
 Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
 
+} {} {}} D:/CsCourse/ECE551/HW3/UART_tx.sv {1 {vlog -work work -sv -stats=none D:/CsCourse/ECE551/HW3/UART_tx.sv
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module UART_tx
+
+Top level modules:
+	UART_tx
+
 } {} {}} I:/551/HW3/pwm8_tb.v {1 {vlog -work work -vopt -stats=none I:/551/HW3/pwm8_tb.v
 Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
 -- Compiling module pwm8_tb
 
 Top level modules:
 	pwm8_tb
-
-} {} {}} D:/CsCourse/ECE551/HW3/ss_A2D_SM.sv {1 {vlog -work work -sv -stats=none D:/CsCourse/ECE551/HW3/ss_A2D_SM.sv
-Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
--- Compiling module ss_A2D_SM
-
-Top level modules:
-	ss_A2D_SM
 
 } {} {}} D:/CsCourse/ECE551/HW3/dual_PWM_tb.v {1 {vlog -work work -stats=none D:/CsCourse/ECE551/HW3/dual_PWM_tb.v
 Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
@@ -134,6 +155,13 @@ Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 
 Top level modules:
 	dual_PWM_tb
 
+} {} {}} D:/CsCourse/ECE551/HW3/ss_A2D_SM.sv {1 {vlog -work work -sv -stats=none D:/CsCourse/ECE551/HW3/ss_A2D_SM.sv
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module ss_A2D_SM
+
+Top level modules:
+	ss_A2D_SM
+
 } {} {}} D:/CsCourse/ECE551/HW3/pwm8.sv {1 {vlog -work work -sv -stats=none D:/CsCourse/ECE551/HW3/pwm8.sv
 Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
 -- Compiling module pwm8
@@ -141,18 +169,18 @@ Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 
 Top level modules:
 	pwm8
 
-} {} {}} I:/551/HW3/ss_A2D_SM.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/HW3/ss_A2D_SM.sv
-Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
--- Compiling module ss_A2D_SM
-
-Top level modules:
-	ss_A2D_SM
-
 } {} {}} I:/551/HW3/dual_PWM_tb.v {1 {vlog -work work -vopt -stats=none I:/551/HW3/dual_PWM_tb.v
 Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
 -- Compiling module dual_PWM_tb
 
 Top level modules:
 	dual_PWM_tb
+
+} {} {}} I:/551/HW3/ss_A2D_SM.sv {1 {vlog -work work -vopt -sv -stats=none I:/551/HW3/ss_A2D_SM.sv
+Model Technology ModelSim SE vlog 10.3c Compiler 2014.07 Jul 19 2014
+-- Compiling module ss_A2D_SM
+
+Top level modules:
+	ss_A2D_SM
 
 } {} {}}

@@ -1,0 +1,54 @@
+'''
+Created on Feb 28, 2016
+
+@author: Cigarent
+'''
+class Solution(object):
+    def threeSum(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        """
+        dict = {}
+        ans = []
+        if nums.count(0)>=3:
+            ans.append([0,0,0])
+        for i in nums:
+            if i not in dict:
+                dict[i]=min(2, nums.count(i))
+        
+        newNums = []
+        for i in dict:
+            for n in range(dict[i]):
+                newNums.append(i)
+        newNums.sort()
+        
+#         rightP = len(newNums)-1
+#         leftP = 0
+#         while rightP>=leftP:
+#             if -(newNums[rightP]+newNums[rightP-1])<newNums[leftP]:
+#                 rightP-=1
+#             if -(newNums[leftP]+newNums[leftP+1])>newNums[rightP]:
+#                 leftP+=1
+#             else :   
+#                 break;
+        nvalues=len(newNums)
+        for i in range(nvalues-2):
+            v1 = values[i]
+            if v1 >= 0:
+                break
+            if i > 0 and v1 == values[i-1]:
+                continue
+            for j in range(i+1,nvalues-1):
+                v2 = values[j]
+                if j > i+1 and v2 == values[j-1]:
+                    continue
+                v3 = -(v1 + v2)
+                if v3 < v2:
+                    break
+                if v3 in instances:
+                    if v3 > v2 or instances[v3] > 1:
+                        result.append([v1,v2,v3])
+    return result 
+         
+    threeSum(object,[-2,-1,0,1,2,5])
