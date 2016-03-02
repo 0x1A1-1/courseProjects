@@ -60,6 +60,6 @@ begin
 	RX = 1'b1;
 	repeat(109) @ (negedge clk); 
 	RX = 1'b1;
-	$stop
+	$stop;
 end
 endmodule
