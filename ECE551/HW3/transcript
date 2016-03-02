@@ -1,0 +1,37 @@
+# Compile of UART_rx.sv failed with 1 errors.
+# Compile of UART_tx.sv was successful.
+# 2 compiles, 1 failed with 1 error.
+# Error opening D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv
+# Path name 'D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv' doesn't exist.
+# Error opening D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv
+# Path name 'D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv' doesn't exist.
+# Error opening D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv
+# Path name 'D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv' doesn't exist.
+# Compile of UART_rx.sv failed with 1 errors.
+# Compile of UART_tx_tb.sv was successful.
+# 2 compiles, 1 failed with 1 error.
+# Compile of dual_PWM.sv was successful.
+# Compile of dual_PWM_tb.sv was successful.
+# Compile of dual_PWM_tb.v was successful.
+# Compile of pwm8.sv was successful.
+# Compile of pwm8_tb.sv was successful.
+# Compile of pwm8_tb.v was successful.
+# Compile of ss_A2D.v was successful.
+# Compile of ss_A2D_datapath.v was successful.
+# Compile of ss_A2D_SM.sv was successful.
+# Compile of ss_A2D_tb.v was successful.
+# Compile of trigger_logic.sv was successful.
+# Compile of trigger_logic_tb.sv was successful.
+# Compile of UART_rx.sv failed with 2 errors.
+# Compile of UART_tx.sv was successful.
+# Compile of UART_tx_tb.sv was successful.
+# 15 compiles, 1 failed with 2 errors.
+# Error opening D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv
+# Path name 'D:/CsCourse/ECE551/HW3/(vlog-13069) D:/CsCourse/ECE551/HW3/UART_rx.sv' doesn't exist.
+# Compile of UART_rx.sv failed with 2 errors.
+# Compile of UART_rx.sv failed with 2 errors.
+# Compile of UART_rx.sv failed with 2 errors.
+# Compile of UART_rx.sv failed with 1 errors.
+# Compile of UART_rx.sv failed with 1 errors.
+# Compile of UART_rx.sv failed with 1 errors.
+# Compile of UART_rx.sv was successful.

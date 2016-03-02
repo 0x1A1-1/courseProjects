@@ -8,7 +8,7 @@ typedef enum reg[1:0] {IDLE, LOAD, TRAN} UART_state;
 UART_state state, next_state;
 
 logic [3:0] bit_cnt;
-logic [11:0] baud_cnt;
+logic [6:0] baud_cnt;
 logic [9:0] tx_shift_reg;
 logic load, shift, transmitting;
 logic set_done, clr_done;
@@ -25,32 +25,32 @@ always @(posedge clk) begin
 		
 //baud_cnt module
 always @(posedge clk) begin
-	if (load)
-		baud_cnt <= 12'b000000000000;
+	if (load | shift) 
+		baud_cnt <= 7'b0;
 	else if (transmitting)
 		baud_cnt <=  baud_cnt +1;
 	else
 		baud_cnt = baud_cnt;
-		//how to get shift
 	end
 
-	assign shift = (baud_cnt==12'b101000101100)? 1:0;
+assign shift = (baud_cnt==7'b1101101)? 1:0;
 
 //shift module	
 always @(posedge clk, negedge rst_n) begin
-	if (!rst_n)
+	if (!rst_n) 
 		tx_shift_reg <= 9'b000000001;
-	else if (load)
+	else if (load) 
 		tx_shift_reg <= {1'b1, TX_DATA, 1'b0};
 	else if (shift)
-		tx_shift_reg <= tx_shift_reg>>1;
+		tx_shift_reg <={1'b1, tx_shift_reg[9:1]};
 	else
 		tx_shift_reg <= tx_shift_reg;
 	end
 
-	assign TX = (state == IDLE)? 1'b1:tx_shift_reg[0];
+assign TX = tx_shift_reg[0];
+
 //output logic
-always @(posedge clk, negedge rst_n, set_done, clr_done) begin
+always @(posedge clk, set_done, clr_done, negedge rst_n) begin
 	if (!rst_n)
 		tx_done <= 1'b0;
 	else if (set_done==1'b1)
@@ -82,26 +82,32 @@ always_comb begin
 			next_state = LOAD;
 			clr_done = 1'b1;
 			set_done = 1'b0;
+			transmitting=1'b1;
 			load = 1'b1;
 		end
 		else begin
 			next_state = IDLE;
+			set_done = 1'b1;
 			load  =1'b0;
 			transmitting = 1'b0;
 		end
-	LOAD:
+	LOAD:  begin
+		//load = 1'b0;
+		transmitting = 1'b1;
 		if (shift) begin
 			next_state = TRAN;
-			transmitting = 1'b1;
 		end
-		else
+		else begin
 			next_state = LOAD;
+		end
+	end
 	TRAN:
-		if (bit_cnt==4'b1001) begin
+		if (bit_cnt==4'b1010) begin
 			set_done=1'b1;
 			next_state=IDLE;
 		end
 		else begin
+			transmitting = 1'b1;
 			next_state = LOAD;
 		end
 	default:
