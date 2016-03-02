@@ -18,13 +18,16 @@ module ss_A2D_SM(clk,rst_n,strt_cnv,smp_eq_8,gt,clr_dac,inc_dac,
   typedef enum reg [1:0] {IDLE,CONV,ACCUM} state_t;
   state_t state, next_state;
 
+  //state machine
   always_ff @(posedge clk, negedge rst_n)
     if(!rst_n)
       state <= IDLE;
     else
       state <= next_state;
 
+  //state machine logic
   always_comb begin
+  //reset some signal at each iteration
   clr_dac = 1'b0;
   inc_dac = 1'b0;
   clr_smp = 1'b0;
@@ -34,7 +37,7 @@ module ss_A2D_SM(clk,rst_n,strt_cnv,smp_eq_8,gt,clr_dac,inc_dac,
   
   case(state)
   IDLE:
-	if(strt_cnv) begin
+	if(strt_cnv) begin		//go to next state if start signal is asserted
 	next_state = CONV;
 	clr_dac = 1'b1;
 	clr_smp = 1'b1;
@@ -44,7 +47,7 @@ module ss_A2D_SM(clk,rst_n,strt_cnv,smp_eq_8,gt,clr_dac,inc_dac,
 	end
 	
   CONV:
-	if (gt) begin
+	if (gt) begin		//if gt is asserted go to next state
 		next_state = ACCUM;
 		accum =1'b1;
 	end
@@ -54,7 +57,7 @@ module ss_A2D_SM(clk,rst_n,strt_cnv,smp_eq_8,gt,clr_dac,inc_dac,
 	end
 	
   ACCUM:
-	if (smp_eq_8) begin
+	if (smp_eq_8) begin		//if 8 sample is finished, go back to IDLE state
 		cnv_cmplt= 1'b1;
 		next_state= IDLE;
 	end
