@@ -43,7 +43,7 @@ end
 //shift flip flop block
 always @(posedge clk)begin
 	if (shift)
-		cmd <= {cmd[6:0],RX};
+		cmd <= {RX,cmd[7:1]};
 	else
 		cmd <= cmd;
 end
@@ -69,7 +69,7 @@ always_comb begin
 		end
 		else if (trigger) begin		//if falling edge of RX is detect, start reading
 			bit_rst = 1'b0;
-			baud_rst = 1'b0;
+			baud_rst = 1'b1;
 			data_rdy = 1'b0;
 			next_state = LOAD;
 		end
