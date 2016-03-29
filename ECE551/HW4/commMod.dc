@@ -13,7 +13,7 @@ set_dont_touch_network [find port clk]
 #constrain input timing & drive#
 set prim_inputs [remove_from_collection [all_inputs] [find port clk]]
 set_input_delay -clock clk 0.5 $prim_inputs
-set_driving_cell -lib_cell ND2D2BWP -from_pin N1 -library tcbn40lpbwptc $prim_inputs
+set_driving_cell -lib_cell ND2D2BWP -from_pin A1 -library tcbn40lpbwptc $prim_inputs
 set_drive 0.1 rst_n
 
 #constrain output timing#
