@@ -52,7 +52,7 @@ always @(posedge clk, negedge rst_n) begin
 assign TX = tx_shift_reg[0]; 	//output for the least sig bit 
 
 //output logic for tx_done
-always @(posedge clk, set_done, clr_done, negedge rst_n) begin
+always @(posedge clk, negedge rst_n) begin
 	if (!rst_n)
 		tx_done <= 1'b0;
 	else if (set_done==1'b1)

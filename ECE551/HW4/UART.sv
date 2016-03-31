@@ -6,6 +6,6 @@ output TX, rdy, tx_done;
 output [7:0] rx_data; 
 
 UART_tx iDUT_tx(.clk(clk), .rst_n(rst_n), .TX(TX), .trmt(trmt), .TX_DATA(tx_data),.tx_done(tx_done));
-UART_rx iDUT_rx(.clk(clk), .rst_n(rst_n), .RX(TX), .rdy(rdy), .cmd(rx_data), .clr_rdy(clr_rdy));
+UART_rx iDUT_rx(.clk(clk), .rst_n(rst_n), .RX(RX), .rdy(rdy), .rx_data(rx_data), .clr_rdy(clr_rdy));
 
 endmodule
