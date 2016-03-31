@@ -43,8 +43,10 @@ always_comb begin
 	SEND_HIGH: if (tx_done) begin
 		trmt = 1;
 		next_state = SEND_LOW;
-	end else
+	end else begin
+		sel = 1;
 		next_state = SEND_HIGH;
+	end
 		
 	SEND_LOW:if (tx_done) begin
 		cmd_cmplt = 1;
