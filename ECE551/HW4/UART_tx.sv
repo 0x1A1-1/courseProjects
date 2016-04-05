@@ -11,8 +11,8 @@ UART_state state, next_state;
 
 logic [3:0] bit_cnt;
 logic [6:0] baud_cnt;
-logic [9:0] tx_shift_reg; //register for data shifting
-logic load, shift, transmitting; //signal help determine the state machine
+logic [9:0] tx_shift_reg; 			//register for data shifting
+logic load, shift, transmitting; 	//signal help determine the state machine
 logic set_done, clr_done;
 
 //bit counter flip flop
@@ -32,7 +32,7 @@ always @(posedge clk) begin
 	else if (transmitting)
 		baud_cnt <=  baud_cnt +1;
 	else
-		baud_cnt = baud_cnt;
+		baud_cnt <= baud_cnt;
 	end
 
 assign shift = (baud_cnt==7'b1101101)? 1:0;
@@ -84,13 +84,11 @@ always_comb begin
 		if (trmt) begin
 			next_state = LOAD;	//advance stat if trmt is asserted
 			clr_done = 1'b1;
-			set_done = 1'b0;
 			transmitting=1'b1;
 			load = 1'b1;
 		end
 		else begin
 			next_state = IDLE; //stay at current state otherwise
-			set_done = 1'b1;
 			load  =1'b0;
 			transmitting = 1'b0;
 		end

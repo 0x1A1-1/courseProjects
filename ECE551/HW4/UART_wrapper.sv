@@ -34,7 +34,7 @@ always_comb begin
 	capture_high = 0;
 	cmd_rdy = 0;
 	clr_rdy = 0;
-	nxt_state = HIGH;
+	nxt_state = HIGH;	//set default value of every loop
 	case (state)
 		HIGH : 
 			if (rdy) begin
@@ -46,11 +46,11 @@ always_comb begin
 		
 		LOW :
 			if (rdy) begin
-				cmd_rdy = 1;
+				cmd_rdy = 1;     //clear rx for new receiving
 				clr_rdy = 1;
 				nxt_state = RDY;
 			end else
-			nxt_state = LOW;
+				nxt_state = LOW;
 			
 		///// default case = RDY /////
 		RDY : 

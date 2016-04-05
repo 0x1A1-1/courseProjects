@@ -1,5 +1,5 @@
 #read in verilog file first# 
-read_file -format verilog {./UART.sv ./UART_rx.sv ./UART_tx.sv}
+read_file -format Sverilog {./UART.sv ./UART_rx.sv ./UART_tx.sv}
 
 #set current design to top level#
 set current_design UART

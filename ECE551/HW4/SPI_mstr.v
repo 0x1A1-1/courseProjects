@@ -1,4 +1,4 @@
-`timescale 100ps/10ps
+//`timescale 100ps/10ps
 //////////////////////////////////////////////////////////////////////////
 // SPI master module that transmits 8-bit or 16-bit packets (data_out) //
 // The edge that MOSI shifts on is determined by pos_edge.  The width //
