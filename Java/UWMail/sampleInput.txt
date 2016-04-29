@@ -1,0 +1,4 @@
+[0] p2 (Sep 22)
+[1] Action item (Sep 21)
+[2] Message subject (Sep 18)
+Enter option ([#]Open conversation, [T]rash, [Q]uit): 

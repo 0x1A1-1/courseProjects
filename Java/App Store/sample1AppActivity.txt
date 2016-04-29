@@ -1,0 +1,9 @@
+d,ace.jane@gmail.com,com.facebook.app
+r,ace.jane@gmail.com,com.facebook.app,4
+d,ray@hotmail.com,com.halfbrick.fruitninja
+r,ray@hotmail.com,com.halfbrick.fruitninja,5
+d,ray@hotmail.com,com.facebook.messenger
+d,ray@hotmail.com,org.videolan.vlc
+r,ray@hotmail.com,org.videolan.vlc,2
+d,brand.max@outlook.com,com.intsig.lic.camscanner
+r,brand.max@outlook.com,com.intsig.lic.camscanner,4

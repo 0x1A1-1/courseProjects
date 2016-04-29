@@ -1,0 +1,7 @@
+dev@fb.com,com.facebook.app,Facebook,Social,0.0,1411604234000
+dev@king.com,com.king.candycrush,Candy Crush,Games,0.0,1441678967000
+dev@fb.com,com.facebook.messenger,Messenger,Social,0.0,1425604234000
+help@idc.ucweb.com,com.ucweb.browser,UC Browser,Communication,0.0,1425603234000
+videolan@gmail.com,org.videolan.vlc,VLC Player,Photo&Video,0.0,1425601258000
+android_support@intsig.com,com.intsig.lic.camscanner,Cam Scanner,Productivity,2.0,1425601723000
+fruitninja@halfbrick.com,com.halfbrick.fruitninja,Fruit Ninja,Games,4.0,1428601792000

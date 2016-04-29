@@ -1,0 +1,288 @@
+[0] p2 (Sep 22)
+[1] Action item (Sep 21)
+[2] Message subject (Sep 18)
+Enter option ([#]Open conversation, [T]rash, [Q]uit): j
+Invalid command!
+Enter option ([#]Open conversation, [T]rash, [Q]uit): k
+Invalid command!
+Enter option ([#]Open conversation, [T]rash, [Q]uit): n
+Invalid command!
+Enter option ([#]Open conversation, [T]rash, [Q]uit): p
+Invalid command!
+Enter option ([#]Open conversation, [T]rash, [Q]uit): i
+Invalid command!
+Enter option ([#]Open conversation, [T]rash, [Q]uit): t
+No conversations to show.
+Enter option ([I]nbox, [Q]uit): i
+[0] p2 (Sep 22)
+[1] Action item (Sep 21)
+[2] Message subject (Sep 18)
+Enter option ([#]Open conversation, [T]rash, [Q]uit): 0
+SUBJECT: p2
+--------------------------------------------------------------------------------
+sender@wisc.edu | Don't forget that p2 is due soon! | Sep 21
+--------------------------------------------------------------------------------
+From: you@wisc.edu
+To: sender@wisc.edu
+Date: Sep 22
+
+Thanks for the reminder!
+
+On Mon, Sep 21, 2015 at 9:46 PM, <sender@wisc.edu> wrote:
+> Don't forget that p2 is due soon!
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): n
+SUBJECT: p2
+--------------------------------------------------------------------------------
+sender@wisc.edu | Don't forget that p2 is due soon! | Sep 21
+--------------------------------------------------------------------------------
+From: you@wisc.edu
+To: sender@wisc.edu
+Date: Sep 22
+
+Thanks for the reminder!
+
+On Mon, Sep 21, 2015 at 9:46 PM, <sender@wisc.edu> wrote:
+> Don't forget that p2 is due soon!
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): p
+SUBJECT: p2
+--------------------------------------------------------------------------------
+From: sender@wisc.edu
+To: you@wisc.edu
+Date: Sep 21
+
+Don't forget that p2 is due soon!
+--------------------------------------------------------------------------------
+you@wisc.edu | Thanks for the reminder! | Sep 22
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): n
+SUBJECT: p2
+--------------------------------------------------------------------------------
+sender@wisc.edu | Don't forget that p2 is due soon! | Sep 21
+--------------------------------------------------------------------------------
+From: you@wisc.edu
+To: sender@wisc.edu
+Date: Sep 22
+
+Thanks for the reminder!
+
+On Mon, Sep 21, 2015 at 9:46 PM, <sender@wisc.edu> wrote:
+> Don't forget that p2 is due soon!
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): j
+SUBJECT: Action item
+--------------------------------------------------------------------------------
+From: sender@wisc.edu
+To: you@wisc.edu
+Date: Sep 21
+
+Please respond to this email by tonight!
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): k
+SUBJECT: p2
+--------------------------------------------------------------------------------
+sender@wisc.edu | Don't forget that p2 is due soon! | Sep 21
+--------------------------------------------------------------------------------
+From: you@wisc.edu
+To: sender@wisc.edu
+Date: Sep 22
+
+Thanks for the reminder!
+
+On Mon, Sep 21, 2015 at 9:46 PM, <sender@wisc.edu> wrote:
+> Don't forget that p2 is due soon!
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): p
+SUBJECT: p2
+--------------------------------------------------------------------------------
+From: sender@wisc.edu
+To: you@wisc.edu
+Date: Sep 21
+
+Don't forget that p2 is due soon!
+--------------------------------------------------------------------------------
+you@wisc.edu | Thanks for the reminder! | Sep 22
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): j
+SUBJECT: Action item
+--------------------------------------------------------------------------------
+From: sender@wisc.edu
+To: you@wisc.edu
+Date: Sep 21
+
+Please respond to this email by tonight!
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): k
+SUBJECT: p2
+--------------------------------------------------------------------------------
+From: sender@wisc.edu
+To: you@wisc.edu
+Date: Sep 21
+
+Don't forget that p2 is due soon!
+--------------------------------------------------------------------------------
+you@wisc.edu | Thanks for the reminder! | Sep 22
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): j
+SUBJECT: Action item
+--------------------------------------------------------------------------------
+From: sender@wisc.edu
+To: you@wisc.edu
+Date: Sep 21
+
+Please respond to this email by tonight!
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): n
+SUBJECT: Action item
+--------------------------------------------------------------------------------
+From: sender@wisc.edu
+To: you@wisc.edu
+Date: Sep 21
+
+Please respond to this email by tonight!
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): p
+SUBJECT: Action item
+--------------------------------------------------------------------------------
+From: sender@wisc.edu
+To: you@wisc.edu
+Date: Sep 21
+
+Please respond to this email by tonight!
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): j
+SUBJECT: Message subject
+--------------------------------------------------------------------------------
+sender@wisc.edu | This is the email body. | Sep 18
+--------------------------------------------------------------------------------
+you@wisc.edu | This is the first response. | Sep 18
+--------------------------------------------------------------------------------
+sender@wisc.edu | This is the second response. | Sep 18
+--------------------------------------------------------------------------------
+From: you@wisc.edu
+To: sender@wisc.edu
+Date: Sep 18
+
+Right on!
+
+On Fri, Sep 18, 2015 at 10:21 AM, <sender@wisc.edu> wrote:
+> This is the second response.
+>
+> On Fri, Sep 18, 2015 at 10:20 AM, <you@wisc.edu> wrote:
+>> This is the first response.
+>>
+>> On Fri, Sep 18, 2015 at 10:20 AM, <sender@wisc.edu> wrote:
+>>> This is the email body.
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): p
+SUBJECT: Message subject
+--------------------------------------------------------------------------------
+sender@wisc.edu | This is the email body. | Sep 18
+--------------------------------------------------------------------------------
+you@wisc.edu | This is the first response. | Sep 18
+--------------------------------------------------------------------------------
+From: sender@wisc.edu
+To: you@wisc.edu
+Date: Sep 18
+
+This is the second response.
+
+On Fri, Sep 18, 2015 at 10:20 AM, <you@wisc.edu> wrote:
+> This is the first response.
+>
+> On Fri, Sep 18, 2015 at 10:20 AM, <sender@wisc.edu> wrote:
+>> This is the email body.
+--------------------------------------------------------------------------------
+you@wisc.edu | Right on! | Sep 18
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): p
+SUBJECT: Message subject
+--------------------------------------------------------------------------------
+sender@wisc.edu | This is the email body. | Sep 18
+--------------------------------------------------------------------------------
+From: you@wisc.edu
+To: sender@wisc.edu
+Date: Sep 18
+
+This is the first response.
+
+On Fri, Sep 18, 2015 at 10:20 AM, <sender@wisc.edu> wrote:
+> This is the email body.
+--------------------------------------------------------------------------------
+sender@wisc.edu | This is the second response. | Sep 18
+--------------------------------------------------------------------------------
+you@wisc.edu | Right on! | Sep 18
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): k
+SUBJECT: Action item
+--------------------------------------------------------------------------------
+From: sender@wisc.edu
+To: you@wisc.edu
+Date: Sep 21
+
+Please respond to this email by tonight!
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): j
+SUBJECT: Message subject
+--------------------------------------------------------------------------------
+sender@wisc.edu | This is the email body. | Sep 18
+--------------------------------------------------------------------------------
+From: you@wisc.edu
+To: sender@wisc.edu
+Date: Sep 18
+
+This is the first response.
+
+On Fri, Sep 18, 2015 at 10:20 AM, <sender@wisc.edu> wrote:
+> This is the email body.
+--------------------------------------------------------------------------------
+sender@wisc.edu | This is the second response. | Sep 18
+--------------------------------------------------------------------------------
+you@wisc.edu | Right on! | Sep 18
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): j
+No more conversation to be show!
+[0] p2 (Sep 22)
+[1] Action item (Sep 21)
+[2] Message subject (Sep 18)
+Enter option ([#]Open conversation, [T]rash, [Q]uit): t
+No conversations to show.
+Enter option ([I]nbox, [Q]uit): i
+[0] p2 (Sep 22)
+[1] Action item (Sep 21)
+[2] Message subject (Sep 18)
+Enter option ([#]Open conversation, [T]rash, [Q]uit): 1
+SUBJECT: Action item
+--------------------------------------------------------------------------------
+From: sender@wisc.edu
+To: you@wisc.edu
+Date: Sep 21
+
+Please respond to this email by tonight!
+--------------------------------------------------------------------------------
+Enter option ([N]ext email, [P]revious email, [J]Next conversation, [K]Previous
+conversation, [I]nbox, [#]Move to trash, [Q]uit): #
+[0] p2 (Sep 22)
+[1] Message subject (Sep 18)
+Enter option ([#]Open conversation, [T]rash, [Q]uit): t
+[0] Action item (Sep 21)
+Enter option ([I]nbox, [Q]uit): q
+Quitting...
