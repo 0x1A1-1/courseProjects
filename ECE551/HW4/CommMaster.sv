@@ -8,7 +8,7 @@ logic sel, trmt, tx_done;
 logic [7:0] tx_data, ff_low_bit;
 
 ///////////instantiate UART transmitor module///////////
-UART_tx iDUT_tx(.clk(clk), .rst_n(rst_n), .TX(TX), .trmt(trmt), .TX_DATA(tx_data),.tx_done(tx_done));
+UART_tx iDUT_tx(.clk(clk), .rst_n(rst_n), .TX(TX), .trmt(trmt), .TX_DATA(tx_data), .tx_done(tx_done));
 
 ///////////define state machine///////////
 typedef enum reg[1:0] {IDLE, SEND_HIGH, SEND_LOW, CMD_SEND} state_t;

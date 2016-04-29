@@ -1,0 +1,28 @@
+'''
+Created on Mar 27, 2016
+
+@author: Cigarent
+'''
+def answer(str_S):
+    # your code here
+    S = int(str_S)
+    all = [lambda x: check(x) for x in range(10)]
+    return all
+        
+def check(s):
+    if s==0:
+        return 1
+    elif s==1:
+        return 1
+    elif s==2:
+        return 2
+    even = float(s)/2
+    print("even=",even)
+    if even == int(even):
+        print("even in even",even)
+        return check(even) + check(even+1) + even
+    else:
+        odd = (s-1)/2
+        print("odd = ", odd, odd-1)
+        return check(odd-1) + check(odd) +1
+print(answer("3"))

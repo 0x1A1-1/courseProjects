@@ -1,0 +1,36 @@
+def answer(str_S):
+    # your code here
+    S = int(str_S)
+    load = 0
+    while check(load)<=S and check(load+1)<=S:
+        load+=100
+    print(load)
+    all = [ check(i) for i in range(0,load)]
+    if S in all:
+        return str( [i for i,x in enumerate(all) if x==S].pop() )
+    else:
+        return "None"
+        
+def check(s):
+    if s==0:
+        return 1
+    elif s==1:
+        return 1
+    elif s==2:
+        return 2
+    even = float(s)/2
+    if even == int(even):
+        return int(check(even) + check(even+1) + even)
+    else:
+        odd = (s-1)/2
+        return int(check(odd-1) + check(odd) +1)
+    
+def answerInt(n):
+    
+    
+print(check(65))
+x="122"
+myans= answer(x)
+print(myans)
+if myans!="None":
+    print(check(int(myans))) 

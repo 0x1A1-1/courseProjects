@@ -1,0 +1,39 @@
+from math import factorial
+
+def answer(seq):
+    if len(seq) <= 2:
+        return 1
+    else:
+        return helper(seq)
+    # your code here
+
+def helper(seq):
+    if len(seq) < 2:
+        return len(seq)
+    else:
+        left = [x for x in seq if x>seq[0]]
+        right = [x for x in seq if x<seq[0]]
+        print(left, right)
+        if len(left)==0:
+            return helper(right)
+        elif len(right)==0:
+            return helper(left)
+        else:
+            print((len(right)+1)*len(left),len(left))
+            return helper(left)*helper(right)*combination((len(right)+1)*len(left)
+                                                      ,len(left))
+
+# def combination(n,k):
+#     print(n,k)
+#     numerator=factorial(n)
+#     denominator=(factorial(k)*factorial(n-k))
+#     answer=numerator/denominator
+#     return answer
+def combination(left,right):
+    s = 0
+    for i in range(right+1):
+        for j in range(1, right+2, -1):
+            s += s+j
+    return s
+
+print(answer([5,9,8,2,1]))

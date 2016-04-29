@@ -1,54 +1,71 @@
-module UART_rx(clk, rst_n, RX, rdy, cmd, clr_rdy);
-
-input clk, rst_n, clr_rdy, RX;
+module UART_rx(clk, rst_n, RX, rdy, rx_data, clr_rx_rdy); // rx_data to cmd, clr_rx_rdy to clr_rdy 
+input clk, rst_n, clr_rx_rdy, RX;
 output logic rdy;
-output logic [7:0] cmd;
-
-logic [3:0] bit_counter;
-logic [6:0] baud_cnt;
-//declare intermediate wire and signal 
-logic baud_rst, bit_rst, shift, trigger, data_rdy;
+output logic [7:0] rx_data;
 
 //define state machine
 typedef enum reg {IDLE, LOAD} rx_state;
 rx_state state, next_state;
 
+logic [8:0] shift_reg;
+logic [3:0] bit_counter;
+logic [6:0] baud_cnt;
+//declare intermediate wire and signal 
+logic start, set_rx_rdy, receiving;
+logic rx_ff1, rx_ff2;
+logic shift;
+
 		
 //bit counter flip flop module
-always @(posedge clk) begin
-	if (bit_rst)
+always @(posedge clk, negedge rst_n) begin
+	if (!rst_n)
 		bit_counter <= 4'b0000;
-	else if (shift)
-		bit_counter <= bit_counter+1;
+	else if (start)
+		bit_counter <= 4'b0000;
 	else
-		bit_counter <= bit_counter;
+		bit_counter <= bit_counter+1;
 	end
 		
+assign shift = &baud_cnt;
+
 //baud_cnt flip flop module
-always @(posedge clk) begin
-	if (baud_rst) 
-		baud_cnt <= 7'b0000000;
-	else 
+always @(posedge clk, negedge rst_n) begin
+	if (!rst_n)
+		baud_cnt <= 7'h4A;
+	else if (start) 
+		baud_cnt <= 7'h4A;
+	else if (shift)
+		baud_cnt <= 7'h13;
+	else if (receiving)
 		baud_cnt <=  baud_cnt +1;
 	end
 
-//trigger block detect the falling edge of RX
-always @(negedge RX)begin
-	if (state==IDLE)
-		trigger <= 1'b1;
-	else
-		trigger <= 1'b0;
+//shift flip flop block
+always @(posedge clk) begin
+	if (shift)
+		shift_reg <= {RX, shift_reg[8:1]}; //LSB in first
 end
 
-//shift flip flop block
-always @(posedge clk)begin
-	if (shift)
-		cmd <= {RX,cmd[7:1]};
-	else
-		cmd <= cmd;
+//implement rdy signal
+always @(posedge clk, negedge rst_n) begin
+	if (!rst_n)
+		rdy <= 1'b0;
+	else if (start || clr_rx_rdy)
+		rdy <= 1'b0;
+	else if (set_rx_rdy)
+		rdy <= 1'b1;
 end
-	
-assign rdy = data_rdy?(clr_rdy? 0: 1):0; //output logic of rdy signal
+
+//double flop RX for meta-stability 
+always_ff @(posedge clk, negedge rst_n) begin 
+	if(!rst_n) begin
+		rx_ff1 <= 1'b1; 
+		rx_ff2 <= 1'b1;
+	end else begin
+		rx_ff1 <= RX; 
+		rx_ff2 <= rx_ff1;
+	end
+end 
 
 //state machine
 always @(posedge clk, negedge rst_n)
@@ -57,40 +74,31 @@ always @(posedge clk, negedge rst_n)
 	else
 		state<=next_state;
 
+assign rx_data = shift_reg[7:0];
+
 //state machine logic
 always_comb begin
-	shift = 1'b0;		//reset shif sinal at every iteration
+	start = 0;
+	set_rx_rdy = 0;
+	receiving = 0;
+	next_state = IDLE ;
 	case(state)
 	IDLE:	begin
-		bit_rst = 1'b1;
-		baud_rst = 1'b1;
-		if (!rst_n) begin		//reset state to IDLE if rst_n is low
-			next_state = IDLE;
-		end
-		else if (trigger) begin		//if falling edge of RX is detect, start reading
-			bit_rst = 1'b0;
-			baud_rst = 1'b1;
-			data_rdy = 1'b0;
+		if(!rx_ff2) begin
 			next_state = LOAD;
-		end
-		else
-			next_state = IDLE;
+			start = 1;
+		end else
+		next_state = IDLE;
 	end
 		
-	LOAD:
-		if (bit_counter==4'b1000) begin //if loading is finished, return to IDLE state
+	LOAD: begin
+		if (bit_counter == 4'b1010) begin
+			set_rx_rdy = 1;
 			next_state = IDLE;
-			data_rdy = 1'b1;	
-		end
-		else if (baud_cnt==7'b1101101) begin //if baud rate is 109, go to next bit
-			baud_rst = 1'b1;
-			shift=1'b1;
-			next_state =LOAD;
-		end
-		else begin		 		//reading one bit within determined baud rate
-			baud_rst = 1'b0;
-			next_state= LOAD;
-		end
+		end else
+			next_state = LOAD;
+		receiving = 1;
+	end 	
 	endcase
 end
 		

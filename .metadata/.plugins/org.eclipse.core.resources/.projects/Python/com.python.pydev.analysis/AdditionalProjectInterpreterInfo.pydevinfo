@@ -2,128 +2,225 @@
 -- START DISKCACHE_2
 D:\CsCourse\.metadata\.plugins\org.eclipse.core.resources\.projects\python\com.python.pydev.analysis\v2_indexcache
 mergeList|1456548156560088000|D:\pro\Python Practice\mergeList.py
+scrapy.dirbot.dirbot.spiders.dmoz|1459645250450753000|D:\pro\Python Practice\scrapy\dirbot\dirbot\spiders\dmoz.py
+minion|1458928449337498000|D:\pro\Python Practice\minion.py
+scrapy.tutorial.tutorial.__init__|1459544010520743000|D:\pro\Python Practice\scrapy\tutorial\tutorial\__init__.py
+scrapy.tutorial.tutorial.spiders.__init__|1459544010520743000|D:\pro\Python Practice\scrapy\tutorial\tutorial\spiders\__init__.py
+patchArray|1457328143744405000|D:\pro\Python Practice\patchArray.py
+PygLatin|1458323527325492000|D:\pro\Python Practice\PygLatin.py
+threeSum|1456692646650907000|D:\pro\Python Practice\threeSum.py
+hammingWeight|1458793382039394000|D:\pro\Python Practice\hammingWeight.py
+intIsPalindrome|1456593136467717000|D:\pro\Python Practice\intIsPalindrome.py
+Vacation|1455860003742765000|D:\pro\Python Practice\Vacation.py
+hash_it_out|1458965507239948000|D:\pro\Python Practice\hash_it_out.py
+Market|1455860003739242000|D:\pro\Python Practice\Market.py
+when_it_rains|1458958522072633000|D:\pro\Python Practice\when_it_rains.py
+summaryRanges|1456815382518172000|D:\pro\Python Practice\summaryRanges.py
+peekIterator|1458751220284744000|D:\pro\Python Practice\peekIterator.py
+addTwoNumbers|1456546926911835000|D:\pro\Python Practice\addTwoNumbers.py
+removeNthFromEnd|1456815490481502000|D:\pro\Python Practice\removeNthFromEnd.py
 functional|1455860003766138000|D:\pro\Python Practice\functional.py
 zigzagConvert|1456592489278749000|D:\pro\Python Practice\zigzagConvert.py
-Vacation|1455860003742765000|D:\pro\Python Practice\Vacation.py
-longestPalindrome|1456587951691450000|D:\pro\Python Practice\longestPalindrome.py
+scrapy.dirbot.setup|1459645250451053000|D:\pro\Python Practice\scrapy\dirbot\setup.py
+H_index|1458397269778399000|D:\pro\Python Practice\H_index.py
+weird_breeding|1459398542949592000|D:\pro\Python Practice\weird_breeding.py
+rotateArray|1456815587808215000|D:\pro\Python Practice\rotateArray.py
+zombit_infection|1458930747530958000|D:\pro\Python Practice\zombit_infection.py
 mostWater|1456601653450959000|D:\pro\Python Practice\mostWater.py
-threeSumCloest|1456698265429633000|D:\pro\Python Practice\threeSumCloest.py
 generator|1455865678360292000|D:\pro\Python Practice\generator.py
+scrapy.dirbot.dirbot.spiders.__init__|1459645250450536000|D:\pro\Python Practice\scrapy\dirbot\dirbot\spiders\__init__.py
 learning|1455865424832356000|D:\pro\Python Practice\learning.py
-Market|1455860003739242000|D:\pro\Python Practice\Market.py
-twoSum|1456546808558079000|D:\pro\Python Practice\twoSum.py
-findMedianSortedArrays|1456547456394807000|D:\pro\Python Practice\findMedianSortedArrays.py
+scrapy.tutorial.tutorial.pipelines|1459544074531733000|D:\pro\Python Practice\scrapy\tutorial\tutorial\pipelines.py
 reverseInt|1456592401494273000|D:\pro\Python Practice\reverseInt.py
+countingBits|1458791977983930000|D:\pro\Python Practice\countingBits.py
+scrapy.tutorial.tutorial.items|1459614391444579000|D:\pro\Python Practice\scrapy\tutorial\tutorial\items.py
+sortList|1456684971200702000|D:\pro\Python Practice\sortList.py
+scrapy.tutorial.tutorial.settings|1459544074530368000|D:\pro\Python Practice\scrapy\tutorial\tutorial\settings.py
+scrapy.dirbot.dirbot.items|1459645250449927000|D:\pro\Python Practice\scrapy\dirbot\dirbot\items.py
+scrapy.dirbot.dirbot.__init__|1459645250449738000|D:\pro\Python Practice\scrapy\dirbot\dirbot\__init__.py
+rotateRight|1456815535075396000|D:\pro\Python Practice\rotateRight.py
+longestPalindrome|1457479188768013000|D:\pro\Python Practice\longestPalindrome.py
+scrapy.dirbot.dirbot.settings|1459645250450225000|D:\pro\Python Practice\scrapy\dirbot\dirbot\settings.py
+threeSumCloest|1456698265429633000|D:\pro\Python Practice\threeSumCloest.py
+scrapy.dirbot.dirbot.pipelines|1459645250450068000|D:\pro\Python Practice\scrapy\dirbot\dirbot\pipelines.py
+findMedianSortedArrays|1456547456394807000|D:\pro\Python Practice\findMedianSortedArrays.py
+twoSum|1456546808558079000|D:\pro\Python Practice\twoSum.py
 Exception|1455860003737739000|D:\pro\Python Practice\Exception.py
+String_cleaning|1458961558955500000|D:\pro\Python Practice\String_cleaning.py
 intToRoman|1456605148915276000|D:\pro\Python Practice\intToRoman.py
 maxPoint|1456635109939703000|D:\pro\Python Practice\maxPoint.py
+scrapy.tutorial.tutorial.spiders.dmoz_spider|1459617891675923000|D:\pro\Python Practice\scrapy\tutorial\tutorial\spiders\dmoz_spider.py
 studnetTeacher_func|1455860003769664000|D:\pro\Python Practice\studnetTeacher_func.py
-PygLatin|1455860003740241000|D:\pro\Python Practice\PygLatin.py
-sortList|1456684971200702000|D:\pro\Python Practice\sortList.py
-addTwoNumbers|1456546926911835000|D:\pro\Python Practice\addTwoNumbers.py
-threeSum|1456692646650907000|D:\pro\Python Practice\threeSum.py
-intIsPalindrome|1456593136467717000|D:\pro\Python Practice\intIsPalindrome.py
 battleShip|1455860003763634000|D:\pro\Python Practice\battleShip.py
 lengthOfLongestSubstring|1456546795358552000|D:\pro\Python Practice\lengthOfLongestSubstring.py
 -- END DISKCACHE
 -- START DICTIONARY
-29
-18=mergeList
+61
+36=mergeList
+17=scrapy.dirbot.dirbot.spiders.dmoz
+4=minion
+22=patchArray
+19=PygLatin
+42=threeSum
+27=hammingWeight
+45=intIsPalindrome
+53=DmozItem
+56=PeekingIterator.peek
+20=Vacation
+52=DmozSpider
+58=PeekingIterator.next
+55=PeekingIterator.__init__
+7=hash_it_out
+48=PeekingIterator
+13=Market
+9=when_it_rains
+60=FilterWordsPipeline
+61=Point.__init__
+39=summaryRanges
+23=peekIterator
+21=addTwoNumbers
+44=removeNthFromEnd
 1=functional
-15=zigzagConvert
-21=mostWater
+32=zigzagConvert
+30=H_index
+6=weird_breeding
+5=zombit_infection
+29=rotateArray
+41=mostWater
 2=generator
-4=learning
-12=reverseInt
-28=ListNode.__init__
-7=PygLatin
-23=sortList
-22=threeSum
-24=intIsPalindrome
-27=Solution
-8=Vacation
-19=longestPalindrome
-17=threeSumCloest
-26=Point
-25=ListNode
-6=Market
-14=findMedianSortedArrays
-16=twoSum
-11=Exception
-20=intToRoman
-10=maxPoint
-29=Point.__init__
+54=Website
+10=learning
+46=scrapy.tutorial.tutorial.pipelines
+26=reverseInt
+35=countingBits
+57=ListNode.__init__
+16=scrapy.tutorial.tutorial.items
+43=sortList
+12=scrapy.tutorial.tutorial.settings
+51=Solution
+47=scrapy.dirbot.dirbot.items
+37=rotateRight
+38=longestPalindrome
+14=scrapy.dirbot.dirbot.settings
+33=threeSumCloest
+18=scrapy.dirbot.dirbot.pipelines
+50=Point
+49=ListNode
+31=findMedianSortedArrays
+34=twoSum
+25=Exception
+8=String_cleaning
+40=intToRoman
+24=maxPoint
+15=scrapy.tutorial.tutorial.spiders.dmoz_spider
 3=studnetTeacher_func
-9=addTwoNumbers
-5=battleShip
-13=lengthOfLongestSubstring
+11=battleShip
+59=TutorialPipeline
+28=lengthOfLongestSubstring
 -- END DICTIONARY
 -- START TREE 1
-44
+62
 L|1|L!11@
 L1|1|L1!19@
 L2|1|L2!19@
 ali|1|alice!27@
-app|1|application!34@
+ans|6|answer!34@answer!42@answer!50@answer!58@answer!66@answer!74@
+app|1|application!82@
 ave|1|average!26@
-boa|1|board!43@
-che|1|check_version!34@
+bin|1|bin_search!50@
+boa|1|board!91@
+bot|1|BOT_NAME!99@
+che|3|check_version!82@check!42@check!50@
 cla|1|class_avg!27@
-com|1|compute_bill!50@
-dec|1|decode!34@
-exe|1|EXEC!35@
+com|1|compute_bill!106@
+dec|1|decode!82@
+def|1|DEFAULT_ITEM_CLASS!115@
+dmo|3|DmozSpider!121@DmozItem!129@DmozSpider!137@
+enc|1|encode!58@
+exe|1|EXEC!83@
 f|1|f!10@
-fir|1|first!59@
-get|4|get_name!34@get_letter_grade!26@get_average!26@get_class_average!26@
-gue|2|guess_col!43@guess_row!43@
-hos|1|HOST!35@
-hot|1|hotel_cost!66@
-ind|1|INDEX!35@
+fil|1|FilterWordsPipeline!145@
+fin|0|
+fir|1|first!155@
+get|4|get_name!82@get_letter_grade!26@get_average!26@get_class_average!26@
+gue|2|guess_col!91@guess_row!91@
+hel|0|
+hos|1|HOST!83@
+hot|1|hotel_cost!162@
+ind|1|INDEX!83@
 is_|1|is_odd!10@
-lis|1|ListNode!73@
+ite|1|ITEM_PIPELINES!115@
+lis|1|ListNode!169@
 llo|1|lloyd!27@
-mai|1|main!34@
-new|1|new_word!59@
+mai|1|main!82@
+min|1|minPatches!178@
+mya|1|myans!51@
+new|3|new_word!155@NEWSPIDER_MODULE!115@NEWSPIDER_MODULE!99@
 not|1|not_empty!10@
-ori|1|original!59@
-pla|1|plane_ride_cost!66@
-poi|1|Point!81@
-por|1|PORT!35@
-pri|2|prices!51@print_board!42@
-pyg|1|pyg!59@
-r|1|r!91@
-ran|2|random_row!42@random_col!42@
-ren|1|rental_car_cost!66@
-rev|1|reverse!98@
-shi|2|ship_col!43@ship_row!43@
-sho|1|shopping_list!51@
-sol|15|Solution!105@Solution!113@Solution!121@Solution!129@Solution!137@Solution!81@Solution!145@Solution!97@Solution!153@Solution!161@Solution!169@Solution!177@Solution!73@Solution!185@Solution!193@
-sto|1|stock!51@
-tem|1|TEMP!35@
-tri|1|trip_cost!66@
+ori|1|original!155@
+pee|1|PeekingIterator!185@
+pla|1|plane_ride_cost!162@
+poi|1|Point!193@
+por|1|PORT!83@
+pri|2|prices!107@print_board!90@
+pyg|1|pyg!155@
+r|1|r!203@
+ran|2|random_row!90@random_col!90@
+rem|1|remove!66@
+ren|1|rental_car_cost!162@
+rev|1|reverse!210@
+shi|2|ship_col!91@ship_row!91@
+sho|1|shopping_list!107@
+sol|23|Solution!217@Solution!225@Solution!233@Solution!241@Solution!249@Solution!257@Solution!265@Solution!273@Solution!193@Solution!281@Solution!289@Solution!209@Solution!297@sol!51@Solution!305@Solution!313@Solution!321@Solution!329@Solution!337@Solution!169@Solution!345@Solution!353@Solution!361@
+spi|2|SPIDER_MODULES!99@SPIDER_MODULES!115@
+sto|1|stock!107@
+tem|1|TEMP!83@
+tri|1|trip_cost!162@
+tut|1|TutorialPipeline!369@
 tyl|1|tyler!27@
-wor|1|word!59@
-wri|1|write_py!34@
+web|1|Website!377@
+wor|1|word!155@
+wri|1|write_py!82@
+x|1|x!51@
 -- END TREE
 -- START TREE 2
-19
-__i|2|__init__!25&74@__init__!26&82@
-add|1|addTwoNumbers!27&74@
-con|1|convert!27&122@
-fin|1|findMedianSortedArrays!27&114@
-int|1|intToRoman!27&162@
-isp|1|isPalindrome!27&194@
-len|2|lengthOfLongestSubstring!27&106@lengthOfLongestSubstring_better!27&106@
-lon|1|longestPalindrome!27&154@
-ls|1|ls!27&83@
-max|2|maxArea!27&170@maxPoints!27&82@
-mer|1|merge!27&146@
-nex|1|next!28&75@
-rev|2|reverse!27&98@rev!27&99@
-sor|1|sortList!27&186@
-thr|2|threeSum!27&178@threeSumClosest!27&138@
-two|1|twoSum!27&130@
-val|1|val!28&75@
-x|1|x!29&83@
-y|1|y!29&83@
+38
+__i|3|__init__!48&186@__init__!49&170@__init__!50&194@
+add|1|addTwoNumbers!51&170@
+all|2|allowed_domains!52&123@allowed_domains!52&139@
+con|1|convert!51&258@
+cou|1|countBits!51&282@
+des|2|desc!53&131@description!54&379@
+fin|1|findMedianSortedArrays!51&250@
+ham|1|hammingWeight!51&218@
+has|1|hasNext!48&186@
+hin|1|hIndex!51&242@
+int|1|intToRoman!51&322@
+isp|1|isPalindrome!51&362@
+ite|2|iterator!55&187@item!56&187@
+len|2|lengthOfLongestSubstring!51&226@lengthOfLongestSubstring_better!51&226@
+lin|1|link!53&131@
+lon|1|longestPalindrome!51&306@
+ls|1|ls!51&195@
+max|2|maxPoints!51&194@maxArea!51&330@
+mer|1|merge!51&290@
+nam|3|name!52&139@name!54&379@name!52&123@
+nex|2|next!48&186@next!57&171@
+par|2|parse!52&138@parse!52&122@
+pee|4|peek!48&186@peeked!55&187@peeked!56&187@peeked!58&187@
+pro|2|process_item!59&370@process_item!60&146@
+rem|1|removeNthFromEnd!51&354@
+rev|2|rev!51&211@reverse!51&210@
+rot|2|rotateRight!51&298@rotate!51&234@
+sor|1|sortList!51&346@
+sta|2|start_urls!52&123@start_urls!52&139@
+sum|1|summaryRanges!51&314@
+thr|2|threeSumClosest!51&266@threeSum!51&338@
+tit|1|title!53&131@
+two|1|twoSum!51&274@
+url|1|url!54&379@
+val|1|val!57&171@
+wor|1|words_to_filter!60&147@
+x|1|x!61&195@
+y|1|y!61&195@
 -- END TREE
