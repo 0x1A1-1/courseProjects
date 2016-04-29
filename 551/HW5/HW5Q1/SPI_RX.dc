@@ -1,0 +1,45 @@
+#read in verilog file first# 
+read_file -format Sverilog {./SPI_RX.sv}
+
+#set current design to top level#
+set current_design SPI_RX
+
+#clk setting#
+create_clock -name "clk" -period 2 -waveform {0 1} {clk}
+
+#set dont touch#
+set_dont_touch_network [find port clk]
+
+#constrain input timing & drive#
+set prim_inputs [remove_from_collection [all_inputs] [find port clk]]
+set_input_delay -clock clk 0.5 $prim_inputs
+
+set all_inputs_no_rst_or_clk [remove_from_collection [remove_from_collection [all_inputs][find port clk]][find port rst_n]]
+set_driving_cell -lib_cell ND2D2BWP -library tcbn40lpbwptc $all_inputs_no_rst_or_clk
+#set_driving_cell -lib_cell ND2D2BWP -from_pin A1 -library tcbn40lpbwptc $prim_inputs
+#set_drive 0.1 rst_n
+
+#constrain output timing#
+set_output_delay -clock clk 0.75 [all_outputs]
+set_load 0.15 [all_outputs]
+
+#set wireload & tranisiton time#
+set_wire_load_model -name TSMC32K_Lowk_Conservative -library tcbn40lpbwptc
+set_max_transition 0.15 [current_design]
+
+#compile the design#
+compile -map_effort medium
+
+#flatten hierarchy
+ungroup -all -flatten
+
+#2nd compile
+compile -map_effort medium
+
+#generate timing & area reports
+report_timing -delay max > max_delay.rpt
+report_timing -delay min > min_delay.rpt
+report_area > UART_area.txt
+
+#write out resulting synthesized netlist#
+write -format verilog SPI_RX -output SPI_RX.vg

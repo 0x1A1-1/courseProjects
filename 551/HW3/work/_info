@@ -1,0 +1,341 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dD:/CsCourse/ECE551/HW3
+vdual_PWM
+Z1 DXx6 sv_std 3 std 0 22 WmjPaeP=7F5?QFXzJ>D[Q2
+Z2 !s110 1456877819
+!i10b 1
+!s100 [omACRzGcHkecnRTn]Y5R2
+IYR9GYb54;aZIjAADg55=X2
+Z3 VDg1SIo80bB@j0V0VzS_@n1
+!s105 dual_PWM_sv_unit
+S1
+R0
+Z4 w1456451541
+8D:/CsCourse/ECE551/HW3/dual_PWM.sv
+FD:/CsCourse/ECE551/HW3/dual_PWM.sv
+L0 1
+Z5 OP;L;10.4a;61
+r1
+!s85 0
+31
+!s108 1456877818.000000
+!s107 D:/CsCourse/ECE551/HW3/dual_PWM.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW3/dual_PWM.sv|
+!s101 -O0
+!i113 1
+Z6 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact -O0
+ndual_@p@w@m
+vdual_PWM_tb
+R2
+!i10b 1
+!s100 eO1G13C9ei0=KULijN]?Q0
+If]P:Jk[A_ael<l1N4I04f0
+R3
+R0
+R4
+8D:/CsCourse/ECE551/HW3/dual_PWM_tb.v
+FD:/CsCourse/ECE551/HW3/dual_PWM_tb.v
+L0 1
+R5
+r1
+!s85 0
+31
+Z7 !s108 1456877819.000000
+!s107 D:/CsCourse/ECE551/HW3/dual_PWM_tb.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/CsCourse/ECE551/HW3/dual_PWM_tb.v|
+!s101 -O0
+!i113 1
+Z8 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact -O0
+ndual_@p@w@m_tb
+vpwm8
+R1
+R2
+!i10b 1
+!s100 `Q7DC0gE8LSoeGOY>UTlV3
+I9RS02[jI3:d3a9Dz6Rc320
+R3
+!s105 pwm8_sv_unit
+S1
+R0
+Z9 w1456451542
+8D:/CsCourse/ECE551/HW3/pwm8.sv
+FD:/CsCourse/ECE551/HW3/pwm8.sv
+L0 1
+R5
+r1
+!s85 0
+31
+R7
+!s107 D:/CsCourse/ECE551/HW3/pwm8.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW3/pwm8.sv|
+!s101 -O0
+!i113 1
+R6
+vpwm8_tb
+Z10 !s110 1456877820
+!i10b 1
+!s100 HV<M8L;6Sm7_nOag:12gc0
+IIjk1NUGaJkim^oZ66PUhQ1
+R3
+R0
+R9
+8D:/CsCourse/ECE551/HW3/pwm8_tb.v
+FD:/CsCourse/ECE551/HW3/pwm8_tb.v
+L0 1
+R5
+r1
+!s85 0
+31
+Z11 !s108 1456877820.000000
+!s107 D:/CsCourse/ECE551/HW3/pwm8_tb.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/CsCourse/ECE551/HW3/pwm8_tb.v|
+!s101 -O0
+!i113 1
+R8
+vss_A2D
+R10
+!i10b 1
+!s100 iI4[IHbbC?D4<TP@K8Uan0
+ICcEC6hOD[@2fQCl:hZNDO2
+R3
+R0
+Z12 w1456451547
+8D:/CsCourse/ECE551/HW3/ss_A2D.v
+FD:/CsCourse/ECE551/HW3/ss_A2D.v
+L0 1
+R5
+r1
+!s85 0
+31
+R11
+!s107 D:/CsCourse/ECE551/HW3/ss_A2D.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/CsCourse/ECE551/HW3/ss_A2D.v|
+!s101 -O0
+!i113 1
+R8
+nss_@a2@d
+vss_A2D_datapath
+R10
+!i10b 1
+!s100 `6JhgMhkW8gHk<H7?SL2G0
+INoAzOTS1@Gg4[z:1WkVR80
+R3
+R0
+R12
+8D:/CsCourse/ECE551/HW3/ss_A2D_datapath.v
+FD:/CsCourse/ECE551/HW3/ss_A2D_datapath.v
+L0 1
+R5
+r1
+!s85 0
+31
+R11
+!s107 D:/CsCourse/ECE551/HW3/ss_A2D_datapath.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/CsCourse/ECE551/HW3/ss_A2D_datapath.v|
+!s101 -O0
+!i113 1
+R8
+nss_@a2@d_datapath
+vss_A2D_SM
+R1
+R10
+!i10b 1
+!s100 VPI9?P;IGOOJ>c79?[eWe3
+I5ijPQIi>OIM>KZ_S[_l0k2
+R3
+!s105 ss_A2D_SM_sv_unit
+S1
+R0
+R12
+8D:/CsCourse/ECE551/HW3/ss_A2D_SM.sv
+FD:/CsCourse/ECE551/HW3/ss_A2D_SM.sv
+L0 1
+R5
+r1
+!s85 0
+31
+R11
+!s107 D:/CsCourse/ECE551/HW3/ss_A2D_SM.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW3/ss_A2D_SM.sv|
+!s101 -O0
+!i113 1
+R6
+nss_@a2@d_@s@m
+vss_A2D_tb
+Z13 !s110 1456877821
+!i10b 1
+!s100 Z5Kbk:7chaz`6_2^>;>Za0
+IegZm9J5Ub=J<=cVgN883d3
+R3
+R0
+R12
+8D:/CsCourse/ECE551/HW3/ss_A2D_tb.v
+FD:/CsCourse/ECE551/HW3/ss_A2D_tb.v
+L0 1
+R5
+r1
+!s85 0
+31
+Z14 !s108 1456877821.000000
+!s107 D:/CsCourse/ECE551/HW3/ss_A2D_tb.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/CsCourse/ECE551/HW3/ss_A2D_tb.v|
+!s101 -O0
+!i113 1
+R8
+nss_@a2@d_tb
+vtrigger_logic
+R1
+R13
+!i10b 1
+!s100 j967?eGIT[fz=W5hKXl2K2
+IIQHBjCEO>CG>R]mEeMG_22
+R3
+!s105 trigger_logic_sv_unit
+S1
+R0
+R12
+8D:/CsCourse/ECE551/HW3/trigger_logic.sv
+FD:/CsCourse/ECE551/HW3/trigger_logic.sv
+L0 1
+R5
+r1
+!s85 0
+31
+R14
+!s107 D:/CsCourse/ECE551/HW3/trigger_logic.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW3/trigger_logic.sv|
+!s101 -O0
+!i113 1
+R6
+vtrigger_logic_tb
+R1
+R13
+!i10b 1
+!s100 H9ImAD:lYPP^dhhUZnKVV1
+IWh66YV<dND2B=@TAVnPmB1
+R3
+!s105 trigger_logic_tb_sv_unit
+S1
+R0
+R12
+8D:/CsCourse/ECE551/HW3/trigger_logic_tb.sv
+FD:/CsCourse/ECE551/HW3/trigger_logic_tb.sv
+L0 1
+R5
+r1
+!s85 0
+31
+R14
+!s107 D:/CsCourse/ECE551/HW3/trigger_logic_tb.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW3/trigger_logic_tb.sv|
+!s101 -O0
+!i113 1
+R6
+vUART_rx
+R1
+!s110 1456879542
+!i10b 1
+!s100 15`nJJKdh_a_ZP@YgFhC32
+IR@?mUaGCfKZ?aGY:^9EzF2
+R3
+!s105 UART_rx_sv_unit
+S1
+R0
+w1456879503
+8D:/CsCourse/ECE551/HW3/UART_rx.sv
+FD:/CsCourse/ECE551/HW3/UART_rx.sv
+L0 1
+R5
+r1
+!s85 0
+31
+!s108 1456879542.000000
+!s107 D:/CsCourse/ECE551/HW3/UART_rx.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW3/UART_rx.sv|
+!s101 -O0
+!i113 1
+R6
+n@u@a@r@t_rx
+vUART_rx_tb
+R1
+!s110 1456880241
+!i10b 1
+!s100 SkYB@j^1A=[J4BK0SH^FI1
+IKf2XfBG`JZ;3e9XMjNj5]2
+R3
+!s105 UART_rx_tb_sv_unit
+S1
+R0
+w1456880232
+8D:/CsCourse/ECE551/HW3/UART_rx_tb.sv
+FD:/CsCourse/ECE551/HW3/UART_rx_tb.sv
+L0 1
+R5
+r1
+!s85 0
+31
+!s108 1456880241.000000
+!s107 D:/CsCourse/ECE551/HW3/UART_rx_tb.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW3/UART_rx_tb.sv|
+!s101 -O0
+!i113 1
+R6
+n@u@a@r@t_rx_tb
+vUART_tx
+R1
+Z15 !s110 1456877822
+!i10b 1
+!s100 UNkog:Mk>V9GZDeCZiSXK1
+IadkQS_MLie^SF2?=PKgOL3
+R3
+!s105 UART_tx_sv_unit
+S1
+R0
+Z16 w1456877607
+8D:/CsCourse/ECE551/HW3/UART_tx.sv
+FD:/CsCourse/ECE551/HW3/UART_tx.sv
+L0 1
+R5
+r1
+!s85 0
+31
+R14
+!s107 D:/CsCourse/ECE551/HW3/UART_tx.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW3/UART_tx.sv|
+!s101 -O0
+!i113 1
+R6
+n@u@a@r@t_tx
+vUART_tx_tb
+R1
+R15
+!i10b 1
+!s100 k[IYWf1MdTHi2e?@V4oGO1
+IBeWDjNoEFB=K1@2:]J]9<2
+R3
+!s105 UART_tx_tb_sv_unit
+S1
+R0
+R16
+8D:/CsCourse/ECE551/HW3/UART_tx_tb.sv
+FD:/CsCourse/ECE551/HW3/UART_tx_tb.sv
+L0 1
+R5
+r1
+!s85 0
+31
+!s108 1456877822.000000
+!s107 D:/CsCourse/ECE551/HW3/UART_tx_tb.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW3/UART_tx_tb.sv|
+!s101 -O0
+!i113 1
+R6
+n@u@a@r@t_tx_tb

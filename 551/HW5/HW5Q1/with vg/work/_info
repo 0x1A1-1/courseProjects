@@ -1,0 +1,79 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dD:/CsCourse/ECE551/HW5Q1
+vSPI_mstr
+Z0 !s110 1460574660
+!i10b 1
+!s100 ?loV]9R8LiTMhUh;k5]<I2
+IHHAY5@9KTdK46A6Nf5H4J3
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+Z2 dD:/CsCourse/ECE551/HW5Q1/with vg
+w1460573350
+8D:/CsCourse/ECE551/HW5Q1/with vg/SPI_mstr.v
+FD:/CsCourse/ECE551/HW5Q1/with vg/SPI_mstr.v
+L0 9
+Z3 OP;L;10.4a;61
+r1
+!s85 0
+31
+Z4 !s108 1460574660.000000
+!s107 D:/CsCourse/ECE551/HW5Q1/with vg/SPI_mstr.v|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/CsCourse/ECE551/HW5Q1/with vg/SPI_mstr.v|
+!s101 -O0
+!i113 1
+Z5 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact -O0
+n@s@p@i_mstr
+vSPI_RX
+R0
+!i10b 1
+!s100 3^hOHEk=ZlT`UOV`:DB:c3
+IC?@O[]FhC64[hbl6Z<aA<1
+R1
+R2
+w1460573707
+8D:/CsCourse/ECE551/HW5Q1/with vg/SPI_RX.vg
+FD:/CsCourse/ECE551/HW5Q1/with vg/SPI_RX.vg
+L0 2
+R3
+r1
+!s85 0
+31
+R4
+!s107 D:/CsCourse/ECE551/HW5Q1/with vg/SPI_RX.vg|
+!s90 -reportprogress|300|-work|work|-stats=none|D:/CsCourse/ECE551/HW5Q1/with vg/SPI_RX.vg|
+!s101 -O0
+!i113 1
+R5
+n@s@p@i_@r@x
+vSPI_tb
+DXx6 sv_std 3 std 0 22 WmjPaeP=7F5?QFXzJ>D[Q2
+R0
+!i10b 1
+!s100 BYK`1>=PAd4WeZARazhkJ1
+IML7Z7VC98DhA>^HM1jNPM1
+R1
+!s105 SPI_tb_sv_unit
+S1
+R2
+w1460522161
+8D:/CsCourse/ECE551/HW5Q1/with vg/SPI_tb.sv
+FD:/CsCourse/ECE551/HW5Q1/with vg/SPI_tb.sv
+L0 2
+R3
+r1
+!s85 0
+31
+R4
+!s107 D:/CsCourse/ECE551/HW5Q1/with vg/SPI_tb.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|D:/CsCourse/ECE551/HW5Q1/with vg/SPI_tb.sv|
+!s101 -O0
+!i113 1
+o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact -O0
+n@s@p@i_tb
